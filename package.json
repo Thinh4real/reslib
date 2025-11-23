@@ -1,0 +1,230 @@
+{
+  "name": "reslib",
+  "version": "1.0.0",
+  "description": "A lightweight, production-ready TypeScript library for decorator-based resource management and application utilities. ResLib provides a modular framework for building scalable applications with features like authentication, internationalization, validation, session management, and observable patterns. Designed for flexibility, it works seamlessly across web, Node.js, React Native (including Expo), and server-side frameworks like NestJS, offering type safety, extensibility, and performance optimizations without platform-specific dependencies.",
+  "exports": {
+    "./auth": {
+      "types": "./build/auth/index.d.ts",
+      "import": "./lib/esm/auth.mjs",
+      "require": "./lib/cjs/auth.js"
+    },
+    "./countries": {
+      "types": "./build/countries/index.d.ts",
+      "import": "./lib/esm/countries.mjs",
+      "require": "./lib/cjs/countries.js"
+    },
+    "./currency": {
+      "types": "./build/currency/index.d.ts",
+      "import": "./lib/esm/currency.mjs",
+      "require": "./lib/cjs/currency.js"
+    },
+    "./i18n": {
+      "types": "./build/i18n/index.d.ts",
+      "import": "./lib/esm/i18n.mjs",
+      "require": "./lib/cjs/i18n.js"
+    },
+    "./inputFormatter": {
+      "types": "./build/inputFormatter/index.d.ts",
+      "import": "./lib/esm/inputFormatter.mjs",
+      "require": "./lib/cjs/inputFormatter.js"
+    },
+    "./logger": {
+      "types": "./build/logger/index.d.ts",
+      "import": "./lib/esm/logger.mjs",
+      "require": "./lib/cjs/logger.js"
+    },
+    "./observable": {
+      "types": "./build/observable/index.d.ts",
+      "import": "./lib/esm/observable.mjs",
+      "require": "./lib/cjs/observable.js"
+    },
+    "./platform": {
+      "types": "./build/platform/index.d.ts",
+      "import": "./lib/esm/platform.mjs",
+      "require": "./lib/cjs/platform.js"
+    },
+    "./resources": {
+      "types": "./build/resources/index.d.ts",
+      "import": "./lib/esm/resources.mjs",
+      "require": "./lib/cjs/resources.js"
+    },
+    "./session": {
+      "types": "./build/session/index.d.ts",
+      "import": "./lib/esm/session.mjs",
+      "require": "./lib/cjs/session.js"
+    },
+    "./utils": {
+      "types": "./build/utils/index.d.ts",
+      "import": "./lib/esm/utils.mjs",
+      "require": "./lib/cjs/utils.js"
+    },
+    "./types": {
+      "types": "./build/types/index.d.ts",
+      "import": "./lib/esm/types.mjs",
+      "require": "./lib/cjs/types.js"
+    },
+    "./validator": {
+      "types": "./build/validator/index.d.ts",
+      "import": "./lib/esm/validator.mjs",
+      "require": "./lib/cjs/validator.js"
+    },
+    "./build/*": {
+      "types": "./build/*",
+      "import": "./build/*",
+      "require": "./build/*"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "auth": [
+        "./build/auth/index.d.ts"
+      ],
+      "countries": [
+        "./build/countries/index.d.ts"
+      ],
+      "currency": [
+        "./build/currency/index.d.ts"
+      ],
+      "i18n": [
+        "./build/i18n/index.d.ts"
+      ],
+      "inputFormatter": [
+        "./build/inputFormatter/index.d.ts"
+      ],
+      "logger": [
+        "./build/logger/index.d.ts"
+      ],
+      "observable": [
+        "./build/observable/index.d.ts"
+      ],
+      "platform": [
+        "./build/platform/index.d.ts"
+      ],
+      "resources": [
+        "./build/resources/index.d.ts"
+      ],
+      "session": [
+        "./build/session/index.d.ts"
+      ],
+      "utils": [
+        "./build/utils/index.d.ts"
+      ],
+      "types": [
+        "./build/types/index.d.ts"
+      ],
+      "validator": [
+        "./build/validator/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "build",
+    "lib",
+    "docs",
+    "readme.md",
+    "package.json"
+  ],
+  "scripts": {
+    "clear-npx-cache": "npx clear-npx-cache",
+    "pretest": "npm run build-test",
+    "build": "tsup --config tsup.config.build.ts",
+    "build-dts": "tsc -p tsconfig.dts.json && npx tsc-alias -p tsconfig.dts.json",
+    "build-test": "tsup --config tsup.config.test.ts",
+    "clean": "npx rimraf build dist",
+    "dev": "tsup --config tsup.config.build.ts --watch",
+    "test": "npx jest",
+    "start": "node build/test/index",
+    "prepublishOnly": "npm run build",
+    "build-doc": "npx typedoc",
+    "check": "npm pack --dry-run",
+    "publish:canary": "npm publish --tag canary",
+    "publish:beta": "npm publish --tag beta",
+    "publish:latest": "npm publish",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish",
+    "check:updates": "npx npm-check-updates",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/google-libphonenumber": "^7.4.30",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "@types/qs": "^6.14.0",
+    "@types/validator": "^13.15.10",
+    "concurrently": "^9.2.1",
+    "fast-glob": "^3.3.3",
+    "jest": "^30.2.0",
+    "rimraf": "^6.1.2",
+    "ts-jest": "^29.4.5",
+    "ts-patch": "^3.3.0",
+    "tsc-alias": "^1.8.16",
+    "tsup": "^8.5.1",
+    "typedoc": "^0.28.14",
+    "conventional-changelog-cli": "^5.0.0"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "i18n-js": "^4.5.1",
+    "moment": "^2.30.1",
+    "qs": "^6.14.0",
+    "reflect-metadata": "^0.2.2",
+    "stable-hash": "^0.0.6"
+  },
+  "peerDependencies": {
+    "reflect-metadata": "^0.2.2",
+    "google-libphonenumber": "*",
+    "validator": "*"
+  },
+  "peerDependenciesMeta": {},
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "TypeScript",
+    "Decorators",
+    "Modular",
+    "Architecture",
+    "Extensible",
+    "Library",
+    "Custom",
+    "Field",
+    "Types",
+    "Type",
+    "Safety",
+    "API",
+    "Development",
+    "Code",
+    "Organization",
+    "Application",
+    "Scalability",
+    "Dynamic",
+    "Ecosystem",
+    "Clean",
+    "Code",
+    "Object-Oriented",
+    "Programming",
+    "Developer-Friendly",
+    "Open",
+    "Source",
+    "Resource Management",
+    "i18n",
+    "Validation",
+    "Authentication",
+    "Session Management",
+    "Observable",
+    "Cross-Platform"
+  ],
+  "author": "Boris Fouomene",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boris-fouomene/reslib.git"
+  },
+  "bugs": {
+    "url": "https://github.com/boris-fouomene/reslib/issues"
+  },
+  "homepage": "https://github.com/boris-fouomene/reslib#readme",
+  "npmClient": "npm"
+}

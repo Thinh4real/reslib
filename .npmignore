@@ -1,0 +1,27 @@
+# Ignore node_modules (just in case)
+node_modules/
+
+# Ignore specific folders
+test/
+src/
+docs/
+dist/
+jest.config.js
+vite.config.*
+# Ignore specific files
+.env
+*.log
+.rollup.cache
+.rename-mjs.js
+rollup*
+tsconfig*
+# Ignore test files
+**/*.test.ts
+**/*.test.js
+**/__tests__/
+jest.config.ts
+
+# Ignore Jest cache & coverage reports
+coverage/
+.jest-cache/
+# Ignore any other file patterns you don't want to include

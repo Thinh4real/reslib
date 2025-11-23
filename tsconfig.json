@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "skipDefaultLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsxImportSource": "react",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true, // Allow interoperability with CommonJS modules
+    "allowJs": true,
+    "resolveJsonModule": false,
+    "target": "es2020", // Or the desired target
+    "module": "node16", // Enables ESM & CJS interop
+    "moduleResolution": "node16",
+    "removeComments": true,
+    "sourceMap": false,
+    "declarationMap": false,
+    "incremental": false,
+    "composite": false,
+    "strict": true,
+    "noEmitOnError": true,
+    "noEmit": false,
+    "noLib": false,
+    "jsx": "preserve",
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "lib": ["DOM", "ESNext"],
+    //previous options
+    "declaration": true,
+    "rootDir": "./src",
+    "outDir": "./build",
+    "paths": {
+      "@logger": ["./src/logger"],
+      "@countries/*": ["./src/countries/*"],
+      "@countries": ["./src/countries"],
+      "@utils/*": ["./src/utils/*"],
+      "@session/*": ["./src/session/*"],
+      "@resources/*": ["./src/resources/*"],
+      "@validator/*": ["./src/validator/*"],
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist", "build"]
+}
