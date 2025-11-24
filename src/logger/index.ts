@@ -1,7 +1,7 @@
 import { DateHelper } from '@utils/date';
 import { defaultStr } from '@utils/defaultStr';
 import 'reflect-metadata';
-import { IClassConstructor } from '../types/index';
+import { ClassConstructor } from '../types/index';
 
 /**
  * Represents a logger that provides logging functionalities with different log levels.
@@ -332,7 +332,7 @@ const isValidLogger = (logger?: ILogger): boolean => {
  * ```
  */
 export function AttachLogger() {
-  return function (target: IClassConstructor<ILogger>) {
+  return function (target: ClassConstructor<ILogger>) {
     try {
       const logger = new target();
       if (!isValidLogger(logger)) {

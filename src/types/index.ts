@@ -1,11 +1,10 @@
-export * from "./date";
-export * from "./dictionary";
-export * from "./i18n";
-export * from "./percentage";
+export * from './date';
+export * from './dictionary';
+export * from './i18n';
 /**
- * @typedef IPrimitive
+ * @typedef Primitive
  * @description
- * The `IPrimitive` type represents a union of the basic primitive data types in TypeScript.
+ * The `Primitive` type represents a union of the basic primitive data types in TypeScript.
  * It can be one of the following types:
  * - `string`: Represents textual data.
  * - `number`: Represents numeric values, both integers and floating-point numbers.
@@ -15,8 +14,8 @@ export * from "./percentage";
  * any of these primitive types, providing flexibility in your code.
  *
  * @example
- * // Example of using IPrimitive in a function
- * function logValue(value: IPrimitive): void {
+ * // Example of using Primitive in a function
+ * function logValue(value: Primitive): void {
  *     console.log(`The value is: ${value}`);
  * }
  *
@@ -25,18 +24,16 @@ export * from "./percentage";
  * logValue(true);             // Logs: The value is: true
  *
  * @example
- * // Example of using IPrimitive in a variable
- * let myValue: IPrimitive;
+ * // Example of using Primitive in a variable
+ * let myValue: Primitive;
  * myValue = "A string"; // Valid
  * myValue = 100;        // Valid
  * myValue = false;      // Valid
  *
- * // myValue = [];      // Error: Type 'never[]' is not assignable to type 'IPrimitive'.
+ * // myValue = [];      // Error: Type 'never[]' is not assignable to type 'Primitive'.
  *
  */
-export type IPrimitive = string | number | boolean;
-
-export * from "./merge";
+export type Primitive = string | number | boolean;
 
 /**
  * A type that represents a constructor function that can be instantiated with any number of arguments.
@@ -45,12 +42,12 @@ export * from "./merge";
  * @template D -  A tuple representing the types of the constructor parameters.
  * @example
  * ```typescript
- * // Example of using IClassConstructor
+ * // Example of using ClassConstructor
  * class MyController {
  *   constructor(private readonly service: MyService) { }
  * }
  * 
- * const controllerClass: IClassConstructor<MyController> = MyController;
+ * const controllerClass: ClassConstructor<MyController> = MyController;
  * ```
  * type ExampleControllerType = IClassController<ExampleController, [ExampleService]>;
  * const ExampleControllerClass: ExampleControllerType = ExampleController;
@@ -58,35 +55,12 @@ export * from "./merge";
   const exampleService = new ExampleService();
   const exampleController = new ExampleControllerClass(exampleService);
  */
-export interface IClassConstructor<T = any, D extends any[] = any[]>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface ClassConstructor<T = unknown, D extends any[] = any[]>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   extends Function {
   new (...args: D): T;
 }
-
-/**
- * A renderer function type that renders a given value of type `InputType` into a value of type `OutputType`.
- * 
- * This type is used to define renderers for different value types (e.g., number, string)
- * within various components (e.g., `datagridCell`, `formField`). The renderer function
- * receives a value and returns an HTML string or a ReactNode or other content representing that value.
- * 
- * @template InputType - The type of the value to be rendered.
-   @template OutputType - The type of the rendered value.
- * @param {InputType} value - The value to render.
- * @returns {OutputType} - The content representation of the rendered value.
- * 
- * ## Example:
- * 
- * ```typescript
- * const numberRenderer: ITypeRegistryRenderer<number,string> = (value: number) => {
- *   return `<div class="cell number">${value}</div>`;
- * };
- * console.log(numberRenderer(123)); // Output: <div class="cell number">123</div>
- * ```
- */
-export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (
-  value: InputType
-) => OutputType;
 
 /**
  * ## Make Optional Utility Type
@@ -118,7 +92,7 @@ export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (
  * }
  *
  * // Make only 'age' and 'isActive' optional
- * type UserWithOptionalFields = IMakeOptional<User, 'age' | 'isActive'>;
+ * type UserWithOptionalFields = MakeOptional<User, 'age' | 'isActive'>;
  *
  * // Result: {
  * //   id: number;
@@ -131,7 +105,7 @@ export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (
  *
  * #### Single Property
  * ```typescript
- * type UserWithOptionalEmail = IMakeOptional<User, 'email'>;
+ * type UserWithOptionalEmail = MakeOptional<User, 'email'>;
  *
  * // Result: {
  * //   id: number;
@@ -151,7 +125,7 @@ export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (
  * type AllRequired = Required<User>;
  *
  * // Specific properties optional (this type)
- * type SomeOptional = IMakeOptional<User, 'age' | 'email'>;
+ * type SomeOptional = MakeOptional<User, 'age' | 'email'>;
  * ```
  *
  * ### Use Cases
@@ -173,5 +147,5 @@ export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (
  * @see {@link Pick} - Selects specific properties
  * @see {@link Omit} - Removes specific properties
  */
-export type IMakeOptional<T, K extends keyof T> = Omit<T, K> &
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;

@@ -1,7 +1,7 @@
 import { isPromise } from '@utils/isPromise';
 import 'reflect-metadata';
 import { Platform } from '../platform';
-import { Dictionary, IClassConstructor } from '../types/index';
+import { ClassConstructor, Dictionary } from '../types/index';
 import { isNonNullString } from '../utils/isNonNullString';
 import { JsonHelper } from '../utils/json';
 
@@ -1960,7 +1960,7 @@ export const Session = {
  * - Implement cleanup strategies for temporary data
  */
 export function AttachSessionStorage() {
-  return function (target: IClassConstructor<SessionStorage>) {
+  return function (target: ClassConstructor<SessionStorage>) {
     try {
       const storage = new target();
       if (!isValidStorage(storage)) {

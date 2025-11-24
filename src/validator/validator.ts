@@ -2,7 +2,7 @@ import {
   buildPropertyDecorator,
   getDecoratedProperties,
 } from '@/resources/decorators';
-import { Dictionary, IClassConstructor, IMakeOptional } from '@/types';
+import { ClassConstructor, Dictionary, MakeOptional } from '@/types';
 import {
   defaultStr,
   isEmpty,
@@ -988,7 +988,7 @@ export class Validator {
    *
    * @template Context - Optional type for the validation context object
    *
-   * @param options - Validation options (IMakeOptional<
+   * @param options - Validation options (MakeOptional<
     IValidatorValidateOptions<Array<any>, Context>,
     "i18n"
   >)
@@ -1019,7 +1019,7 @@ export class Validator {
   static async validate<Context = unknown>({
     rules,
     ...extra
-  }: IMakeOptional<
+  }: MakeOptional<
     IValidatorValidateOptions<Array<any>, Context>,
     'i18n'
   >): Promise<IValidatorValidateResult<Context>> {
@@ -1187,7 +1187,7 @@ export class Validator {
           ruleParams[0]
         ) {
           const nestedResult = await Validator.validateNestedRule<
-            IClassConstructor,
+            ClassConstructor,
             Context
           >({
             ...validateOptions,
@@ -1492,7 +1492,7 @@ export class Validator {
    * - **Successful Validation**: Returns `true` without modification
    *
    * ### Type Parameters
-   * - `Target` - Class constructor extending IClassConstructor with validation decorators
+   * - `Target` - Class constructor extending ClassConstructor with validation decorators
    * - `Context` - Optional validation context type passed through nested validations
    *
    * ### Return Values
@@ -1541,7 +1541,7 @@ export class Validator {
    * - **Context Propagation**: Passes validation context through to nested validators
    * - **Timing Tracking**: Maintains duration tracking across nested validations
    *
-   * @template Target - Class constructor type (must extend IClassConstructor)
+   * @template Target - Class constructor type (must extend ClassConstructor)
    * @template Context - Optional validation context type
    *
    * @param options - Validation rule function options (IValidatorNestedRuleFunctionOptions<Target, Context>)
@@ -1583,7 +1583,7 @@ export class Validator {
    * @async
    */
   static async validateNestedRule<
-    Target extends IClassConstructor = IClassConstructor,
+    Target extends ClassConstructor = ClassConstructor,
     Context = unknown,
   >({
     ruleParams,
@@ -2128,7 +2128,7 @@ export class Validator {
    * ```
    *
    * ### Type Parameters
-   * - `Target` - Class constructor type (extends IClassConstructor) that the nested object must satisfy
+   * - `Target` - Class constructor type (extends ClassConstructor) that the nested object must satisfy
    * - `Context` - Optional validation context type passed through nested validations
    *
    * ### Parameters
@@ -2239,7 +2239,7 @@ export class Validator {
    * @public
    */
   static validateNested<
-    Target extends IClassConstructor = IClassConstructor,
+    Target extends ClassConstructor = ClassConstructor,
     Context = unknown,
   >(
     ruleParams: [target: Target]
@@ -2461,7 +2461,7 @@ export class Validator {
    * ### Signature
    * ```typescript
    * static async validateTarget<
-   *   Target extends IClassConstructor = IClassConstructor,
+   *   Target extends ClassConstructor = ClassConstructor,
    *   Context = unknown,
    * >(
    *   target: Target,
@@ -2501,7 +2501,7 @@ export class Validator {
    * });
    * ```
    *
-   * @template Target - Class constructor type (extends IClassConstructor)\n   * @template Context - Optional type for validation context passed to rules
+   * @template Target - Class constructor type (extends ClassConstructor)\n   * @template Context - Optional type for validation context passed to rules
    *
    * @param target - Class constructor decorated with validation decorators (e.g., UserForm)
    * @param options - Validation options object\n   *                Extended from IValidatorValidateTargetOptions with optional i18n property\n   *                Type: Omit<IValidatorValidateTargetOptions<Target, Context>, \"i18n\"> & { i18n?: I18n }
@@ -2541,7 +2541,7 @@ export class Validator {
    * @async
    */
   static async validateTarget<
-    Target extends IClassConstructor = IClassConstructor,
+    Target extends ClassConstructor = ClassConstructor,
     Context = unknown,
   >(
     target: Target,
@@ -2742,7 +2742,7 @@ export class Validator {
    * @see {@link buildPropertyDecorator} - How rules are attached to properties
    * @public
    */
-  static getTargetRules<T extends IClassConstructor = any>(
+  static getTargetRules<T extends ClassConstructor = any>(
     target: T
   ): Record<keyof InstanceType<T>, IValidatorRule[]> {
     return getDecoratedProperties(
@@ -2800,7 +2800,7 @@ export class Validator {
    * - Robustness: Works with minified code (uses symbol markers, not function names)
    * - Decoupling: No dependency on rule name strings or normalization
    *
-   * @template T - Class constructor type extending IClassConstructor
+   * @template T - Class constructor type extending ClassConstructor
    *
    * @param target - The class constructor to inspect
    * @param propertyKey - The property name to check for ValidateNested decorator
@@ -2813,7 +2813,7 @@ export class Validator {
    * @see {@link ValidateNested} - The decorator that applies nested validation
    * @public
    */
-  static hasValidateNestedRule<T extends IClassConstructor = any>(
+  static hasValidateNestedRule<T extends ClassConstructor = any>(
     target: T,
     propertyKey: keyof InstanceType<T>
   ): boolean {
@@ -2895,10 +2895,10 @@ export class Validator {
    * @see {@link getTargetRules} - Get all rules for a class
    * @public
    */
-  static getValidateNestedTarget<T extends IClassConstructor = any>(
+  static getValidateNestedTarget<T extends ClassConstructor = any>(
     target: T,
     propertyKey: keyof InstanceType<T>
-  ): IClassConstructor | undefined {
+  ): ClassConstructor | undefined {
     const rules = this.getTargetRules(target);
     const propertyRules = rules[propertyKey];
 
@@ -2979,7 +2979,7 @@ export class Validator {
    * @see {@link ValidationTargetOptions} - Decorator to set these options
    * @public
    */
-  public static getValidateTargetOptions<T extends IClassConstructor>(
+  public static getValidateTargetOptions<T extends ClassConstructor>(
     target: T
   ): IValidatorValidateTargetOptions<T, any> {
     return Object.assign(
@@ -3151,7 +3151,7 @@ export class Validator {
    * 5. The rule function receives the target class constructor in ruleParams[0]
    *
    * ### Type Parameters
-   * - Target: The nested class constructor type (defaults to IClassConstructor)
+   * - Target: The nested class constructor type (defaults to ClassConstructor)
    *   - Must be a valid TypeScript class constructor
    *   - Can have any validation decorators
    *   - Example: Address, Contact, Location
@@ -3286,7 +3286,7 @@ export class Validator {
    * - I18n support for error messages
    *
    * @template Target - Class constructor type for the target/nested class
-   *   - Extends IClassConstructor (default generic class constructor)
+   *   - Extends ClassConstructor (default generic class constructor)
    *   - Must be a class decorated with validation rules
    *   - Example types: typeof Address, typeof Contact, typeof Location
    *
@@ -3316,7 +3316,7 @@ export class Validator {
    * @public
    */
   static buildTargetRuleDecorator<
-    Target extends IClassConstructor = IClassConstructor,
+    Target extends ClassConstructor = ClassConstructor,
     Context = unknown,
   >(ruleFunction: IValidatorRuleFunction<[target: Target], Context>) {
     return this.buildRuleDecorator<[target: Target], Context>(ruleFunction);

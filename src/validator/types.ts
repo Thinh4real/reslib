@@ -1,6 +1,6 @@
 import { I18n } from '@/i18n';
 import { InputFormatterResult } from '@/inputFormatter/types';
-import { IClassConstructor } from '@/types';
+import { ClassConstructor } from '@/types';
 import { ICountryCode } from '@countries/types';
 
 /**
@@ -851,7 +851,7 @@ export type IValidatorRuleParams<
  * ```
  *
  * ### Generic Parameters
- * - **Target**: The class constructor type being validated (extends `IClassConstructor`)
+ * - **Target**: The class constructor type being validated (extends `ClassConstructor`)
  * - **Context**: Optional context type for validation (defaults to `unknown`)
  *
  * ### Properties Overview
@@ -954,7 +954,7 @@ export type IValidatorRuleParams<
  * - **Memory usage**: Larger data structures require more memory
  * - **Serialization**: Complex objects may need special handling
  *
- * @template Target - The class constructor type being validated (must extend IClassConstructor)
+ * @template Target - The class constructor type being validated (must extend ClassConstructor)
  * @template Context - Optional context type for validation (defaults to unknown)
  *
  * @public
@@ -963,10 +963,10 @@ export type IValidatorRuleParams<
  * @see {@link IValidatorValidateOptions} - Single-value validation options
  * @see {@link Validator.validateNestedRule} - Method that uses this interface
  * @see {@link IValidatorValidateTargetData} - Target data type
- * @see {@link IClassConstructor} - Class constructor constraint
+ * @see {@link ClassConstructor} - Class constructor constraint
  */
 export interface IValidatorNestedRuleFunctionOptions<
-  Target extends IClassConstructor = IClassConstructor,
+  Target extends ClassConstructor = ClassConstructor,
   Context = unknown,
 > extends Omit<
     IValidatorValidateTargetOptions<Target, Context, [target: Target]>,
@@ -1640,7 +1640,7 @@ export type IValidatorMultiRuleFunction<
 > = IValidatorRuleFunction<RulesFunctions, Context>;
 
 export type IValidatorValidateTargetData<
-  Target extends IClassConstructor = IClassConstructor,
+  Target extends ClassConstructor = ClassConstructor,
 > = Partial<Record<keyof InstanceType<Target>, any>>;
 
 /**
@@ -1671,7 +1671,7 @@ export type IValidatorValidateTargetData<
  * ```
  *
  * ### Generic Parameters
- * - **Target**: The class constructor type being validated (extends `IClassConstructor`)
+ * - **Target**: The class constructor type being validated (extends `ClassConstructor`)
  * - **Context**: Optional context type for validation (defaults to `unknown`)
  * - **ParamsTypes**: Parameter types for validation rules (defaults to `IValidatorRuleParams`)
  *
@@ -1829,7 +1829,7 @@ export type IValidatorValidateTargetData<
  * - **Supports**: Multi-field validation with error aggregation
  * - **Integrates with**: Decorator-based validation system
  *
- * @template Target - The class constructor type being validated (must extend IClassConstructor)
+ * @template Target - The class constructor type being validated (must extend ClassConstructor)
  * @template Context - Optional context type for validation (defaults to unknown)
  * @template ParamsTypes - Parameter types for validation rules (defaults to IValidatorRuleParams)
  *
@@ -1838,11 +1838,11 @@ export type IValidatorValidateTargetData<
  * @see {@link IValidatorValidateOptions} - Base options interface being extended
  * @see {@link IValidatorValidateTargetData} - Target data type
  * @see {@link Validator.validateTarget} - Method that uses this interface
- * @see {@link IClassConstructor} - Class constructor constraint
+ * @see {@link ClassConstructor} - Class constructor constraint
  * @see {@link IValidatorValidationError} - Error type for errorMessageBuilder
  */
 export interface IValidatorValidateTargetOptions<
-  Target extends IClassConstructor = IClassConstructor,
+  Target extends ClassConstructor = ClassConstructor,
   Context = unknown,
   ParamsTypes extends IValidatorRuleParams = IValidatorRuleParams,
 > extends Omit<

@@ -5,7 +5,7 @@ import { Scope, TranslateOptions } from 'i18n-js';
 import 'reflect-metadata';
 import { Auth } from '../auth';
 import { Logger } from '../logger';
-import { IClassConstructor } from '../types/index';
+import { ClassConstructor } from '../types/index';
 import {
   defaultStr,
   extendObj,
@@ -1241,7 +1241,7 @@ export class ResourcesManager {
    * @returns {Resource} An object containing the resource metadata for the given target.
    */
   public static getMetaDataFromTarget(
-    target: IClassConstructor
+    target: ClassConstructor
   ): IResource | undefined {
     return Object.assign(
       {},

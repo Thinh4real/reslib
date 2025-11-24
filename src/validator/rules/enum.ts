@@ -1,8 +1,8 @@
-import { IPrimitive } from "@/types";
-import { IValidatorResult, IValidatorValidateOptions } from "../types";
-import { Validator } from "../validator";
+import { Primitive } from '@/types';
+import { IValidatorResult, IValidatorValidateOptions } from '../types';
+import { Validator } from '../validator';
 
-function _IsEnum<T extends IPrimitive = IPrimitive>({
+function _IsEnum<T extends Primitive = Primitive>({
   value,
   ruleParams,
   fieldName,
@@ -11,8 +11,8 @@ function _IsEnum<T extends IPrimitive = IPrimitive>({
   ...rest
 }: IValidatorValidateOptions<Array<T>>): IValidatorResult {
   if (!ruleParams || !ruleParams.length) {
-    const message = i18n.t("validator.invalidRuleParams", {
-      rule: "Enum",
+    const message = i18n.t('validator.invalidRuleParams', {
+      rule: 'Enum',
       field: translatedPropertyName || fieldName,
       ruleParams,
       ...rest,
@@ -21,18 +21,18 @@ function _IsEnum<T extends IPrimitive = IPrimitive>({
   }
   const exists = allInRules(value, ruleParams);
   if (!exists) {
-    return i18n.t("validator.invalidEnumValue", {
+    return i18n.t('validator.invalidEnumValue', {
       field: translatedPropertyName || fieldName,
       value,
-      expectedValues: ruleParams.map((r) => String(r)).join("|"),
+      expectedValues: ruleParams.map((r) => String(r)).join('|'),
       ...rest,
     });
   }
   return true;
 }
-export const IsEnum = Validator.buildRuleDecorator<Array<IPrimitive>>(_IsEnum);
-Validator.registerRule("Enum", _IsEnum);
-declare module "../types" {
+export const IsEnum = Validator.buildRuleDecorator<Array<Primitive>>(_IsEnum);
+Validator.registerRule('Enum', _IsEnum);
+declare module '../types' {
   export interface IValidatorRulesMap<Context = unknown> {
     /**
      * ### Enum Rule
@@ -47,7 +47,7 @@ declare module "../types" {
      * @since 1.25.13
      * @public
      */
-    Enum: IValidatorRuleParams<Array<IPrimitive>, Context>;
+    Enum: IValidatorRuleParams<Array<Primitive>, Context>;
   }
 }
 

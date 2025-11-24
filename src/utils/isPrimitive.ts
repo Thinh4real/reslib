@@ -1,4 +1,4 @@
-import { IPrimitive } from "../types";
+import { Primitive } from '../types';
 
 /**
  * Type guard to check if a value is a primitive type.
@@ -14,6 +14,12 @@ import { IPrimitive } from "../types";
  * isPrimitive({})          // returns false
  * isPrimitive([])          // returns false
  */
-export function isPrimitive(value: any): value is IPrimitive {
-  return value === null || value === undefined || typeof value === "string" || typeof value === "number" || typeof value === "boolean";
+export function isPrimitive(value: any): value is Primitive {
+  return (
+    value === null ||
+    value === undefined ||
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  );
 }

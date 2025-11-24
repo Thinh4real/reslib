@@ -1,4 +1,4 @@
-import { Dictionary, IPrimitive } from '../types';
+import { Dictionary, Primitive } from '../types';
 import { isDateObj } from './date/isDateObj';
 import { isDOMElement } from './dom';
 import { isPrimitive } from './isPrimitive';
@@ -515,7 +515,7 @@ declare global {
      * @category Utilities
      * @since 1.0.0
      */
-    flatten(obj: any): Record<string, IPrimitive>;
+    flatten(obj: any): Record<string, Primitive>;
 
     /**
      * Enhanced version of Object.entries that preserves key types in TypeScript inference.
@@ -771,7 +771,7 @@ function _flattenObject(
   prefix: string = '',
   flattened: Record<string, any> = {},
   options?: FlattenObjectOptions
-): Record<string, IPrimitive> {
+): Record<string, Primitive> {
   flattened = isObj(flattened) ? flattened : {};
   // Handle null/undefined early
   if (

@@ -23,6 +23,7 @@ import { Dictionary } from './dictionary';
  *     }
  * };
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface II18nTranslation extends Dictionary {}
 
 /**
@@ -74,7 +75,8 @@ export type I18nEvent =
  */
 export type I18nFormatter = (
   value: string,
-  params?: Record<string, any>
+
+  params?: Dictionary
 ) => string;
 
 /**
