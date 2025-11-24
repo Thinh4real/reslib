@@ -128,7 +128,9 @@ function hasImageExtension(
   supportedExtensions?: string[]
 ): boolean {
   const cleanUrl = url.split('?')[0].split('#')[0].toLowerCase();
-  const ext = getFileExtension(cleanUrl, false).toLowerCase().trim();
+  const ext = getFileExtension(cleanUrl, { withoutDot: false })
+    .toLowerCase()
+    .trim();
   const extensions =
     Array.isArray(supportedExtensions) && supportedExtensions.length > 0
       ? supportedExtensions
