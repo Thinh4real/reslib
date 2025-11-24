@@ -1,28 +1,28 @@
 import {
-  IMongoArrayOperators,
-  IMongoComparisonOperatorName,
-  IMongoLogicalOperatorName,
-  IMongoLogicalOperators,
-  IMongoOperatorName,
-} from "./types";
+  MongoArrayOperators,
+  MongoComparisonOperatorName,
+  MongoLogicalOperatorName,
+  MongoLogicalOperators,
+  MongoOperatorName,
+} from './types';
 
-const LOGICAL: IMongoLogicalOperatorName[] = ["$and", "$or", "$nor", "$not"];
-const COMPARAISON: IMongoComparisonOperatorName[] = [
-  "$eq",
-  "$ne",
-  "$gt",
-  "$gte",
-  "$lt",
-  "$lte",
-  "$in",
-  "$nin",
-  "$exists",
-  "$type",
-  "$regex",
-  "$size",
-  "$mod",
-  "$all",
-  "$elemMatch",
+const LOGICAL: MongoLogicalOperatorName[] = ['$and', '$or', '$nor', '$not'];
+const COMPARAISON: MongoComparisonOperatorName[] = [
+  '$eq',
+  '$ne',
+  '$gt',
+  '$gte',
+  '$lt',
+  '$lte',
+  '$in',
+  '$nin',
+  '$exists',
+  '$type',
+  '$regex',
+  '$size',
+  '$mod',
+  '$all',
+  '$elemMatch',
 ];
 
 /**
@@ -34,14 +34,14 @@ const COMPARAISON: IMongoComparisonOperatorName[] = [
  *
  * @constant
  * @type {Object}
- * @property {Array<keyof IMongoLogicalOperators>} LOGICAL - An array of logical operators.
+ * @property {Array<keyof MongoLogicalOperators>} LOGICAL - An array of logical operators.
  *   - **Example**:
  *     - `$and`: Joins query clauses with a logical AND.
  *     - `$or`: Joins query clauses with a logical OR.
  *     - `$nor`: Joins query clauses with a logical NOR.
  *     - `$not`: Inverts the effect of a query expression.
  *
- * @property {Array<keyof IMongoComparisonOperators>} COMPARAISON - An array of comparison operators.
+ * @property {Array<keyof MongoComparisonOperators>} COMPARAISON - An array of comparison operators.
  *   - **Example**:
  *     - `$eq`: Matches values that are equal to a specified value.
  *     - `$ne`: Matches all values that are not equal to a specified value.
@@ -59,13 +59,13 @@ const COMPARAISON: IMongoComparisonOperatorName[] = [
  *     - `$all`: Matches arrays that contain all elements specified in the query.
  *     - `$elemMatch`: Matches documents that contain an array field with at least one element that matches all the specified query criteria.
  *
- * @property {Array<keyof IMongoArrayOperators>} ARRAY - An array of array operators.
+ * @property {Array<keyof MongoArrayOperators>} ARRAY - An array of array operators.
  *   - **Example**:
  *     - `$all`: Matches arrays that contain all elements specified in the query.
  *     - `$elemMatch`: Matches documents that contain an array field with at least one element that matches all the specified query criteria.
  *     - `$in`: Matches any of the values specified in an array.
  *     - `$nin`: Matches none of the values specified in an array.
- * @property {Array<keyof IMongoOperators>} ALL - An array of all operators.
+ * @property {Array<keyof MongoOperators>} ALL - An array of all operators.
  * @example
  * // Example usage of MONGO_OPERATORS in a MongoDB query
  * const query = {
@@ -81,18 +81,13 @@ const COMPARAISON: IMongoComparisonOperatorName[] = [
  * @see {@link https://docs.mongodb.com/manual/reference/operator/|MongoDB Operators Documentation} for more details on each operator.
  */
 export const MONGO_OPERATORS: {
-  LOGICAL: (keyof IMongoLogicalOperators)[];
-  COMPARAISON: IMongoComparisonOperatorName[];
-  ARRAY: (keyof IMongoArrayOperators)[];
-  ALL: IMongoOperatorName[];
+  LOGICAL: (keyof MongoLogicalOperators)[];
+  COMPARAISON: MongoComparisonOperatorName[];
+  ARRAY: (keyof MongoArrayOperators)[];
+  ALL: MongoOperatorName[];
 } = {
   LOGICAL,
   COMPARAISON,
   ALL: [...LOGICAL, ...COMPARAISON],
-  ARRAY: [
-    "$all",
-    "$elemMatch",
-    "$in",
-    "$nin",
-  ] as (keyof IMongoArrayOperators)[],
+  ARRAY: ['$all', '$elemMatch', '$in', '$nin'] as (keyof MongoArrayOperators)[],
 };

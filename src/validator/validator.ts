@@ -2567,9 +2567,12 @@ export class Validator {
 
     const validationErrors: IValidatorValidationError[] = [];
     const validationPromises: Promise<IValidatorValidateResult<Context>>[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let validatedFieldCount = 0;
 
-    const translatedPropertyNames = i18n.translateTarget(target, { data });
+    const translatedPropertyNames = i18n.translateTarget(target as any, {
+      data,
+    });
     for (const propertyKey in targetRules) {
       const rules = targetRules[propertyKey];
       const { sanitizedRules } = this.parseAndValidateRules(rules);

@@ -6,8 +6,8 @@
  * comparison operation that can be applied to filter results.
  *
  * @example
- * // Example of using IMongoComparisonOperators
- * const filter: IMongoComparisonOperators = {
+ * // Example of using MongoComparisonOperators
+ * const filter: MongoComparisonOperators = {
  *     $eq: "example",          // Matches documents where the field equals "example"
  *     $ne: 42,                 // Matches documents where the field is not equal to 42
  *     $gt: 100,                // Matches documents where the field is greater than 100
@@ -28,8 +28,8 @@
  *     }
  * };
  */
-export interface IMongoComparisonOperators<T = any>
-  extends IMongoArrayOperators<T> {
+export interface MongoComparisonOperators<T = unknown>
+  extends MongoArrayOperators<T> {
   $eq?: T; // equals
   $ne?: T; // not equals
   $gt?: T; // greater than
@@ -57,8 +57,8 @@ export interface IMongoComparisonOperators<T = any>
  * different conditions relate to each other.
  *
  * @example
- * // Example of using IMongoLogicalOperators
- * const filter: IMongoLogicalOperators = {
+ * // Example of using MongoLogicalOperators
+ * const filter: MongoLogicalOperators = {
  *     $and: [
  *         { age: { $gte: 18 } }, // Must be 18 or older
  *         { status: "active" }   // Must be active
@@ -75,7 +75,7 @@ export interface IMongoComparisonOperators<T = any>
  *     }
  * };
  */
-export interface IMongoLogicalOperators<T = unknown> {
+export interface MongoLogicalOperators<T = unknown> {
   $and?: MongoQuery<T>[]; // An array of filter selectors that must all match
   $or?: MongoQuery<T>[]; // An array of filter selectors where at least one must match
   $nor?: MongoQuery<T>[]; // An array of filter selectors where none must match
@@ -83,27 +83,27 @@ export interface IMongoLogicalOperators<T = unknown> {
 }
 
 /**
- * Represents the names of logical operators defined in the `IMongoLogicalOperators` interface.
+ * Represents the names of logical operators defined in the `MongoLogicalOperators` interface.
  *
- * The `IMongoLogicalOperatorName` type is a union of the keys from the `IMongoLogicalOperators` interface.
+ * The `MongoLogicalOperatorName` type is a union of the keys from the `MongoLogicalOperators` interface.
  * It provides a concise and type-safe way to refer to logical operator names used in MongoDB queries.
  *
  * @example
  * ```typescript
- * const logicalOperator: IMongoLogicalOperatorName = "$and"; // Valid, as $and is a logical operator
- * const invalidOperator: IMongoLogicalOperatorName = "$invalid"; // Error: "$invalid" is not a valid logical operator
+ * const logicalOperator: MongoLogicalOperatorName = "$and"; // Valid, as $and is a logical operator
+ * const invalidOperator: MongoLogicalOperatorName = "$invalid"; // Error: "$invalid" is not a valid logical operator
  * ```
  *
  * @remarks
  * - This type is particularly useful when you need to validate or restrict the usage of logical operator names in MongoDB queries.
  * - It ensures type safety and reduces the risk of typos in operator names.
  *
- * @see {@link IMongoLogicalOperators} for the structure of logical operators.
+ * @see {@link MongoLogicalOperators} for the structure of logical operators.
  */
-export type IMongoLogicalOperatorName = keyof IMongoLogicalOperators;
+export type MongoLogicalOperatorName = keyof MongoLogicalOperators;
 
 /**
- * @interface IMongoOperators
+ * @interface MongoOperators
  * Combines logical and comparison operators for MongoDB queries.
  *
  * This interface represents a union of logical and comparison operators, allowing you to construct
@@ -112,14 +112,14 @@ export type IMongoLogicalOperatorName = keyof IMongoLogicalOperators;
  * @template T - The type of the data being queried (default is `unknown`).
  *
  * @example
- * // Example usage of IMongoOperators
+ * // Example usage of MongoOperators
  * interface User {
  *   name: string;
  *   age: number;
  *   tags: string[];
  * }
  *
- * const query: IMongoOperators<User> = {
+ * const query: MongoOperators<User> = {
  *   $and: [
  *     { age: { $gte: 18 } }, // Logical AND: age must be greater than or equal to 18
  *     { tags: { $in: ["active", "premium"] } } // Logical AND: tags must include "active" or "premium"
@@ -134,67 +134,67 @@ export type IMongoLogicalOperatorName = keyof IMongoLogicalOperators;
  * // - The age is greater than or equal to 18 AND the tags include "active" or "premium".
  * // - OR the name starts with "John" (case-insensitive) OR the age is less than 30.
  *
- * @see {@link IMongoLogicalOperators} for logical operators.
- * @see {@link IMongoComparisonOperators} for comparison operators.
+ * @see {@link MongoLogicalOperators} for logical operators.
+ * @see {@link MongoComparisonOperators} for comparison operators.
  */
-export interface IMongoOperators
-  extends IMongoLogicalOperators,
-    IMongoComparisonOperators {}
+export interface MongoOperators
+  extends MongoLogicalOperators,
+    MongoComparisonOperators {}
 
 /**
- * @typedef IMongoOperatorName
- * Represents the names of all available operators (logical and comparison) defined in the `IMongoOperators` interface.
+ * @typedef MongoOperatorName
+ * Represents the names of all available operators (logical and comparison) defined in the `MongoOperators` interface.
  *
- * This type is a union of the keys from the `IMongoOperators` interface, allowing for a concise way to refer to nknown operator name
+ * This type is a union of the keys from the `MongoOperators` interface, allowing for a concise way to refer to nknown operator name
  * that can be used in MongoDB queries. It ensures type safety and reduces the risk of typos in operator names.
  *
  * @example
- * // Example usage of IMongoOperatorName
- * const operator1: IMongoOperatorName = "$and"; // Valid, as $and is a logical operator
- * const operator2: IMongoOperatorName = "$eq";  // Valid, as $eq is a comparison operator
+ * // Example usage of MongoOperatorName
+ * const operator1: MongoOperatorName = "$and"; // Valid, as $and is a logical operator
+ * const operator2: MongoOperatorName = "$eq";  // Valid, as $eq is a comparison operator
  *
  * // The following would cause a TypeScript error, as "$invalid" is not a defined operator
- * // const invalidOperator: IMongoOperatorName = "$invalid"; // Error: Type '"$invalid"' is not assignable to type 'IMongoOperatorName'
+ * // const invalidOperator: MongoOperatorName = "$invalid"; // Error: Type '"$invalid"' is not assignable to type 'MongoOperatorName'
  *
  * @remarks
  * This type is particularly useful when you need to validate or restrict the usage of operator names in MongoDB queries.
  * It provides a type-safe way to reference operator names, ensuring that only valid operators are used.
  *
- * @see {@link IMongoOperators} for the full list of logical and comparison operators.
+ * @see {@link MongoOperators} for the full list of logical and comparison operators.
  */
-export type IMongoOperatorName = keyof IMongoOperators;
+export type MongoOperatorName = keyof MongoOperators;
 /**
  * A type that represents the depth limit for recursion in MongoDB queries.
  *
  * This type is used to limit the depth of nested objects in a query, preventing infinite recursion.
  *
- * @typedef {number[]} IMongoQueryDepth
+ * @typedef {number[]} MongoQueryDepth
  * @example
- * // Example usage of IMongoQueryDepth
- * const depthLimit: IMongoQueryDepth = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+ * // Example usage of MongoQueryDepth
+ * const depthLimit: MongoQueryDepth = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
  */
-type IMongoQueryDepth = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+type MongoQueryDepth = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 /**
  * A type that generates dot notation paths with a depth limit.
  *
  * This type is used to create a list of possible dot notation paths in a MongoDB query, taking into account the depth limit.
  *
- * @typedef {object} IMongoCreateDotPaths
+ * @typedef {object} MongoCreateDotPaths
  * @template T - The type of the object being queried.
  * @template D - The depth limit for the query (default is 9).
  * @template Prefix - The prefix for the dot notation path (default is an empty string).
  * @property {string} [key] - A key in the object being queried.
  * @returns {string | never} - The dot notation path for the key, or never if the key is not a string or the depth limit is reached.
  * @example
- * // Example usage of IMongoCreateDotPaths
- * const paths: IMongoCreateDotPaths<{ a: { b: { c: string } } }> = {
+ * // Example usage of MongoCreateDotPaths
+ * const paths: MongoCreateDotPaths<{ a: { b: { c: string } } }> = {
  *   'a': 'a',
  *   'a.b': 'a.b',
  *   'a.b.c': 'a.b.c',
  * };
  */
-type IMongoCreateDotPaths<
+type MongoCreateDotPaths<
   T,
   D extends number = 9,
   Prefix extends string = '',
@@ -206,9 +206,9 @@ type IMongoCreateDotPaths<
           ? T[K] extends object
             ?
                 | `${Prefix}${K}`
-                | IMongoCreateDotPaths<
+                | MongoCreateDotPaths<
                     T[K],
-                    IMongoQueryDepth[D],
+                    MongoQueryDepth[D],
                     `${Prefix}${K}.`
                   >
             : `${Prefix}${K}`
@@ -221,34 +221,30 @@ type IMongoCreateDotPaths<
  *
  * This type is used to navigate through nested objects and retrieve the type of a value at a specific path.
  *
- * @typedef {object} IMongoTypeAtPath
+ * @typedef {object} MongoTypeAtPath
  * @template T - The type of the object being queried.
  * @template Path - The path to the value in the object (e.g. "a.b.c").
  * @template D - The depth limit for the query (default is 9).
  * @returns {T[Path] | never} - The type of the value at the given path, or never if the path is invalid or the depth limit is reached.
  * @example
- * // Example usage of IMongoTypeAtPath
- * const typeAtPath: IMongoTypeAtPath<{ a: { b: { c: string } } }, 'a.b.c'> = string;
+ * // Example usage of MongoTypeAtPath
+ * const typeAtPath: MongoTypeAtPath<{ a: { b: { c: string } } }, 'a.b.c'> = string;
  *
  * // This would resolve to the type of the value at the path 'a.b.c' in the object.
  *
  * @example
- * // Example usage of IMongoTypeAtPath with an invalid path
- * const invalidTypeAtPath: IMongoTypeAtPath<{ a: { b: { c: string } } }, 'a.b.d'> = never;
+ * // Example usage of MongoTypeAtPath with an invalid path
+ * const invalidTypeAtPath: MongoTypeAtPath<{ a: { b: { c: string } } }, 'a.b.d'> = never;
  *
  * // This would resolve to never, because the path 'a.b.d' is invalid.
  */
-type IMongoTypeAtPath<
-  T,
-  Path extends string,
-  D extends number = 9,
-> = D extends 0
+type MongoTypeAtPath<T, Path extends string, D extends number = 9> = D extends 0
   ? never
   : Path extends keyof T
     ? T[Path]
     : Path extends `${infer Key}.${infer Rest}`
       ? Key extends keyof T
-        ? IMongoTypeAtPath<T[Key], Rest, IMongoQueryDepth[D]>
+        ? MongoTypeAtPath<T[Key], Rest, MongoQueryDepth[D]>
         : never
       : never;
 
@@ -263,9 +259,9 @@ type IMongoTypeAtPath<
  * @template D - The depth limit for the query (default is 9).
  * @property {string} [key] - A key in the data being queried.
  * @property {T[key]} [value] - The value of the key in the data being queried.
- * @property {IMongoComparisonOperators<T[key]>} [comparisonOperator] - A comparison operator to apply to the value.
- * @property {MongoQuery<T[key], IMongoQueryDepth[D]>} [nestedQuery] - A nested query to apply to the value.
- * @property {IMongoLogicalOperators<T>} [logicalOperator] - A logical operator to apply to the query.
+ * @property {MongoComparisonOperators<T[key]>} [comparisonOperator] - A comparison operator to apply to the value.
+ * @property {MongoQuery<T[key], MongoQueryDepth[D]>} [nestedQuery] - A nested query to apply to the value.
+ * @property {MongoLogicalOperators<T>} [logicalOperator] - A logical operator to apply to the query.
  * @returns {object} - The query object.
  * @example
  * // Example usage of MongoQuery
@@ -317,26 +313,26 @@ type IMongoTypeAtPath<
  * // This would create a query that filters data where the name is 'John', the age is greater than 18, and the occupation is either 'Developer' or 'Engineer'.
  * ```	
  * @see {@link https://www.mongodb.com/docs/manual/reference/operator/query/} for more information on MongoDB query operators.
- * @see {@link IMongoArrayOperators} for more information on MongoDB array operators.
- * @see {@link IMongoComparisonOperators} for more information on MongoDB comparison operators.
- * @see {@link IMongoLogicalOperators} for more information on MongoDB logical operators.
+ * @see {@link MongoArrayOperators} for more information on MongoDB array operators.
+ * @see {@link MongoComparisonOperators} for more information on MongoDB comparison operators.
+ * @see {@link MongoLogicalOperators} for more information on MongoDB logical operators.
  */
 export type MongoQuery<T = unknown, D extends number = 9> = D extends 0
   ? never
   : {
-      [P in IMongoCreateDotPaths<T, D> | keyof T]?: P extends keyof T
+      [P in MongoCreateDotPaths<T, D> | keyof T]?: P extends keyof T
         ?
             | T[P]
-            | IMongoComparisonOperators<T[P]>
+            | MongoComparisonOperators<T[P]>
             | (T[P] extends object
-                ? MongoQuery<T[P], IMongoQueryDepth[D]>
+                ? MongoQuery<T[P], MongoQueryDepth[D]>
                 : never)
         : P extends string
           ?
-              | IMongoTypeAtPath<T, P, D>
-              | IMongoComparisonOperators<IMongoTypeAtPath<T, P, D>>
+              | MongoTypeAtPath<T, P, D>
+              | MongoComparisonOperators<MongoTypeAtPath<T, P, D>>
           : never;
-    } & IMongoLogicalOperators<T>;
+    } & MongoLogicalOperators<T>;
 
 /**
  * Interface representing array operators for filtering operations.
@@ -346,42 +342,46 @@ export type MongoQuery<T = unknown, D extends number = 9> = D extends 0
  * and their elements.
  *
  * @example
- * // Example of using IMongoArrayOperators
- * const filter: IMongoArrayOperators = {
+ * // Example of using MongoArrayOperators
+ * const filter: MongoArrayOperators = {
  *     $all: [1, 2, 3], // Matches documents where the array contains all specified values
  *     $elemMatch: {    // Matches documents where at least one element in the array matches the criteria
  *         field: { $gt: 10 } // At least one element must be greater than 10
  *     }
  * };
  */
-export interface IMongoArrayOperators<T = unknown> {
+export interface MongoArrayOperators<T = unknown> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   $in?: T extends Array<any> ? T : T[]; // in array
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   $nin?: T extends Array<any> ? T : T[]; // not in array
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   $all?: T extends Array<any> ? T : T[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   $elemMatch?: T extends Array<any> ? MongoQuery<T[number]> : never;
 }
 
 /**
  * A type that represents the names of all available comparison operators
- * defined in the `IMongoComparisonOperators` interface.
+ * defined in the `MongoComparisonOperators` interface.
  *
- * This type is a union of the keys from the `IMongoComparisonOperators` interface,
+ * This type is a union of the keys from the `MongoComparisonOperators` interface,
  * allowing for a concise way to refer to any comparison operator name that can
  * be used in MongoDB queries. It ensures type safety and reduces the risk
  * of typos in operator names.
  *
- * @type IMongoComparisonOperatorName
+ * @type MongoComparisonOperatorName
  * @example
- * // Example usage of IMongoComparisonOperatorName
- * const comparisonOperator1: IMongoComparisonOperatorName = "$eq"; // Valid, as $eq is a comparison operator
- * const comparisonOperator2: IMongoComparisonOperatorName = "$gt"; // Valid, as $gt is a comparison operator
+ * // Example usage of MongoComparisonOperatorName
+ * const comparisonOperator1: MongoComparisonOperatorName = "$eq"; // Valid, as $eq is a comparison operator
+ * const comparisonOperator2: MongoComparisonOperatorName = "$gt"; // Valid, as $gt is a comparison operator
  *
  * // The following would cause a TypeScript error, as "$invalid" is not a defined comparison operator
- * // const invalidComparisonOperator: IMongoComparisonOperatorName = "$invalid"; // Error: Type '"$invalid"' is not assignable to type 'IMongoComparisonOperatorName'
+ * // const invalidComparisonOperator: MongoComparisonOperatorName = "$invalid"; // Error: Type '"$invalid"' is not assignable to type 'MongoComparisonOperatorName'
  *
- * @see {@link IMongoComparisonOperators} for a list of comparison operators.
+ * @see {@link MongoComparisonOperators} for a list of comparison operators.
  */
-export type IMongoComparisonOperatorName = keyof IMongoComparisonOperators;
+export type MongoComparisonOperatorName = keyof MongoComparisonOperators;
 
 /**
  * Represents the ordering specification for resource queries.

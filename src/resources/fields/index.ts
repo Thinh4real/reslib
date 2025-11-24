@@ -61,6 +61,9 @@ export function getFieldsFromTarget(
 export function getFields<T extends ClassConstructor>(
   instance: InstanceType<T>
 ): Record<string, { name: string } & Field> {
-  const fields = Reflect.getMetadata(fieldsMetaData, instance.constructor);
+  const fields = Reflect.getMetadata(
+    fieldsMetaData,
+    Object.getPrototypeOf(instance).constructor
+  );
   return Object.assign({}, fields);
 }
