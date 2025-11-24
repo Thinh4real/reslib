@@ -1,0 +1,585 @@
+import 'reflect-metadata';
+/**
+ * Represents an event map where each event key maps to a tuple of parameter types.
+ * This allows for type-safe event handling with parameter inference.
+ *
+ * @template T - The union of event names. Defaults to `string` for backward compatibility.
+ *
+ * @example
+ * ```typescript
+ * type MyEventMap = ObservableEventMap<'userLogin' | 'dataUpdate'>;
+ * // Equivalent to: Record<'userLogin' | 'dataUpdate', unknown[]>
+ * ```
+ */
+export type ObservableEventMap<T extends string = string> = Record<
+  T,
+  unknown[]
+>;
+
+/**
+ * Represents a callback function for a specific event in the event map.
+ * The callback parameters are inferred from the event's parameter tuple.
+ *
+ * @template TEventMap - The event map type.
+ * @template TEvent - The specific event key.
+ *
+ * @example
+ * ```typescript
+ * type MyEventMap = ObservableEventMap<'userLogin'> & { userLogin: [string, number] };
+ * type LoginCallback = ObservableCallback<MyEventMap, 'userLogin'>;
+ * // Equivalent to: (username: string, userId: number) => any
+ * ```
+ */
+export type ObservableCallback<
+  TEventMap extends ObservableEventMap,
+  TEvent extends keyof TEventMap | ObservableAllEvent,
+> = TEvent extends ObservableAllEvent
+  ? ObservableEventAllCallback<TEventMap>
+  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (...args: TEventMap[TEvent][]) => any;
+
+export type ObservableCallbackArgs<
+  TEventMap extends ObservableEventMap,
+  TEvent extends keyof TEventMap,
+> = TEventMap[TEvent];
+export type ObservableEvent<TEventMap extends ObservableEventMap> =
+  keyof TEventMap & ObservableAllEvent;
+
+export interface ObservableBindEventResult {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  remove: () => any;
+}
+
+/**
+ * Represents the collection of callback functions for all events in the event map.
+ * Each event key maps to an array of callback functions.
+ *
+ * @template TEventMap - The event map type.
+ *
+ * @example
+ * ```typescript
+ * type MyEventMap = ObservableEventMap<'event1' | 'event2'>;
+ * type Callbacks = ObservableCallbacks<MyEventMap>;
+ * // Equivalent to: { event1?: ((...args: unknown[]) => any)[], event2?: ((...args: unknown[]) => any)[] }
+ * ```
+ */
+export type ObservableCallbacks<TEventMap extends ObservableEventMap> = {
+  [K in keyof TEventMap]?: ObservableCallback<TEventMap, K>[];
+} & {
+  [K in ObservableAllEvent]: ObservableEventAllCallbacks<TEventMap>;
+};
+export type ObservableEventAllCallbacks<TEventMap extends ObservableEventMap> =
+  ObservableEventAllCallback<TEventMap>[];
+
+export type ObservableEventAllCallback<TEventMap extends ObservableEventMap> = (
+  event: keyof TEventMap
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+) => any;
+
+/**
+ * Represents a wildcard event type for observable systems.
+ *
+ * This type is used to signify that a callback should be triggered for all events within
+ * an observable system. It acts as a catch-all for any event, allowing developers to
+ * register handlers that respond to every event emitted by the observable.
+ *
+ * @example
+ * // Using the wildcard event type to listen for all events
+ * observable.on('*', (event, ...args) => {
+ *   console.log(`An event occurred: ${event}`, 'Arguments:', args);
+ * });
+ *
+ * @remarks
+ * The use of a wildcard event type can be useful for logging, debugging, or handling
+ * global events that are not specific to a single event type. However, it should be used
+ * judiciously, as it may lead to performance concerns if many events are emitted frequently.
+ */
+export type ObservableAllEvent = '*';
+
+export interface Observable<
+  TEventMap extends ObservableEventMap = Record<string, unknown[]>,
+> {
+  /**
+   * Flag indicating whether the object is observable.
+   */
+  readonly _____isObservable?: boolean;
+
+  on<E extends ObservableEvent<TEventMap>>(
+    event: E | ObservableAllEvent,
+    fn: ObservableCallback<TEventMap, E>
+  ): ObservableBindEventResult;
+
+  finally<E extends ObservableEvent<TEventMap>>(
+    event: E,
+    fn: ObservableCallback<TEventMap, E>
+  ): Observable<TEventMap>;
+
+  off<E extends ObservableEvent<TEventMap>>(
+    event: E | ObservableAllEvent,
+    fn: ObservableCallback<TEventMap, E>
+  ): Observable<TEventMap>;
+
+  trigger<E extends ObservableEvent<TEventMap>>(
+    event: E,
+    ...args: TEventMap[E]
+  ): Observable<TEventMap>;
+
+  /**
+   * Remove all event bindings.
+   *
+   * @returns The observable object for chaining.
+   *
+   * @example
+   * ```typescript
+   * observable.offAll();
+   * ```
+   */
+  offAll(): Observable<TEventMap>;
+
+  /**
+   * Listen to the given event and execute the callback at most once.
+   *
+   * @template E - The event key.
+   * @param event - The event to listen to.
+   * @param fn - The callback function to execute with type-safe parameters.
+   * @returns An object with a `remove` method to remove the callback.
+   *
+   * @example
+   * ```typescript
+   * observable.once('ready', () => {
+   *   console.log('System is ready');
+   * });
+   * ```
+   */
+  once<E extends ObservableEvent<TEventMap>>(
+    event: E,
+    fn: ObservableCallback<TEventMap, E>
+  ): ObservableBindEventResult;
+
+  /**
+   * Get all event callbacks.
+   *
+   * @returns An object with event names as keys and arrays of callback functions as values.
+   *
+   * @example
+   * ```typescript
+   * const callbacks = observable.getEventCallBacks();
+   * console.log(callbacks);
+   * ```
+   */
+  getEventCallBacks(): ObservableCallbacks<TEventMap>;
+
+  getEventAllCallbacks(): ObservableEventAllCallbacks<TEventMap>;
+}
+
+/**
+ * Returns an instance of the Observable interface.
+ * The `observableFactory` function creates a new observable object with methods to manage
+ * event listeners and trigger events. The returned observable object allows for adding,
+ * removing, and triggering event callbacks, as well as managing final callbacks that execute
+ * after all other callbacks for an event.
+ *
+ * @template TEventMap - The event map defining available events and their parameter types.
+ * @template Context - Additional context properties to mix into the observable.
+ * @param context - Optional context object to extend the observable with.
+ * @returns A new instance of the observable object.
+ *
+ * @example
+ * ```typescript
+ * const observable = observableFactory();
+ * observable.on("event", (arg1, arg2) => {
+ *   console.log(arg1, arg2);
+ * });
+ * observable.trigger("event", "Hello", "World"); // Outputs: Hello World
+ * observable.on("event",function(){
+ *  console.log("event triggered");
+ * })
+ * ```
+ * @see {@link Observable} for more information on the observable interface.
+ * @see {@link ObservableCallbacks} for more information on the observable callbacks interface.
+ * @see {@link ObservableAllEvent} for more information on the observable all event type.
+ * @see {@link isObservable} for more information on the observable check function.
+ */
+export const observableFactory = function <
+  TEventMap extends ObservableEventMap = Record<string, unknown[]>,
+  Context = unknown,
+>(context?: Context): Observable<TEventMap> & Context {
+  /**
+   * Private variables
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let callbacks: ObservableCallbacks<TEventMap> = {} as any,
+    finallyCallback: {
+      [E in keyof TEventMap]: ObservableCallback<TEventMap, E>[];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = {} as any,
+    slice = Array.prototype.slice;
+
+  return {
+    ...Object.assign({}, context),
+    on: function <E extends ObservableEvent<TEventMap>>(
+      event: E | ObservableAllEvent,
+      fn: ObservableCallback<TEventMap, E>
+    ): ObservableBindEventResult {
+      if (fn && event) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (callbacks as any)[event] = Array.isArray(callbacks[event])
+          ? callbacks[event]
+          : [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (callbacks as any).push(fn);
+      }
+      return {
+        remove: () => {
+          this.off(event, fn);
+        },
+      };
+    },
+    finally: function <E extends ObservableEvent<TEventMap>>(
+      event: E,
+      fn: ObservableCallback<TEventMap, E>
+    ): Observable<TEventMap> {
+      if (fn && event) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ((finallyCallback as any)[event] =
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (finallyCallback as any)[event] || []).push(fn);
+        return this;
+      }
+      return this;
+    },
+    off: function <E extends ObservableEvent<TEventMap>>(
+      event: E,
+      fn: ObservableCallback<TEventMap, E>
+    ): Observable<TEventMap> {
+      if (!event) return this;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (event == '*' && !fn) callbacks = {} as any;
+      else {
+        if (fn) {
+          var arr = callbacks[event];
+          for (var i = 0, cb; (cb = arr && arr[i]); ++i) {
+            if (cb == fn) {
+              arr.splice(i--, 1);
+            }
+          }
+        }
+      }
+      return this;
+    },
+    once: function <E extends ObservableEvent<TEventMap>>(
+      event: E,
+      fn: ObservableCallback<TEventMap, E>
+    ) {
+      const on: ObservableCallback<TEventMap, E> = (...args) => {
+        this.off(event, on);
+        fn.apply(this, args);
+        return true;
+      };
+      return this.on(event, on);
+    },
+    trigger: function <E extends keyof TEventMap>(
+      event: E,
+      ...args: ObservableCallbackArgs<TEventMap, E>[]
+    ): Observable<TEventMap> {
+      if (!event) return this;
+      // getting the arguments
+      let fns, fn, i;
+      fns = slice.call(callbacks[event] || [], 0);
+      let fnsReturns = [];
+      for (i = 0; (fn = fns[i]); ++i) {
+        if (typeof fn === 'function') {
+          fnsReturns.push(fn.apply(this, args));
+        }
+      }
+      if (typeof callbacks['*'] == 'function' && event != '*') {
+        this.trigger(event, ...(args as ObservableCallbackArgs<TEventMap, E>));
+        this.trigger('*', ...args);
+      }
+      //finaly events callback
+      var finalCals = slice.call(finallyCallback[event] || [], 0);
+      // le premier paramètres, représente un tableau des différents résultats retournés par les écouteurs de l'évènemet
+      // Le deuxième paramètre est le tableau contenant toute la liste de tous les arguments qui ont été passés à la fonction trigger
+      for (i = 0; (fn = finalCals[i]); ++i) {
+        fn.call(this, fnsReturns, args);
+      }
+      return this;
+    },
+    offAll: function (): Observable<TEventMap> {
+      callbacks = {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      finallyCallback = {} as any;
+      return this;
+    },
+    getEventCallBacks: function (): ObservableCallbacks<TEventMap> {
+      return callbacks;
+    },
+  };
+};
+
+/**
+ * Creates an observable object based on the provided element.
+ *
+ * The `observable` function checks if the given element is already observable. If it is,
+ * the function returns the existing observable instance. If not, it creates a new observable
+ * instance and extends the provided element with observable methods. This allows the element
+ * to listen for events, trigger callbacks, and manage event listeners.
+ *
+ * @template TEventType - The type of the event. This can be any string or a custom type.
+ * @param {any} element - The element to make observable. This can be any object or value.
+ * @returns {Observable<TEventType>} The observable object, which includes methods for event handling.
+ *
+ * @example
+ * ```typescript
+ * const context = observable({});
+ * const testCb = (e) => console.log("test");
+ * context.on("test", testCb);
+ * context.trigger("test");
+ * context.off("test", testCb);
+ * context.offAll();
+ * ```
+ * @see {@link Observable} for more information on the observable interface.
+ * @see {@link ObservableCallbacks} for more information on the observable callbacks interface.
+ * @see {@link ObservableAllEvent} for more information on the observable all event type.
+ * @see {@link isObservable} for more information on the observable check function.
+ */
+export const observable = function <
+  TEventMap extends ObservableEventMap = Record<string, unknown[]>,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  element: any
+): Observable<TEventMap> {
+  /**
+   * Check if the element is already observable.
+   *
+   * If the element is already observable, return it immediately.
+   */
+  if (isObservable(element)) return element; ///avoid redefine observable
+
+  /**
+   * Create a new observable object.
+   */
+  const context = element || {};
+
+  /**
+   * Create a new observable instance using the observableFactory function.
+   */
+  const obj = observableFactory<TEventMap>();
+
+  /**
+   * Extend the context object with the observable methods.
+   */
+  Object.defineProperties(context, {
+    /**
+     * Flag indicating whether the object is observable.
+     */
+    _____isObservable: { value: true },
+
+    /**
+     * Listen to the given `event` and execute the `callback` each time an event is triggered.
+     *
+     * @param {TEventType} event - The event to listen to.
+     * @param {ObservableCallback} fn - The callback function to execute.
+     * @returns {{ remove: () => any }} An object with a `remove` method to remove the callback.
+     */
+    on: {
+      value: obj.on.bind(context),
+    },
+
+    /**
+     * Add a callback function to an event that will be triggered once.
+     *
+     * @param {TEventType} event - The event to listen to.
+     * @param {ObservableCallback} fn - The callback function to execute.
+     * @returns {Observable<TEventType>} The observable object.
+     */
+    finally: {
+      value: obj.finally.bind(context),
+    },
+
+    /**
+     * Removes the given `event` listener.
+     *
+     * If `fn` is provided, removes the specific callback function from the event.
+     * If `fn` is not provided, removes all callback functions from the event.
+     *
+     * @param {TEventType} event - The event to remove the listener from.
+     * @param {ObservableCallback} [fn] - The callback function to remove.
+     * @returns {Observable<TEventType>} The observable object.
+     */
+    off: {
+      value: obj.off.bind(context),
+    },
+
+    /**
+     * Remove all event bindings.
+     *
+     * @returns {Observable<TEventType>} The observable object.
+     */
+    offAll: {
+      value: obj.offAll.bind(context),
+    },
+
+    /**
+     * Listen to the given `event` and execute the `callback` at most once.
+     *
+     * @param {string} event - The event to listen to.
+     * @param {ObservableCallback} fn - The callback function to execute.
+     * @returns {{ remove: () => any }} An object with a `remove` method to remove the callback.
+     */
+    once: {
+      value: obj.once.bind(context),
+    },
+
+    /**
+     * Get all event callbacks.
+     *
+     * @returns {{ [key: string]: ObservableCallback[] }} An object with event names as keys and arrays of callback functions as values.
+     */
+    getEventCallBacks: {
+      value: obj.getEventCallBacks.bind(context),
+    },
+
+    /**
+     * Execute all callback functions that listen to the given `event`.
+     *
+     * If the last argument is a function, it will be considered as the final callback function to be executed after all callbacks' execution.
+     *
+     * @param {TEventType} event - The event to trigger.
+     * @param {...any[]} args - The arguments to pass to the callback functions.
+     * @returns {Observable<TEventType>} The observable object.
+     */
+    trigger: {
+      value: obj.trigger.bind(context),
+    },
+  });
+  return context;
+};
+
+export class ObservableClass<
+  TEventMap extends ObservableEventMap = Record<string, unknown[]>,
+> implements Observable<TEventMap>
+{
+  /**
+   * Flag indicating whether the object is observable.
+   *
+   * This property is used internally to identify instances of observable objects.
+   * It is set to true for all instances of this class.
+   */
+  readonly _____isObservable?: boolean | undefined = true;
+
+  /**
+   * The internal observable object that provides the observable functionality.
+   *
+   * This object is created using the observableFactory function and contains
+   * the core methods for managing event listeners and triggering events.
+   */
+  readonly _observable = observableFactory<TEventMap>();
+
+  on<E extends ObservableEvent<TEventMap>>(
+    event: E,
+    fn: ObservableCallback<TEventMap, E>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): { remove: () => any } {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this._observable.on.call(this, event, fn as any);
+  }
+
+  finally<E extends keyof TEventMap>(
+    event: E,
+    fn: ObservableCallback<TEventMap, E>
+  ): Observable<TEventMap> {
+    return this._observable.finally.call(this, event, fn);
+  }
+  off<E extends keyof TEventMap>(
+    event: E,
+    fn: ObservableCallback<TEventMap, E>
+  ): Observable<TEventMap> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this._observable.off.call(this, event, fn as any);
+  }
+
+  trigger<E extends keyof TEventMap>(
+    event: E,
+    ...args: ObservableCallbackArgs<TEventMap, E>
+  ): Observable<TEventMap> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this._observable.trigger.call(this, event as any, ...args);
+  }
+
+  once<E extends ObservableEvent<TEventMap>>(
+    event: E,
+    fn: ObservableCallback<TEventMap, E>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): { remove: () => any } {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this._observable.once.call(this, event, fn as any);
+  }
+
+  /**
+   * Get all event callbacks.
+   *
+   * This method returns an object with event names as keys and arrays of callback functions as values.
+   *
+   * @returns {ObservableCallbacks<TEventType>} An object with event names as keys and arrays of callback functions as values.
+   *
+   * @example
+   * ```typescript
+   * const callbacks = observable.getEventCallBacks();
+   * console.log(callbacks);
+   * ```
+   */
+  getEventCallBacks(): ObservableCallbacks<TEventMap> {
+    return this._observable.getEventCallBacks.call(this);
+  }
+}
+
+/**
+ * Checks if the given object is an observable element.
+ *
+ * An object is considered observable if it implements the Observable interface and has
+ * the following properties and methods:
+ * - `_____isObservable` set to `true`
+ * - `on` method
+ * - `trigger` method
+ * - `off` method
+ *
+ * @param {any} obj - The object to check.
+ * @returns {boolean} `true` if the object is observable, `false` otherwise.
+ *
+ * @example
+ * ```typescript
+ * const observable = new ObservableClass();
+ * console.log(isObservable(observable)); // true
+ *
+ * const nonObservable = {};
+ * console.log(isObservable(nonObservable)); // false
+ * ```
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function isObservable(obj: any): boolean {
+  /**
+   * Check if the object is null or undefined, or if it's a primitive type (string, boolean, number).
+   * If so, return false immediately.
+   */
+  if (!obj || ['string', 'boolean', 'number'].includes(typeof obj))
+    return false;
+  try {
+    /**
+     * Check if the object has the required properties and methods.
+     * If any of these checks fail, the object is not observable.
+     */
+    return (
+      obj?._____isObservable === true &&
+      typeof obj?.on === 'function' &&
+      typeof obj?.trigger === 'function' &&
+      typeof obj?.off === 'function'
+    );
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    /**
+     * If an error occurs during the checks, return false.
+     */
+  }
+  return false;
+}

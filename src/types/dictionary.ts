@@ -8,8 +8,8 @@
  * const config: Dictionary = { theme: 'dark', enabled: true };
  * ```
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Dictionary = Record<string, any>;
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-explicit-any
+export interface Dictionary extends Record<string | symbol | number, any> {}
 
 /**
  * A utility type that capitalizes the first character of a string type.
