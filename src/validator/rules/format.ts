@@ -1,11 +1,11 @@
-import { InputFormatter } from "@/inputFormatter";
-import { ICountryCode } from "@countries/types";
-import { defaultStr } from "@utils/defaultStr";
-import { isNonNullString } from "@utils/isNonNullString";
-import { isValidUrl } from "@utils/uri";
-import { isValidEmail } from "@utils/validators/isValidEmail";
-import { IValidatorResult, IValidatorValidateOptions } from "../types";
-import { Validator } from "../validator";
+import { InputFormatter } from '@/inputFormatter';
+import { ICountryCode } from '@countries/types';
+import { defaultStr } from '@utils/defaultStr';
+import { isNonNullString } from '@utils/isNonNullString';
+import { isUrl } from '@utils/uri';
+import { isValidEmail } from '@utils/validators/isValidEmail';
+import { IValidatorResult, IValidatorValidateOptions } from '../types';
+import { Validator } from '../validator';
 
 /**
  * ### IsEmail Decorator
@@ -44,11 +44,11 @@ import { Validator } from "../validator";
  * @see {@link IsRequired} - Often used together
  * @public
  */
-export const IsEmail = Validator.buildPropertyDecorator(["Email"]);
+export const IsEmail = Validator.buildPropertyDecorator(['Email']);
 
-Validator.registerRule("Email", function Email(options) {
+Validator.registerRule('Email', function Email(options) {
   const { value, i18n } = options;
-  const message = i18n.t("validator.email", options);
+  const message = i18n.t('validator.email', options);
   if (!isNonNullString(value)) {
     return message;
   }
@@ -93,20 +93,20 @@ Validator.registerRule("Email", function Email(options) {
  * @since 1.0.0
  * @public
  */
-export const IsUrl = Validator.buildPropertyDecorator(["Url"]);
+export const IsUrl = Validator.buildPropertyDecorator(['Url']);
 
-Validator.registerRule("Url", function Url(options) {
+Validator.registerRule('Url', function Url(options) {
   const { value, i18n } = options;
-  return !value || typeof value !== "string"
+  return !value || typeof value !== 'string'
     ? true
-    : isValidUrl(value) || i18n.t("validator.url", options);
+    : isUrl(value) || i18n.t('validator.url', options);
 });
 
 function phoneNumber(
   options: IValidatorValidateOptions<[countryCode?: ICountryCode]>
 ) {
   const { value, phoneCountryCode, i18n, ruleParams } = options;
-  const message = i18n.t("validator.phoneNumber", options);
+  const message = i18n.t('validator.phoneNumber', options);
   if (!isNonNullString(value)) {
     return message;
   }
@@ -117,7 +117,7 @@ function phoneNumber(
     ) || message
   );
 }
-Validator.registerRule("PhoneNumber", phoneNumber);
+Validator.registerRule('PhoneNumber', phoneNumber);
 
 /**
  * A validator decorator to check if a phone number is valid.
@@ -143,10 +143,10 @@ function emailOrPhoneNumber(options: IValidatorValidateOptions) {
   return (
     isValidEmail(value) ||
     InputFormatter.isValidPhoneNumber(value, phoneCountryCode) ||
-    i18n.t("validator.emailOrPhoneNumber", options)
+    i18n.t('validator.emailOrPhoneNumber', options)
   );
 }
-Validator.registerRule("EmailOrPhoneNumber", emailOrPhoneNumber);
+Validator.registerRule('EmailOrPhoneNumber', emailOrPhoneNumber);
 
 /**
  * A validator decorator to check if value is a valid email or phone number.
@@ -162,7 +162,7 @@ Validator.registerRule("EmailOrPhoneNumber", emailOrPhoneNumber);
  * ```
  */
 export const IsEmailOrPhone = Validator.buildPropertyDecorator([
-  "EmailOrPhoneNumber",
+  'EmailOrPhoneNumber',
 ]);
 
 /**
@@ -199,11 +199,11 @@ export const IsEmailOrPhone = Validator.buildPropertyDecorator([
  * @since 1.0.0
  * @public
  */
-export const IsFileName = Validator.buildPropertyDecorator(["FileName"]);
+export const IsFileName = Validator.buildPropertyDecorator(['FileName']);
 
-Validator.registerRule("FileName", function FileName(options) {
+Validator.registerRule('FileName', function FileName(options) {
   const { value, i18n } = options;
-  const message = i18n.t("validator.fileName", options);
+  const message = i18n.t('validator.fileName', options);
   if (!isNonNullString(value)) return message;
   const rg1 = /^[^\\/:*?"<>|]+$/; // forbidden characters \ / : * ? " < > |
   const rg2 = /^\./; // cannot start with dot (.)
@@ -221,8 +221,8 @@ function _UUID({
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
-    if (typeof value !== "string") {
-      const message = i18n.t("validator.uuid", {
+    if (typeof value !== 'string') {
+      const message = i18n.t('validator.uuid', {
         field: translatedPropertyName || fieldName,
         fieldName,
         translatedPropertyName,
@@ -237,7 +237,7 @@ function _UUID({
     if (uuidRegex.test(value)) {
       resolve(true);
     } else {
-      const message = i18n.t("validator.uuid", {
+      const message = i18n.t('validator.uuid', {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
@@ -246,7 +246,7 @@ function _UUID({
     }
   });
 }
-Validator.registerRule("UUID", _UUID);
+Validator.registerRule('UUID', _UUID);
 
 /**
  * ### UUID Rule
@@ -269,7 +269,7 @@ Validator.registerRule("UUID", _UUID);
  * @since 1.22.0
  * @public
  */
-export const IsUUID = Validator.buildPropertyDecorator(["UUID"]);
+export const IsUUID = Validator.buildPropertyDecorator(['UUID']);
 
 function _JSON({
   value,
@@ -279,8 +279,8 @@ function _JSON({
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
-    if (typeof value !== "string") {
-      const message = i18n.t("validator.json", {
+    if (typeof value !== 'string') {
+      const message = i18n.t('validator.json', {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
@@ -292,7 +292,7 @@ function _JSON({
       JSON.parse(value);
       resolve(true);
     } catch (error) {
-      const message = i18n.t("validator.json", {
+      const message = i18n.t('validator.json', {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
@@ -301,7 +301,7 @@ function _JSON({
     }
   });
 }
-Validator.registerRule("JSON", _JSON);
+Validator.registerRule('JSON', _JSON);
 
 /**
  * ### JSON Rule
@@ -324,7 +324,7 @@ Validator.registerRule("JSON", _JSON);
  * @since 1.22.0
  * @public
  */
-export const IsJSON = Validator.buildPropertyDecorator(["JSON"]);
+export const IsJSON = Validator.buildPropertyDecorator(['JSON']);
 
 function _Base64({
   value,
@@ -334,8 +334,8 @@ function _Base64({
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
-    if (typeof value !== "string") {
-      const message = i18n.t("validator.base64", {
+    if (typeof value !== 'string') {
+      const message = i18n.t('validator.base64', {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
@@ -348,7 +348,7 @@ function _Base64({
     if (base64Regex.test(value)) {
       resolve(true);
     } else {
-      const message = i18n.t("validator.base64", {
+      const message = i18n.t('validator.base64', {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
@@ -357,7 +357,7 @@ function _Base64({
     }
   });
 }
-Validator.registerRule("Base64", _Base64);
+Validator.registerRule('Base64', _Base64);
 
 /**
  * ### Base64 Rule
@@ -380,7 +380,7 @@ Validator.registerRule("Base64", _Base64);
  * @since 1.22.0
  * @public
  */
-export const IsBase64 = Validator.buildPropertyDecorator(["Base64"]);
+export const IsBase64 = Validator.buildPropertyDecorator(['Base64']);
 
 function _HexColor({
   value,
@@ -390,8 +390,8 @@ function _HexColor({
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
-    if (typeof value !== "string") {
-      const message = i18n.t("validator.hexColor", {
+    if (typeof value !== 'string') {
+      const message = i18n.t('validator.hexColor', {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
@@ -405,7 +405,7 @@ function _HexColor({
     if (hexColorRegex.test(value)) {
       resolve(true);
     } else {
-      const message = i18n.t("validator.hexColor", {
+      const message = i18n.t('validator.hexColor', {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
@@ -414,7 +414,7 @@ function _HexColor({
     }
   });
 }
-Validator.registerRule("HexColor", _HexColor);
+Validator.registerRule('HexColor', _HexColor);
 
 /**
  * ### HexColor Rule
@@ -437,7 +437,7 @@ Validator.registerRule("HexColor", _HexColor);
  * @since 1.22.0
  * @public
  */
-export const IsHexColor = Validator.buildPropertyDecorator(["HexColor"]);
+export const IsHexColor = Validator.buildPropertyDecorator(['HexColor']);
 
 function _CreditCard({
   value,
@@ -447,8 +447,8 @@ function _CreditCard({
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
-    if (typeof value !== "string") {
-      const message = i18n.t("validator.creditCard", {
+    if (typeof value !== 'string') {
+      const message = i18n.t('validator.creditCard', {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
@@ -457,11 +457,11 @@ function _CreditCard({
     }
 
     // Remove spaces and dashes
-    const cleanValue = value.replace(/[\s-]/g, "");
+    const cleanValue = value.replace(/[\s-]/g, '');
 
     // Check if it's all digits and length is between 13-19
     if (!/^\d{13,19}$/.test(cleanValue)) {
-      const message = i18n.t("validator.creditCard", {
+      const message = i18n.t('validator.creditCard', {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
@@ -490,7 +490,7 @@ function _CreditCard({
     if (sum % 10 === 0) {
       resolve(true);
     } else {
-      const message = i18n.t("validator.creditCard", {
+      const message = i18n.t('validator.creditCard', {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
@@ -499,7 +499,7 @@ function _CreditCard({
     }
   });
 }
-Validator.registerRule("CreditCard", _CreditCard);
+Validator.registerRule('CreditCard', _CreditCard);
 
 /**
  * ### CreditCard Rule
@@ -522,7 +522,7 @@ Validator.registerRule("CreditCard", _CreditCard);
  * @since 1.22.0
  * @public
  */
-export const IsCreditCard = Validator.buildPropertyDecorator(["CreditCard"]);
+export const IsCreditCard = Validator.buildPropertyDecorator(['CreditCard']);
 
 function _IsIP({
   value,
@@ -533,25 +533,25 @@ function _IsIP({
   ...rest
 }: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
-    if (typeof value !== "string") {
-      const message = i18n.t("validator.ip", {
+    if (typeof value !== 'string') {
+      const message = i18n.t('validator.ip', {
         field: translatedPropertyName || fieldName,
         value,
-        version: ruleParams?.[0] || "4/6",
+        version: ruleParams?.[0] || '4/6',
         ...rest,
       });
       return reject(message);
     }
 
-    const version = ruleParams?.[0] || "4/6";
+    const version = ruleParams?.[0] || '4/6';
     let ipRegex: RegExp;
 
     switch (version) {
-      case "4":
+      case '4':
         ipRegex =
           /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
         break;
-      case "6":
+      case '6':
         ipRegex =
           /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
         break;
@@ -567,7 +567,7 @@ function _IsIP({
     if (ipRegex.test(value)) {
       resolve(true);
     } else {
-      const message = i18n.t("validator.ip", {
+      const message = i18n.t('validator.ip', {
         field: translatedPropertyName || fieldName,
         value,
         version,
@@ -577,7 +577,7 @@ function _IsIP({
     }
   });
 }
-Validator.registerRule("IP", _IsIP);
+Validator.registerRule('IP', _IsIP);
 
 /**
  * ### IP Rule
@@ -619,8 +619,8 @@ function _MACAddress({
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
-    if (typeof value !== "string") {
-      const message = i18n.t("validator.macAddress", {
+    if (typeof value !== 'string') {
+      const message = i18n.t('validator.macAddress', {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
@@ -634,7 +634,7 @@ function _MACAddress({
     if (macRegex.test(value)) {
       resolve(true);
     } else {
-      const message = i18n.t("validator.macAddress", {
+      const message = i18n.t('validator.macAddress', {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
@@ -643,7 +643,7 @@ function _MACAddress({
     }
   });
 }
-Validator.registerRule("MACAddress", _MACAddress);
+Validator.registerRule('MACAddress', _MACAddress);
 
 /**
  * ### MACAddress Rule
@@ -666,7 +666,7 @@ Validator.registerRule("MACAddress", _MACAddress);
  * @since 1.22.0
  * @public
  */
-export const IsMACAddress = Validator.buildPropertyDecorator(["MACAddress"]);
+export const IsMACAddress = Validator.buildPropertyDecorator(['MACAddress']);
 
 function _Matches({
   value,
@@ -678,19 +678,19 @@ function _Matches({
 }: IValidatorValidateOptions<
   [rule: RegExp, errorMessage?: string]
 >): IValidatorResult {
-  if (typeof value !== "string") {
-    const message = i18n.t("validator.regex", {
+  if (typeof value !== 'string') {
+    const message = i18n.t('validator.regex', {
       field: translatedPropertyName || fieldName,
       value,
-      pattern: ruleParams?.[0] || "",
+      pattern: ruleParams?.[0] || '',
       ...rest,
     });
     return message;
   }
 
   if (!ruleParams || !ruleParams[0]) {
-    const message = i18n.t("validator.invalidRuleParams", {
-      rule: "Matches",
+    const message = i18n.t('validator.invalidRuleParams', {
+      rule: 'Matches',
       field: translatedPropertyName || fieldName,
       ruleParams,
       ...rest,
@@ -699,11 +699,11 @@ function _Matches({
   }
   const messageParams = defaultStr(ruleParams[1]).trim();
   const translatedMessage = defaultStr(
-    messageParams ? i18n.getNestedTranslation(messageParams) : ""
+    messageParams ? i18n.getNestedTranslation(messageParams) : ''
   ).trim();
   const message =
     translatedMessage ??
-    i18n.t("validator.regex", {
+    i18n.t('validator.regex', {
       field: translatedPropertyName || fieldName,
       value,
       pattern: ruleParams[0],
@@ -715,7 +715,7 @@ function _Matches({
   } catch (error) {}
   return message;
 }
-Validator.registerRule("Matches", _Matches);
+Validator.registerRule('Matches', _Matches);
 
 /**
  * ### Matches Rule
@@ -746,7 +746,7 @@ Validator.registerRule("Matches", _Matches);
 export const Matches =
   Validator.buildRuleDecorator<[rule: RegExp, errorMessage?: string]>(_Matches);
 
-declare module "../types" {
+declare module '../types' {
   export interface IValidatorRulesMap<Context = unknown> {
     /**
      * ### UUID Rule

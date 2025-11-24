@@ -1,17 +1,18 @@
-import { IObservable, observable } from "@/observable";
+import { IObservable, observable } from '@/observable';
 import {
   IResourceActionName,
   IResourceActionTupleArray,
   IResourceActionTupleObject,
   IResourceName,
-} from "@resources/types";
-import CryptoJS from "crypto-js";
-import { i18n } from "../i18n";
-import { Logger } from "../logger";
-import { Session as $session } from "../session";
-import { IDict } from "../types/dictionary";
-import { isNonNullString, isObj, JsonHelper, stringify } from "../utils";
-import "./types";
+} from '@resources/types';
+import CryptoJS from 'crypto-js';
+import 'reflect-metadata';
+import { i18n } from '../i18n';
+import { Logger } from '../logger';
+import { Session as $session } from '../session';
+import { IDict } from '../types/dictionary';
+import { isNonNullString, isObj, JsonHelper, stringify } from '../utils';
+import './types';
 import {
   IAuthEvent,
   IAuthPerm,
@@ -19,14 +20,14 @@ import {
   IAuthRole,
   IAuthSessionStorage,
   IAuthUser,
-} from "./types";
+} from './types';
 
-export * from "./types";
+export * from './types';
 
 const encrypt = CryptoJS.AES.encrypt;
 const decrypt = CryptoJS.AES.decrypt;
-const SESSION_ENCRYPT_KEY = "auth-decrypted-key";
-const USER_SESSION_KEY = "user-session";
+const SESSION_ENCRYPT_KEY = 'auth-decrypted-key';
+const USER_SESSION_KEY = 'user-session';
 
 type ILocalUserRef = {
   current: IAuthUser | null;
@@ -111,7 +112,7 @@ class Session {
    * const sessionKey = getKey(); // Returns: 'auth--'
    */
   static getKey(sessionName?: string) {
-    return `auth-${stringify(Auth.getSignedUser()?.id)}-${sessionName || ""}`;
+    return `auth-${stringify(Auth.getSignedUser()?.id)}-${sessionName || ''}`;
   }
   /**
    * Retrieves session data associated with a specific session name.
@@ -299,7 +300,7 @@ export class Auth {
   static isMasterAdmin?: (user?: IAuthUser) => boolean;
   private static _isMasterAdmin(user?: IAuthUser): boolean {
     user = isObj(user) ? user : (Auth.getSignedUser() as IAuthUser);
-    return typeof Auth.isMasterAdmin == "function"
+    return typeof Auth.isMasterAdmin == 'function'
       ? Auth.isMasterAdmin(user)
       : false;
   }
@@ -447,13 +448,13 @@ export class Auth {
     if (encrypted) {
       try {
         const ded = decrypt(encrypted, SESSION_ENCRYPT_KEY);
-        if (ded && typeof ded?.toString == "function") {
+        if (ded && typeof ded?.toString == 'function') {
           const decoded = ded.toString(CryptoJS.enc.Utf8);
           Auth.localUserRef.current = JsonHelper.parse(decoded) as IAuthUser;
           return Auth.localUserRef.current;
         }
       } catch (e) {
-        Logger.log("getting local user ", e);
+        Logger.log('getting local user ', e);
       }
     }
     return null;
@@ -617,14 +618,14 @@ export class Auth {
         : null;
     } catch (e) {
       Auth.localUserRef.current = null;
-      Logger.log(e, " setting local user");
+      Logger.log(e, ' setting local user');
     }
     await $session.set(USER_SESSION_KEY, encrypted);
     if (triggerEvent) {
       const event =
         isObj(uToSave) && encrypted && encrypted !== null
-          ? "SIGN_IN"
-          : "SIGN_OUT";
+          ? 'SIGN_IN'
+          : 'SIGN_OUT';
       Auth.events.trigger(event, uToSave);
     }
     return u;
@@ -820,7 +821,7 @@ export class Auth {
     triggerEvent: boolean = true
   ): Promise<IAuthUser> {
     if (!isObj(user)) {
-      throw new Error(i18n.t("auth.invalidSignInUser"));
+      throw new Error(i18n.t('auth.invalidSignInUser'));
     }
     return (await Auth.setSignedUser(user, triggerEvent)) as IAuthUser;
   }
@@ -1045,7 +1046,7 @@ export class Auth {
   }
 
   private static isResourceActionTupleArray<
-    ResourceName extends IResourceName = IResourceName
+    ResourceName extends IResourceName = IResourceName,
   >(
     perm: IAuthPerm<ResourceName>
   ): perm is IResourceActionTupleArray<ResourceName> {
@@ -1057,13 +1058,13 @@ export class Auth {
     );
   }
   private static isResourceActionTupleObject<
-    ResourceName extends IResourceName = IResourceName
+    ResourceName extends IResourceName = IResourceName,
   >(
     perm: IAuthPerm<ResourceName>
   ): perm is IResourceActionTupleObject<ResourceName> {
     return (
       !Array.isArray(perm) &&
-      typeof perm === "object" &&
+      typeof perm === 'object' &&
       isObj(perm) &&
       isNonNullString(perm.resourceName) &&
       isNonNullString(perm.action)
@@ -1178,10 +1179,10 @@ export class Auth {
     user?: IAuthUser
   ): boolean {
     user = Object.assign({}, user || (Auth.getSignedUser() as IAuthUser));
-    if (typeof perm === "boolean") return perm;
+    if (typeof perm === 'boolean') return perm;
     if (Auth._isMasterAdmin(user)) return true;
     if (!perm) return true;
-    if (typeof perm === "function") return !!perm(user);
+    if (typeof perm === 'function') return !!perm(user);
     if (Auth.isResourceActionTupleObject(perm)) {
       if (
         Auth.checkUserPermission(user, perm.resourceName, perm.action as any)
@@ -1476,11 +1477,11 @@ export class Auth {
    * - Logs errors internally for debugging purposes without exposing sensitive information
    */
   static checkUserPermission<
-    ResourceName extends IResourceName = IResourceName
+    ResourceName extends IResourceName = IResourceName,
   >(
     user: IAuthUser,
     resource: ResourceName,
-    action: IResourceActionName<ResourceName> = "read"
+    action: IResourceActionName<ResourceName> = 'read'
   ) {
     if (!isObj(user) || !user) return false;
     if (
@@ -1781,15 +1782,15 @@ export class Auth {
   static checkPermission<ResourceName extends IResourceName = IResourceName>(
     perms: IAuthPerms,
     resource: ResourceName,
-    action: IResourceActionName<ResourceName> = "read"
+    action: IResourceActionName<ResourceName> = 'read'
   ) {
     perms = Object.assign({}, perms);
-    resource = (isNonNullString(resource) ? resource : "") as ResourceName;
+    resource = (isNonNullString(resource) ? resource : '') as ResourceName;
     if (!isObj(perms) || !resource) {
       return false;
     }
     const resourceStr = String(resource).trim().toLowerCase();
-    action = isNonNullString(action) ? action : "read";
+    action = isNonNullString(action) ? action : 'read';
     let userActions: IResourceActionName[] = [];
     for (let i in perms) {
       if (
@@ -1801,7 +1802,7 @@ export class Auth {
       }
     }
     if (!Array.isArray(userActions) || !userActions.length) return false;
-    if (userActions.includes("all")) {
+    if (userActions.includes('all')) {
       return true;
     }
     for (let i in userActions) {

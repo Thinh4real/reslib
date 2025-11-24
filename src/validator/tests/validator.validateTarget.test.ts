@@ -1,6 +1,7 @@
-import { Validator } from "@/validator";
-import { i18n } from "../../i18n";
-import { ValidateNested } from "../rules/target";
+import { Validator } from '@/validator';
+import 'reflect-metadata';
+import { i18n } from '../../i18n';
+import { ValidateNested } from '../rules/target';
 
 /**
  * Comprehensive test suite for Validator.validateTarget() method
@@ -8,21 +9,21 @@ import { ValidateNested } from "../rules/target";
  * Tests class validation using the Either pattern (discriminated unions).
  * Covers basic validation, error handling, and response format consistency.
  */
-describe("Validator.validateTarget() - Class Validation with Either Pattern", () => {
+describe('Validator.validateTarget() - Class Validation with Either Pattern', () => {
   beforeAll(async () => {
-    await i18n.setLocale("en");
+    await i18n.setLocale('en');
   });
 
-  describe("Basic Validation Success", () => {
-    it("should return success result for valid data", async () => {
+  describe('Basic Validation Success', () => {
+    it('should return success result for valid data', async () => {
       class User {
-        email: string = "";
-        name: string = "";
+        email: string = '';
+        name: string = '';
       }
 
       const data = {
-        email: "user@example.com",
-        name: "John Doe",
+        email: 'user@example.com',
+        name: 'John Doe',
       };
 
       const result = await Validator.validateTarget(User, { data });
@@ -35,37 +36,37 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       }
     });
 
-    it("should return consistent success structure", async () => {
+    it('should return consistent success structure', async () => {
       class Config {
-        apiKey: string = "";
-        endpoint: string = "";
+        apiKey: string = '';
+        endpoint: string = '';
       }
 
       const data = {
-        apiKey: "secret",
-        endpoint: "https://api.example.com",
+        apiKey: 'secret',
+        endpoint: 'https://api.example.com',
       };
 
       const result = await Validator.validateTarget(Config, { data });
 
-      expect(result).toHaveProperty("success", true);
+      expect(result.success).toBe(true);
       if (result.success) {
-        expect(result).toHaveProperty("data");
-        expect(result).toHaveProperty("validatedAt");
-        expect(result).toHaveProperty("duration");
-        expect(typeof result.duration).toBe("number");
+        expect(result.data).toBeDefined();
+        expect(result.validatedAt).toBeDefined();
+        expect(result.duration).toBeDefined();
+        expect(typeof result.duration).toBe('number');
       }
     });
 
-    it("should preserve data object in response", async () => {
+    it('should preserve data object in response', async () => {
       class Model {
-        field1: string = "";
+        field1: string = '';
         field2: number = 0;
         field3: boolean = false;
       }
 
       const originalData = {
-        field1: "value",
+        field1: 'value',
         field2: 42,
         field3: true,
       };
@@ -81,24 +82,32 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
     });
   });
 
-  describe("No Rules Defined", () => {
-    it("should pass when class has no validation rules", async () => {
+  describe('No Rules Defined', () => {
+    it('should pass when class has no validation rules', async () => {
       class SimpleModel {
-        value: string = "";
+        value: string = '';
       }
 
-      const data = { value: "test" };
+      const data = { value: 'test' };
       const result = await Validator.validateTarget(SimpleModel, { data });
 
       expect(result.success).toBe(true);
     });
 
-    it("should accept any data when no rules are defined", async () => {
+    it('should accept any data when no rules are defined', async () => {
       class OpenModel {
         field: any;
       }
 
-      const variations = [{ field: "string" }, { field: 123 }, { field: true }, { field: null }, { field: undefined }, { field: { nested: "object" } }, { field: ["array"] }];
+      const variations = [
+        { field: 'string' },
+        { field: 123 },
+        { field: true },
+        { field: null },
+        { field: undefined },
+        { field: { nested: 'object' } },
+        { field: ['array'] },
+      ];
 
       for (const data of variations) {
         const result = await Validator.validateTarget(OpenModel, { data });
@@ -106,14 +115,14 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       }
     });
 
-    it("should accept extra fields when no rules defined", async () => {
+    it('should accept extra fields when no rules defined', async () => {
       class Model {
-        field: string = "";
+        field: string = '';
       }
 
       const data = {
-        field: "value",
-        extra1: "should be ok",
+        field: 'value',
+        extra1: 'should be ok',
         extra2: 123,
         extra3: { nested: true },
       };
@@ -123,8 +132,8 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
     });
   });
 
-  describe("Empty Data Handling", () => {
-    it("should handle empty object", async () => {
+  describe('Empty Data Handling', () => {
+    it('should handle empty object', async () => {
       class Model {
         field?: string;
       }
@@ -135,28 +144,28 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       expect(result.success).toBe(true);
     });
 
-    it("should handle partial data", async () => {
+    it('should handle partial data', async () => {
       class Model {
-        field1: string = "";
+        field1: string = '';
         field2?: string;
         field3?: number;
       }
 
-      const data = { field1: "value" };
+      const data = { field1: 'value' };
       const result = await Validator.validateTarget(Model, { data });
 
       expect(result.success).toBe(true);
     });
   });
 
-  describe("Response Structure on Success", () => {
-    it("should include validatedAt as Date", async () => {
+  describe('Response Structure on Success', () => {
+    it('should include validatedAt as Date', async () => {
       class Model {
-        data: string = "";
+        data: string = '';
       }
 
       const result = await Validator.validateTarget(Model, {
-        data: { data: "test" },
+        data: { data: 'test' },
       });
 
       if (result.success) {
@@ -164,40 +173,40 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       }
     });
 
-    it("should include duration as number", async () => {
+    it('should include duration as number', async () => {
       class Model {
-        data: string = "";
+        data: string = '';
       }
 
       const result = await Validator.validateTarget(Model, {
-        data: { data: "test" },
+        data: { data: 'test' },
       });
 
       if (result.success) {
-        expect(typeof result.duration).toBe("number");
+        expect(typeof result.duration).toBe('number');
         expect(result.duration).toBeGreaterThanOrEqual(0);
       }
     });
 
-    it("should have success flag set to true", async () => {
+    it('should have success flag set to true', async () => {
       class Model {
-        field: string = "";
+        field: string = '';
       }
 
       const result = await Validator.validateTarget(Model, {
-        data: { field: "test" },
+        data: { field: 'test' },
       });
 
       expect(result.success === true).toBe(true);
     });
 
-    it("should have proper response structure when valid", async () => {
+    it('should have proper response structure when valid', async () => {
       class Model {
-        field: string = "";
+        field: string = '';
       }
 
       const result = await Validator.validateTarget(Model, {
-        data: { field: "test" },
+        data: { field: 'test' },
       });
 
       if (result.success) {
@@ -208,30 +217,30 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
     });
   });
 
-  describe("Context Passing", () => {
-    it("should accept context option", async () => {
+  describe('Context Passing', () => {
+    it('should accept context option', async () => {
       class Model {
-        field: string = "";
+        field: string = '';
       }
 
-      const context = { userId: 123, role: "admin" };
+      const context = { userId: 123, role: 'admin' };
       const result = await Validator.validateTarget(Model, {
-        data: { field: "test" },
+        data: { field: 'test' },
         context,
       });
 
       expect(result.success).toBe(true);
     });
 
-    it("should pass context through to validation", async () => {
+    it('should pass context through to validation', async () => {
       class Model {
-        field: string = "";
+        field: string = '';
       }
 
-      const testContext = { testValue: "context-data" };
+      const testContext = { testValue: 'context-data' };
 
       const result = await Validator.validateTarget(Model, {
-        data: { field: "test" },
+        data: { field: 'test' },
         context: testContext,
       });
 
@@ -241,15 +250,17 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
     });
   });
 
-  describe("Concurrent Validation", () => {
-    it("should handle multiple concurrent validations", async () => {
+  describe('Concurrent Validation', () => {
+    it('should handle multiple concurrent validations', async () => {
       class Model {
-        id: string = "";
+        id: string = '';
       }
 
-      const instances = [{ id: "1" }, { id: "2" }, { id: "3" }];
+      const instances = [{ id: '1' }, { id: '2' }, { id: '3' }];
 
-      const results = await Promise.all(instances.map((data) => Validator.validateTarget(Model, { data })));
+      const results = await Promise.all(
+        instances.map((data) => Validator.validateTarget(Model, { data }))
+      );
 
       expect(results).toHaveLength(3);
       results.forEach((result) => {
@@ -257,12 +268,16 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       });
     });
 
-    it("should not interfere between concurrent calls", async () => {
+    it('should not interfere between concurrent calls', async () => {
       class Model {
-        value: string = "";
+        value: string = '';
       }
 
-      const results = await Promise.all([Validator.validateTarget(Model, { data: { value: "a" } }), Validator.validateTarget(Model, { data: { value: "b" } }), Validator.validateTarget(Model, { data: { value: "c" } })]);
+      const results = await Promise.all([
+        Validator.validateTarget(Model, { data: { value: 'a' } }),
+        Validator.validateTarget(Model, { data: { value: 'b' } }),
+        Validator.validateTarget(Model, { data: { value: 'c' } }),
+      ]);
 
       expect(results[0].success).toBe(true);
       expect(results[1].success).toBe(true);
@@ -270,22 +285,22 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
     });
   });
 
-  describe("Data Type Handling", () => {
-    it("should preserve string types", async () => {
+  describe('Data Type Handling', () => {
+    it('should preserve string types', async () => {
       class Model {
-        text: string = "";
+        text: string = '';
       }
 
-      const data = { text: "test string" };
+      const data = { text: 'test string' };
       const result = await Validator.validateTarget(Model, { data });
 
       if (result.success) {
-        expect(result.data?.text).toEqual("test string");
-        expect(typeof result.data?.text).toBe("string");
+        expect(result.data?.text).toEqual('test string');
+        expect(typeof result.data?.text).toBe('string');
       }
     });
 
-    it("should preserve number types", async () => {
+    it('should preserve number types', async () => {
       class Model {
         count: number = 0;
       }
@@ -295,11 +310,11 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
 
       if (result.success) {
         expect(result.data?.count).toEqual(42);
-        expect(typeof result.data?.count).toBe("number");
+        expect(typeof result.data?.count).toBe('number');
       }
     });
 
-    it("should preserve boolean types", async () => {
+    it('should preserve boolean types', async () => {
       class Model {
         active: boolean = false;
       }
@@ -309,61 +324,61 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
 
       if (result.success) {
         expect(result.data?.active).toEqual(true);
-        expect(typeof result.data?.active).toBe("boolean");
+        expect(typeof result.data?.active).toBe('boolean');
       }
     });
 
-    it("should preserve array types", async () => {
+    it('should preserve array types', async () => {
       class Model {
         items: string[] = [];
       }
 
-      const data = { items: ["a", "b", "c"] };
+      const data = { items: ['a', 'b', 'c'] };
       const result = await Validator.validateTarget(Model, { data });
 
       if (result.success) {
         expect(Array.isArray(result.data?.items)).toBe(true);
-        expect(result.data?.items).toEqual(["a", "b", "c"]);
+        expect(result.data?.items).toEqual(['a', 'b', 'c']);
       }
     });
 
-    it("should preserve object types", async () => {
+    it('should preserve object types', async () => {
       class Model {
         metadata: Record<string, any> = {};
       }
 
-      const data = { metadata: { key: "value", nested: { prop: 123 } } };
+      const data = { metadata: { key: 'value', nested: { prop: 123 } } };
       const result = await Validator.validateTarget(Model, { data });
 
       if (result.success) {
-        expect(typeof result.data?.metadata).toBe("object");
+        expect(typeof result.data?.metadata).toBe('object');
         expect(result.data?.metadata).toEqual(data.metadata);
       }
     });
   });
 
-  describe("Class Variations", () => {
-    it("should work with simple classes", async () => {
+  describe('Class Variations', () => {
+    it('should work with simple classes', async () => {
       class Simple {
-        value: string = "";
+        value: string = '';
       }
 
       const result = await Validator.validateTarget(Simple, {
-        data: { value: "test" },
+        data: { value: 'test' },
       });
       expect(result.success).toBe(true);
     });
 
-    it("should work with empty classes", async () => {
+    it('should work with empty classes', async () => {
       class Empty {}
 
       const result = await Validator.validateTarget(Empty, { data: {} });
       expect(result.success).toBe(true);
     });
 
-    it("should work with classes with default properties", async () => {
+    it('should work with classes with default properties', async () => {
       class WithDefaults {
-        name: string = "Default Name";
+        name: string = 'Default Name';
         count: number = 0;
       }
 
@@ -372,14 +387,14 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
     });
   });
 
-  describe("Discriminated Union Type Safety", () => {
-    it("should allow accessing success properties when success is true", async () => {
+  describe('Discriminated Union Type Safety', () => {
+    it('should allow accessing success properties when success is true', async () => {
       class Model {
-        field: string = "";
+        field: string = '';
       }
 
       const result = await Validator.validateTarget(Model, {
-        data: { field: "test" },
+        data: { field: 'test' },
       });
 
       if (result.success) {
@@ -394,13 +409,13 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       }
     });
 
-    it("should have success flag as boolean literal", async () => {
+    it('should have success flag as boolean literal', async () => {
       class Model {
-        field: string = "";
+        field: string = '';
       }
 
       const result = await Validator.validateTarget(Model, {
-        data: { field: "test" },
+        data: { field: 'test' },
       });
 
       // result.success should be narrowed to true in the if block
@@ -413,10 +428,10 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
     });
   });
 
-  describe("Error Message Builder", () => {
-    it("should accept custom error message builder", async () => {
+  describe('Error Message Builder', () => {
+    it('should accept custom error message builder', async () => {
       class Model {
-        field: string = "";
+        field: string = '';
       }
 
       const customBuilder = (name: string, error: string) => {
@@ -424,7 +439,7 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       };
 
       const result = await Validator.validateTarget(Model, {
-        data: { field: "test" },
+        data: { field: 'test' },
         errorMessageBuilder: customBuilder,
       });
 
@@ -432,21 +447,21 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
     });
   });
 
-  describe("Multiple Class Instances", () => {
-    it("should validate different class types independently", async () => {
+  describe('Multiple Class Instances', () => {
+    it('should validate different class types independently', async () => {
       class UserModel {
-        email: string = "";
+        email: string = '';
       }
 
       class ProductModel {
-        name: string = "";
+        name: string = '';
       }
 
       const [userResult, productResult] = await Promise.all([
         Validator.validateTarget(UserModel, {
-          data: { email: "test@example.com" },
+          data: { email: 'test@example.com' },
         }),
-        Validator.validateTarget(ProductModel, { data: { name: "Widget" } }),
+        Validator.validateTarget(ProductModel, { data: { name: 'Widget' } }),
       ]);
 
       expect(userResult.success).toBe(true);
@@ -454,19 +469,19 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
     });
   });
 
-  describe("Response Consistency", () => {
-    it("should always return Either pattern result", async () => {
+  describe('Response Consistency', () => {
+    it('should always return Either pattern result', async () => {
       class Model {
-        field: string = "";
+        field: string = '';
       }
 
       const result = await Validator.validateTarget(Model, {
-        data: { field: "test" },
+        data: { field: 'test' },
       });
 
       // Should always have these properties
-      expect(result).toHaveProperty("success");
-      expect(typeof result.success).toBe("boolean");
+      expect(result.success).toBeDefined();
+      expect(typeof result.success).toBe('boolean');
 
       // Should have either success data or error data
       if (result.success) {
@@ -478,13 +493,13 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       }
     });
 
-    it("should always include timing information", async () => {
+    it('should always include timing information', async () => {
       class Model {
-        field: string = "";
+        field: string = '';
       }
 
       const result = await Validator.validateTarget(Model, {
-        data: { field: "test" },
+        data: { field: 'test' },
       });
 
       if (result.success) {
@@ -494,25 +509,25 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
     });
   });
 
-  describe("ValidateNested Decorator - Nested Class Validation", () => {
-    it("should validate nested object with @ValidateNested decorator", async () => {
+  describe('ValidateNested Decorator - Nested Class Validation', () => {
+    it('should validate nested object with @ValidateNested decorator', async () => {
       class Address {
-        street: string = "";
-        city: string = "";
+        street: string = '';
+        city: string = '';
       }
 
       class User {
-        name: string = "";
+        name: string = '';
 
         @ValidateNested([Address])
         address: Address = new Address();
       }
 
       const data = {
-        name: "John Doe",
+        name: 'John Doe',
         address: {
-          street: "123 Main St",
-          city: "Springfield",
+          street: '123 Main St',
+          city: 'Springfield',
         },
       };
 
@@ -524,64 +539,67 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       }
     });
 
-    it("should detect @ValidateNested decorator using metadata inspection", async () => {
+    it('should detect @ValidateNested decorator using metadata inspection', async () => {
       // This test demonstrates metadata-based detection as an alternative
       // to the string-based normalizedRule === "validatenested" check
 
       class Address {
-        street: string = "";
-        city: string = "";
+        street: string = '';
+        city: string = '';
       }
 
       class User {
-        name: string = "";
+        name: string = '';
 
         @ValidateNested([Address])
         address: Address = new Address();
       }
 
       // Use the metadata-based method to check if a property has ValidateNested
-      const hasAddressNested = Validator.hasValidateNestedRule(User, "address");
-      const hasNameNested = Validator.hasValidateNestedRule(User, "name");
+      const hasAddressNested = Validator.hasValidateNestedRule(User, 'address');
+      const hasNameNested = Validator.hasValidateNestedRule(User, 'name');
 
       expect(hasAddressNested).toBe(true);
       expect(hasNameNested).toBe(false);
     });
 
-    it("should retrieve nested class target from metadata", async () => {
+    it('should retrieve nested class target from metadata', async () => {
       // This test demonstrates retrieving the nested class constructor
       // using metadata instead of relying on string-based rule detection
 
       class Contact {
-        email: string = "";
+        email: string = '';
       }
 
       class Person {
-        name: string = "";
+        name: string = '';
 
         @ValidateNested([Contact])
         contact: Contact = new Contact();
       }
 
       // Retrieve the target class metadata
-      const contactTarget = Validator.getValidateNestedTarget(Person, "contact");
-      const nameTarget = Validator.getValidateNestedTarget(Person, "name");
+      const contactTarget = Validator.getValidateNestedTarget(
+        Person,
+        'contact'
+      );
+      const nameTarget = Validator.getValidateNestedTarget(Person, 'name');
 
       expect(contactTarget).toBe(Contact);
       expect(nameTarget).toBeUndefined();
     });
 
-    it("should use metadata detection to ensure nested validation path", async () => {
+    it('should use metadata detection to ensure nested validation path', async () => {
       // This test verifies that metadata-based detection correctly identifies
       // properties requiring nested validation, providing an alternative to
       // the normalizedRule === "validatenested" string check
 
       class Address {
-        street: string = "";
+        street: string = '';
       }
 
       class User {
-        email: string = "";
+        email: string = '';
 
         @ValidateNested([Address])
         address: Address = new Address();
@@ -589,40 +607,43 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
 
       // Metadata-based detection
       const targetRules = Validator.getTargetRules(User);
-      const hasMetadataValidation = Validator.hasValidateNestedRule(User, "address");
-      const nestedClass = Validator.getValidateNestedTarget(User, "address");
+      const hasMetadataValidation = Validator.hasValidateNestedRule(
+        User,
+        'address'
+      );
+      const nestedClass = Validator.getValidateNestedTarget(User, 'address');
 
       // All metadata-based checks should identify the nested structure
       expect(hasMetadataValidation).toBe(true);
       expect(nestedClass).toBe(Address);
-      expect(targetRules).toHaveProperty("address");
+      expect(targetRules.address).toBeDefined();
 
       // Validation should also succeed
       const result = await Validator.validateTarget(User, {
         data: {
-          email: "test@example.com",
-          address: { street: "Main St" },
+          email: 'test@example.com',
+          address: { street: 'Main St' },
         },
       });
 
       expect(result.success).toBe(true);
     });
 
-    it("should accept nested object with any type when no decorators present", async () => {
+    it('should accept nested object with any type when no decorators present', async () => {
       class Address {
-        street: string = "";
+        street: string = '';
       }
 
       class User {
-        name: string = "";
+        name: string = '';
 
         @ValidateNested([Address])
         address: Address = new Address();
       }
 
       const data = {
-        name: "John Doe",
-        address: "not an object",
+        name: 'John Doe',
+        address: 'not an object',
       };
 
       const result = await Validator.validateTarget(User, { data });
@@ -631,30 +652,30 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       expect(result.success).toBe(false);
     });
 
-    it("should support multi-level nested validation with @ValidateNested", async () => {
+    it('should support multi-level nested validation with @ValidateNested', async () => {
       class Coordinates {
         latitude: number = 0;
         longitude: number = 0;
       }
 
       class Location {
-        name: string = "";
+        name: string = '';
 
         @ValidateNested([Coordinates])
         coordinates: Coordinates = new Coordinates();
       }
 
       class Event {
-        title: string = "";
+        title: string = '';
 
         @ValidateNested([Location])
         location: Location = new Location();
       }
 
       const data = {
-        title: "Conference",
+        title: 'Conference',
         location: {
-          name: "City Hall",
+          name: 'City Hall',
           coordinates: {
             latitude: 40.7128,
             longitude: -74.006,
@@ -670,34 +691,40 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       }
 
       // Metadata detection for multi-level nesting
-      expect(Validator.hasValidateNestedRule(Event, "location")).toBe(true);
-      expect(Validator.hasValidateNestedRule(Location, "coordinates")).toBe(true);
-      expect(Validator.getValidateNestedTarget(Event, "location")).toBe(Location);
-      expect(Validator.getValidateNestedTarget(Location, "coordinates")).toBe(Coordinates);
+      expect(Validator.hasValidateNestedRule(Event, 'location')).toBe(true);
+      expect(Validator.hasValidateNestedRule(Location, 'coordinates')).toBe(
+        true
+      );
+      expect(Validator.getValidateNestedTarget(Event, 'location')).toBe(
+        Location
+      );
+      expect(Validator.getValidateNestedTarget(Location, 'coordinates')).toBe(
+        Coordinates
+      );
     });
 
-    it("should invoke validatenested rule handling path in normalizedRule check", async () => {
+    it('should invoke validatenested rule handling path in normalizedRule check', async () => {
       // This test specifically verifies the code path at validator.ts line ~1108:
       // else if (normalizedRule === "validatenested" && ruleParams[0])
       // is properly triggered when using @ValidateNested decorator
 
       class Contact {
-        email: string = "";
-        phone: string = "";
+        email: string = '';
+        phone: string = '';
       }
 
       class Person {
-        name: string = "";
+        name: string = '';
 
         @ValidateNested([Contact])
         contact: Contact = new Contact();
       }
 
       const data = {
-        name: "Alice",
+        name: 'Alice',
         contact: {
-          email: "alice@example.com",
-          phone: "+1234567890",
+          email: 'alice@example.com',
+          phone: '+1234567890',
         },
       };
 
@@ -708,25 +735,25 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       // invoking Validator.validateNestedRule internally
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.name).toBe("Alice");
-        expect(result.data.contact.email).toBe("alice@example.com");
+        expect(result.data.name).toBe('Alice');
+        expect(result.data.contact.email).toBe('alice@example.com');
       }
     });
 
-    it("should fail nested validation with null when no decorators present", async () => {
+    it('should fail nested validation with null when no decorators present', async () => {
       class Address {
-        street: string = "";
+        street: string = '';
       }
 
       class User {
-        name: string = "";
+        name: string = '';
 
         @ValidateNested([Address])
         address: Address = new Address();
       }
 
       const data = {
-        name: "John",
+        name: 'John',
         address: null,
       };
 
@@ -735,24 +762,24 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       expect(result.success).toBe(false);
     });
 
-    it("should validate nested object when nested class has no decorators", async () => {
+    it('should validate nested object when nested class has no decorators', async () => {
       class SimpleAddress {
-        street: string = "";
-        city: string = "";
+        street: string = '';
+        city: string = '';
       }
 
       class User {
-        name: string = "";
+        name: string = '';
 
         @ValidateNested([SimpleAddress])
         address: SimpleAddress = new SimpleAddress();
       }
 
       const data = {
-        name: "John",
+        name: 'John',
         address: {
-          street: "Main St",
-          city: "Boston",
+          street: 'Main St',
+          city: 'Boston',
         },
       };
 
@@ -761,27 +788,27 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       expect(result.success).toBe(true);
     });
 
-    it("should process @ValidateNested decorator in the validate() rule chain", async () => {
+    it('should process @ValidateNested decorator in the validate() rule chain', async () => {
       // This test ensures @ValidateNested decorator is recognized in the validator chain
       // and properly identified by normalizedRule === "validatenested" check
 
       class Metadata {
-        created: string = "";
-        updated: string = "";
+        created: string = '';
+        updated: string = '';
       }
 
       class Document {
-        title: string = "";
+        title: string = '';
 
         @ValidateNested([Metadata])
         meta: Metadata = new Metadata();
       }
 
       const data = {
-        title: "My Document",
+        title: 'My Document',
         meta: {
-          created: "2024-01-01",
-          updated: "2024-01-02",
+          created: '2024-01-01',
+          updated: '2024-01-02',
         },
       };
 
@@ -789,29 +816,29 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.title).toBe("My Document");
-        expect(result.data.meta.created).toBe("2024-01-01");
+        expect(result.data.title).toBe('My Document');
+        expect(result.data.meta.created).toBe('2024-01-01');
       }
     });
 
-    it("should handle optional nested objects with @ValidateNested", async () => {
+    it('should handle optional nested objects with @ValidateNested', async () => {
       class PhoneNumber {
-        countryCode: string = "";
-        number: string = "";
+        countryCode: string = '';
+        number: string = '';
       }
 
       class Customer {
-        email: string = "";
+        email: string = '';
         phone?: PhoneNumber;
       }
 
       // Test with nested object present
       const resultWith = await Validator.validateTarget(Customer, {
         data: {
-          email: "customer@example.com",
+          email: 'customer@example.com',
           phone: {
-            countryCode: "+1",
-            number: "5551234567",
+            countryCode: '+1',
+            number: '5551234567',
           },
         },
       });
@@ -821,7 +848,7 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       // Test with nested object omitted
       const resultWithout = await Validator.validateTarget(Customer, {
         data: {
-          email: "customer@example.com",
+          email: 'customer@example.com',
         },
       });
 
@@ -829,18 +856,17 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
     });
   });
 
-  describe("Response Consistency", () => {
-    it("should always return Either pattern result", async () => {
+  describe('Response Consistency', () => {
+    it('should always return Either pattern result', async () => {
       class Model {
-        field: string = "";
+        field: string = '';
       }
 
       const result = await Validator.validateTarget(Model, {
-        data: { field: "test" },
+        data: { field: 'test' },
       });
 
-      expect(result).toHaveProperty("success");
-      expect(typeof result.success).toBe("boolean");
+      expect(typeof result.success).toBe('boolean');
 
       if (result.success) {
         expect(result.data).toBeDefined();
@@ -851,13 +877,13 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       }
     });
 
-    it("should always include timing information", async () => {
+    it('should always include timing information', async () => {
       class Model {
-        field: string = "";
+        field: string = '';
       }
 
       const result = await Validator.validateTarget(Model, {
-        data: { field: "test" },
+        data: { field: 'test' },
       });
 
       if (result.success) {

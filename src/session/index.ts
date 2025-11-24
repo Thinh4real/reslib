@@ -1,11 +1,12 @@
-import { isPromise } from "@utils/isPromise";
-import { Platform } from "../platform";
-import { IClassConstructor, IDict } from "../types/index";
-import { isNonNullString } from "../utils/isNonNullString";
-import { JsonHelper } from "../utils/json";
+import { isPromise } from '@utils/isPromise';
+import 'reflect-metadata';
+import { Platform } from '../platform';
+import { IClassConstructor, IDict } from '../types/index';
+import { isNonNullString } from '../utils/isNonNullString';
+import { JsonHelper } from '../utils/json';
 
 class Manager {
-  static readonly sessionStorageMetaData = Symbol("sessionStorage");
+  static readonly sessionStorageMetaData = Symbol('sessionStorage');
   /**
    * The storage object used by the session manager.
    *
@@ -220,7 +221,7 @@ class Manager {
     if (this._storage) return this._storage;
     if (
       Platform.isClientSide() &&
-      typeof window !== "undefined" &&
+      typeof window !== 'undefined' &&
       window.localStorage &&
       window.localStorage?.getItem
     ) {
@@ -389,7 +390,7 @@ class Manager {
    * - Multiple reads return the same value consistently
    */
   public static get keyNamespace(): string {
-    return isNonNullString(this._keyNamespace) ? this._keyNamespace : "";
+    return isNonNullString(this._keyNamespace) ? this._keyNamespace : '';
   }
 
   /**
@@ -602,7 +603,7 @@ class Manager {
    */
   public static set keyNamespace(prefix: string) {
     if (isNonNullString(prefix)) {
-      this._keyNamespace = prefix.trim().replace(/\s+/g, "-");
+      this._keyNamespace = prefix.trim().replace(/\s+/g, '-');
     }
   }
 
@@ -814,8 +815,8 @@ class Manager {
    * - **Unicode whitespace**: Various Unicode space characters → removed
    */
   public static sanitizeKey(key?: string): string {
-    if (!key || !isNonNullString(key)) return "";
-    key = key.trim().replace(/\s+/g, "-");
+    if (!key || !isNonNullString(key)) return '';
+    key = key.trim().replace(/\s+/g, '-');
     const keyPrefix = this.keyNamespace;
     if (keyPrefix) return `${keyPrefix}-${key}`;
     return key;
@@ -847,7 +848,7 @@ function sanitizeKey(key: string): string {
  */
 const handleSetValue = (value: any, decycle?: boolean) => {
   value = value ? JsonHelper.stringify(value, decycle) : value;
-  if (value === null || value === undefined) value = "";
+  if (value === null || value === undefined) value = '';
   return value;
 };
 
@@ -1140,7 +1141,7 @@ const get = (key: string) => {
   /**
    * Check if the session storage is available and the key is valid.
    */
-  if (Manager.storage && key && typeof key === "string") {
+  if (Manager.storage && key && typeof key === 'string') {
     /**
      * Retrieve the value from the session storage using the sanitized key.
      */
@@ -1174,7 +1175,7 @@ const remove = (key: string) => {
   /**
    * Check if the session storage is available and the key is valid.
    */
-  if (Manager.storage && key && typeof key === "string") {
+  if (Manager.storage && key && typeof key === 'string') {
     /**
      * Remove the value from the session storage using the sanitized key.
      */
@@ -1273,8 +1274,8 @@ const isValidStorage = (storage?: ISessionStorage): boolean => {
      * Check if the storage object has the required methods.
      * If any of these checks fail, the storage object is not valid.
      */
-    return ["get", "set", "remove", "removeAll"].every(
-      (value) => typeof (storage as IDict)[value] === "function"
+    return ['get', 'set', 'remove', 'removeAll'].every(
+      (value) => typeof (storage as IDict)[value] === 'function'
     );
   } catch {
     /**
@@ -1956,7 +1957,7 @@ export function AttachSessionStorage() {
       }
       Manager.storage = storage;
     } catch (error) {
-      console.error(error, " registering session storage");
+      console.error(error, ' registering session storage');
     }
   };
 }

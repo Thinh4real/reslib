@@ -1,11 +1,12 @@
-import { defaultStr } from "../utils/defaultStr";
-import { isNonNullString } from "../utils/isNonNullString";
-import { currencies } from "./currencies";
-import session from "./session";
-import { ICurrency, ICurrencySymbol } from "./types";
-import { isValidCurrency } from "./utils";
+import 'reflect-metadata';
+import { defaultStr } from '../utils/defaultStr';
+import { isNonNullString } from '../utils/isNonNullString';
+import { currencies } from './currencies';
+import session from './session';
+import { ICurrency, ICurrencySymbol } from './types';
+import { isValidCurrency } from './utils';
 
-const isObj = (x: any) => x && typeof x == "object";
+const isObj = (x: any) => x && typeof x == 'object';
 
 /**
  * @group Currency
@@ -46,7 +47,7 @@ function prepareOptions(options?: ICurrency): ICurrency {
     if (p.format) {
       object.format = p.format;
     }
-    if (typeof p.decimalDigits === "number") {
+    if (typeof p.decimalDigits === 'number') {
       object.decimalDigits = p.decimalDigits;
     }
   }
@@ -66,8 +67,8 @@ function prepareOptions(options?: ICurrency): ICurrency {
  * @returns The normalized value of decimalDigits.
  */
 function checkPrecision(val?: number, base?: number): number {
-  val = typeof val == "number" ? val : 0;
-  base = typeof base == "number" ? base : 0;
+  val = typeof val == 'number' ? val : 0;
+  base = typeof base == 'number' ? base : 0;
   /**
    * Ensure the value is a positive integer by taking the absolute value and rounding it.
    */
@@ -106,14 +107,14 @@ function checkCurrencyFormat(
   /**
    * If the format is a string, convert it to lowercase.
    */
-  if (typeof format === "string") {
+  if (typeof format === 'string') {
     format = format.toLowerCase();
   }
 
   /**
    * If the format is not a string or does not contain "%v", use the default format.
    */
-  if (typeof format !== "string" || !format.match("%v")) {
+  if (typeof format !== 'string' || !format.match('%v')) {
     format = defaultFormat;
   }
 
@@ -129,7 +130,7 @@ function checkCurrencyFormat(
     /**
      * The negative format is the original format with "-" removed and "-%v" inserted.
      */
-    neg: format.replace("-", "").replace("%v", "-%v"),
+    neg: format.replace('-', '').replace('%v', '-%v'),
 
     /**
      * The zero format is the same as the positive format.
@@ -171,7 +172,7 @@ const unformat = (value: any, decimalSeparator?: string): number => {
   /**
    * Return the value as-is if it's already a number.
    */
-  if (typeof value === "number") {
+  if (typeof value === 'number') {
     return value;
   }
 
@@ -183,16 +184,16 @@ const unformat = (value: any, decimalSeparator?: string): number => {
   /**
    * Build regex to strip out everything except digits, decimalSeparator point, and minus sign.
    */
-  const regex = new RegExp("[^0-9-" + decimalSeparator + "]", "g");
+  const regex = new RegExp('[^0-9-' + decimalSeparator + ']', 'g');
 
   /**
    * Unformat the value by replacing bracketed values with negatives, stripping out cruft, and making sure decimalSeparator point is standard.
    */
   const unformatted = parseFloat(
-    ("" + value)
-      .replace(/\((?=\d+)(.*)\)/, "-$1") // replace bracketed values with negatives
-      .replace(regex, "") // strip out any cruft
-      .replace(decimalSeparator as string, ".") // make sure decimalSeparator point is standard
+    ('' + value)
+      .replace(/\((?=\d+)(.*)\)/, '-$1') // replace bracketed values with negatives
+      .replace(regex, '') // strip out any cruft
+      .replace(decimalSeparator as string, '.') // make sure decimalSeparator point is standard
   );
 
   /**
@@ -231,30 +232,30 @@ const toFixed: (value: number, decimalDigits?: number) => string = (
   const valueStr = String(value);
 
   // Remove any non-numeric characters (except decimal point) - unformat substitute
-  const cleanValue = valueStr.replace(/[^\d.-]/g, "");
+  const cleanValue = valueStr.replace(/[^\d.-]/g, '');
 
   // Handle BigInt or very large numbers
-  if (cleanValue.length > 15 && !cleanValue.includes(".")) {
+  if (cleanValue.length > 15 && !cleanValue.includes('.')) {
     // For integers, just add decimal places
-    return cleanValue + "." + "0".repeat(decimalDigits);
+    return cleanValue + '.' + '0'.repeat(decimalDigits);
   } else {
     try {
       // For numbers that can be handled by standard JS number operations
       const num = Number(cleanValue);
       if (isNaN(num)) {
-        return "NaN";
+        return 'NaN';
       }
 
       // Use standard exponential trick for standard-sized numbers
-      const exponentialForm = Number(num + "e" + decimalDigits);
+      const exponentialForm = Number(num + 'e' + decimalDigits);
       const rounded = Math.round(exponentialForm);
-      const finalResult = Number(rounded + "e-" + decimalDigits).toFixed(
+      const finalResult = Number(rounded + 'e-' + decimalDigits).toFixed(
         decimalDigits
       );
       return finalResult;
     } catch (e) {
       // Fallback for cases where conversion fails
-      return "NaN";
+      return 'NaN';
     }
   }
 };
@@ -298,11 +299,11 @@ const formatNumber: (
       ? optionsOrDecimalDigits
       : session.getCurrency()
   ) as ICurrency;
-  if (typeof optionsOrDecimalDigits === "number") {
+  if (typeof optionsOrDecimalDigits === 'number') {
     toPrepare.decimalDigits = optionsOrDecimalDigits;
   }
-  if (typeof toPrepare.decimalDigits !== "number") {
-    toPrepare.decimalDigits = String(number).split(".")[1]?.length;
+  if (typeof toPrepare.decimalDigits !== 'number') {
+    toPrepare.decimalDigits = String(number).split('.')[1]?.length;
   }
   if (thousandSeparator !== undefined) {
     toPrepare.thousandSeparator = thousandSeparator;
@@ -324,20 +325,20 @@ const formatNumber: (
   /**
    * Perform some calculations.
    */
-  const negative = number < 0 ? "-" : "";
-  const base = parseInt(toFixed(Math.abs(number || 0), usePrecision), 10) + "";
+  const negative = number < 0 ? '-' : '';
+  const base = parseInt(toFixed(Math.abs(number || 0), usePrecision), 10) + '';
   const mod = base.length > 3 ? base.length % 3 : 0;
 
   /**
    * Format the decimal part of the number.
    */
-  let decimalStr = "";
+  let decimalStr = '';
   if (usePrecision) {
     const fNum = String(
       parseFloat(toFixed(Math.abs(number), usePrecision)) || 0
     );
-    if (fNum.includes(".")) {
-      decimalStr = defaultStr(fNum.split(".")[1]).trim();
+    if (fNum.includes('.')) {
+      decimalStr = defaultStr(fNum.split('.')[1]).trim();
     }
   }
 
@@ -346,11 +347,11 @@ const formatNumber: (
    */
   return (
     negative +
-    (mod ? base.substring(0, mod) + opts.thousandSeparator : "") +
+    (mod ? base.substring(0, mod) + opts.thousandSeparator : '') +
     base
       .substring(mod)
-      .replace(/(\d{3})(?=\d)/g, "$1" + opts.thousandSeparator) +
-    (usePrecision && decimalStr ? opts.decimalSeparator + decimalStr : "")
+      .replace(/(\d{3})(?=\d)/g, '$1' + opts.thousandSeparator) +
+    (usePrecision && decimalStr ? opts.decimalSeparator + decimalStr : '')
   );
 };
 
@@ -405,7 +406,7 @@ const formatMoneyAsObject = (
   const toPrepare: ICurrency = isValidCurrency(symbol)
     ? (symbol as ICurrency)
     : session.getCurrency();
-  if (symbol !== undefined && typeof symbol === "string") {
+  if (symbol !== undefined && typeof symbol === 'string') {
     toPrepare.symbol = symbol;
   }
   if (decimalDigits !== undefined) {
@@ -443,7 +444,7 @@ const formatMoneyAsObject = (
    */
   const symbolStr = defaultStr(opts.symbol);
   const formattedValue = usedFormat.replace(
-    symbolStr ? "%s" : symbolStr,
+    symbolStr ? '%s' : symbolStr,
     symbolStr
   );
   const formattedNumber = formatNumber(
@@ -452,7 +453,7 @@ const formatMoneyAsObject = (
     opts.thousandSeparator,
     opts.decimalSeparator
   );
-  const result = formattedValue.replace("%v", formattedNumber);
+  const result = formattedValue.replace('%v', formattedNumber);
 
   /**
    * Return the formatted value as an object.
@@ -570,7 +571,7 @@ const parseFormat: (format?: string) => ICurrency = (
     /**
      * Remove the decimal digits specification from the format string.
      */
-    format = format.replace(reg, "");
+    format = format.replace(reg, '');
   }
 
   /**
@@ -619,4 +620,4 @@ export const Currency = {
   parseFormat,
 };
 
-export * from "./types";
+export * from './types';

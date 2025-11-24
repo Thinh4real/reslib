@@ -1,15 +1,15 @@
-import { Auth, IAuthUser } from "@/auth";
-import { i18n } from "@/i18n";
-import "../translations";
-import { Resource, ResourceMeta } from "./index";
+import { Auth, IAuthUser } from '@/auth';
+import { i18n } from '@/i18n';
+import '../translations';
+import { Resource, ResourceMeta } from './index';
+import './types';
 import {
   IField,
   IResource,
   IResourceDataService,
-  IResourceName,
   IResourcePaginatedResult,
   IResourceQueryOptions,
-} from "./types";
+} from './types';
 
 interface MockData {
   id: string;
@@ -30,16 +30,16 @@ class MockDataService implements IResourceDataService<MockData, string> {
   findOne(
     options: string | IResourceQueryOptions<MockData>
   ): Promise<MockData | null> {
-    const id = typeof options === "string" ? options : (options as any).id;
+    const id = typeof options === 'string' ? options : (options as any).id;
     return Promise.resolve(this.data.get(id) || null);
   }
 
   findOneOrFail(
     options: string | IResourceQueryOptions<MockData>
   ): Promise<MockData> {
-    const id = typeof options === "string" ? options : (options as any).id;
+    const id = typeof options === 'string' ? options : (options as any).id;
     const record = this.data.get(id);
-    if (!record) return Promise.reject(new Error("Record not found"));
+    if (!record) return Promise.reject(new Error('Record not found'));
     return Promise.resolve(record);
   }
 
@@ -47,8 +47,8 @@ class MockDataService implements IResourceDataService<MockData, string> {
     const id = this.nextId.toString();
     const newRecord: MockData = {
       id,
-      name: record.name || "",
-      email: record.email || "",
+      name: record.name || '',
+      email: record.email || '',
       createdAt: Date.now(),
     };
     this.data.set(id, newRecord);
@@ -58,7 +58,7 @@ class MockDataService implements IResourceDataService<MockData, string> {
 
   update(primaryKey: string, data: Partial<MockData>): Promise<MockData> {
     const existing = this.data.get(primaryKey);
-    if (!existing) return Promise.reject(new Error("Not found"));
+    if (!existing) return Promise.reject(new Error('Not found'));
     const updated = { ...existing, ...data, updatedAt: Date.now() };
     this.data.set(primaryKey, updated);
     return Promise.resolve(updated);
@@ -126,16 +126,16 @@ class MockDataService implements IResourceDataService<MockData, string> {
 }
 
 @ResourceMeta({
-  name: "users" as IResourceName,
-  label: "Users",
-  title: "User Management",
+  name: 'users',
+  label: 'Users',
+  title: 'User Management',
   actions: {},
   instanciate: false,
 })
-class TestUserResource extends Resource<"users", MockData, string> {
-  name: IResourceName = "users";
-  label = "Users";
-  title = "User Management";
+class TestUserResource extends Resource<'users', MockData, string> {
+  name = 'users' as const;
+  label = 'Users';
+  title = 'User Management';
   actions: Partial<any> = {};
   private mockDataService = new MockDataService();
 
@@ -152,12 +152,12 @@ class TestUserResource extends Resource<"users", MockData, string> {
   }
 }
 
-describe("Resource Class", () => {
+describe('Resource Class', () => {
   let resource: TestUserResource;
   let adminUser: IAuthUser;
 
   beforeAll(() => {
-    i18n.setLocale("en");
+    i18n.setLocale('en');
   });
 
   beforeEach(() => {
@@ -166,232 +166,242 @@ describe("Resource Class", () => {
     Auth.setSignedUser(null, false);
     Auth.isMasterAdmin = undefined;
     Resource.events.offAll();
-    adminUser = { id: "admin-1", perms: { users: ["all"] } };
+    adminUser = { id: 'admin-1', perms: { users: ['all'] } };
   });
 
   afterEach(() => {
     resource.destroy();
   });
 
-  describe("Metadata", () => {
-    it("should have correct metadata", () => {
-      expect(resource.name).toBe("users");
-      expect(resource.label).toBe("Users");
+  describe('Metadata', () => {
+    it('should have correct metadata', () => {
+      expect(resource.name).toBe('users');
+      expect(resource.label).toBe('Users');
     });
 
-    it("should retrieve metadata", () => {
+    it('should retrieve metadata', () => {
       const metadata = resource.getMetaData();
       expect(metadata).toBeDefined();
-      expect(metadata.name).toBe("users");
+      expect(metadata.name).toBe('users');
     });
 
-    it("should update metadata", () => {
+    it('should update metadata', () => {
       const newMetadata: IResource = {
-        name: "users",
-        label: "Updated",
-        title: "Updated",
+        name: 'users',
+        label: 'Updated',
+        title: 'Updated',
         actions: {},
       };
       const updated = resource.updateMetadata(newMetadata);
-      expect(updated.label).toBe("Updated");
+      expect(updated.label).toBe('Updated');
     });
   });
 
-  describe("CRUD - Create", () => {
+  describe('CRUD - Create', () => {
     beforeEach(() => {
       Auth.setSignedUser(adminUser, false);
     });
 
-    it("should create record", async () => {
+    it('should create record', async () => {
       const result = await resource.create({
-        name: "John",
-        email: "john@test.com",
+        name: 'John',
+        email: 'john@test.com',
+        id: '1',
       });
       expect(result.id).toBeDefined();
-      expect(result.name).toBe("John");
+      expect(result.name).toBe('John');
     });
 
-    it("should create multiple records", async () => {
+    it('should create multiple records', async () => {
       const results = await resource.createMany([
-        { name: "John", email: "john@test.com" },
-        { name: "Jane", email: "jane@test.com" },
+        { name: 'John', email: 'john@test.com', id: '1' },
+        { name: 'Jane', email: 'jane@test.com', id: '2' },
       ]);
       expect(results).toHaveLength(2);
     });
 
-    it("should reject unauthorized create", async () => {
-      Auth.setSignedUser({ id: "user-1", perms: { users: ["read"] } }, false);
+    it('should reject unauthorized create', async () => {
+      Auth.setSignedUser({ id: 'user-1', perms: { users: ['read'] } }, false);
       await expect(
-        resource.create({ name: "Test", email: "test@test.com" })
+        resource.create({ name: 'Test', email: 'test@test.com', id: '3' })
       ).rejects.toThrow();
     });
   });
 
-  describe("CRUD - Read", () => {
+  describe('CRUD - Read', () => {
     beforeEach(async () => {
       Auth.setSignedUser(adminUser, false);
-      await resource.create({ name: "John", email: "john@test.com" });
-      await resource.create({ name: "Jane", email: "jane@test.com" });
+      await resource.create({ name: 'John', email: 'john@test.com', id: '1' });
+      await resource.create({ name: 'Jane', email: 'jane@test.com', id: '2' });
     });
 
-    it("should find all", async () => {
+    it('should find all', async () => {
       const result = await resource.find();
       expect(Array.isArray(result)).toBe(true);
       expect(result.length).toBe(2);
     });
 
-    it("should find one", async () => {
+    it('should find one', async () => {
       const all = resource.getAllData();
       const result = await resource.findOne(all[0].id);
       expect(result?.id).toBe(all[0].id);
     });
 
-    it("should count", async () => {
+    it('should count', async () => {
       const count = await resource.count();
       expect(count).toBe(2);
     });
 
-    it("should reject unauthorized read", async () => {
-      Auth.setSignedUser({ id: "user-1", perms: { users: ["create"] } }, false);
+    it('should reject unauthorized read', async () => {
+      Auth.setSignedUser({ id: 'user-1', perms: { users: ['create'] } }, false);
       await expect(resource.find()).rejects.toThrow();
     });
   });
 
-  describe("CRUD - Update", () => {
+  describe('CRUD - Update', () => {
     beforeEach(async () => {
       Auth.setSignedUser(adminUser, false);
-      await resource.create({ name: "John", email: "john@test.com" });
+      await resource.create({ name: 'John', email: 'john@test.com', id: '1' });
     });
 
-    it("should update", async () => {
+    it('should update', async () => {
       const all = resource.getAllData();
-      const result = await resource.update(all[0].id, { name: "Jane" });
-      expect(result.name).toBe("Jane");
+      const result = await resource.update(all[0].id, { name: 'Jane' });
+      expect(result.name).toBe('Jane');
     });
 
-    it("should reject unauthorized update", async () => {
-      Auth.setSignedUser({ id: "user-1", perms: { users: ["read"] } }, false);
+    it('should reject unauthorized update', async () => {
+      Auth.setSignedUser({ id: 'user-1', perms: { users: ['read'] } }, false);
       const all = resource.getAllData();
       await expect(
-        resource.update(all[0].id, { name: "Hacked" })
+        resource.update(all[0].id, { name: 'Hacked' })
       ).rejects.toThrow();
     });
   });
 
-  describe("CRUD - Delete", () => {
+  describe('CRUD - Delete', () => {
     beforeEach(async () => {
       Auth.setSignedUser(adminUser, false);
-      await resource.create({ name: "John", email: "john@test.com" });
+      await resource.create({ name: 'John', email: 'john@test.com', id: '1' });
     });
 
-    it("should delete", async () => {
+    it('should delete', async () => {
       const all = resource.getAllData();
       const result = await resource.delete(all[0].id);
       expect(result).toBe(true);
     });
 
-    it("should reject unauthorized delete", async () => {
-      Auth.setSignedUser({ id: "user-1", perms: { users: ["read"] } }, false);
+    it('should reject unauthorized delete', async () => {
+      Auth.setSignedUser({ id: 'user-1', perms: { users: ['read'] } }, false);
       const all = resource.getAllData();
       await expect(resource.delete(all[0].id)).rejects.toThrow();
     });
   });
 
-  describe("Authorization", () => {
-    it("should authorize read", async () => {
-      Auth.setSignedUser({ id: "user-1", perms: { users: ["read"] } }, false);
-      await expect(resource.authorizeAction("read")).resolves.toBeUndefined();
+  describe('Authorization', () => {
+    it('should authorize read', async () => {
+      Auth.setSignedUser({ id: 'user-1', perms: { users: ['read'] } }, false);
+      await expect(resource.authorizeAction('read')).resolves.toBeUndefined();
     });
 
-    it("should reject unauthorized", async () => {
-      Auth.setSignedUser({ id: "user-1", perms: { users: ["create"] } }, false);
-      await expect(resource.authorizeAction("read")).rejects.toThrow();
+    it('should reject unauthorized', async () => {
+      Auth.setSignedUser({ id: 'user-1', perms: { users: ['create'] } }, false);
+      await expect(resource.authorizeAction('read')).rejects.toThrow();
     });
   });
 
-  describe("Permissions", () => {
-    it("should check canUserRead", () => {
+  describe('Permissions', () => {
+    it('should check canUserRead', () => {
       expect(resource.canUserRead(adminUser)).toBe(true);
       expect(
-        resource.canUserRead({ id: "user-1", perms: { users: ["create"] } })
+        resource.canUserRead({ id: 'user-1', perms: { users: ['create'] } })
       ).toBe(false);
     });
 
-    it("should check canUserCreate", () => {
+    it('should check canUserCreate', () => {
       expect(resource.canUserCreate(adminUser)).toBe(true);
     });
 
-    it("should check isAllowed", () => {
-      expect(resource.isAllowed("read", adminUser)).toBe(true);
+    it('should check isAllowed', () => {
+      expect(resource.isAllowed('read', adminUser)).toBe(true);
       expect(
-        resource.isAllowed("read", {
-          id: "user-1",
-          perms: { users: ["delete"] },
+        resource.isAllowed('read', {
+          id: 'user-1',
+          perms: { users: ['delete'] },
         })
       ).toBe(false);
     });
   });
 
-  describe("Actions", () => {
-    it("should get actions", () => {
+  describe('Actions', () => {
+    it('should get actions', () => {
       const actions = resource.getActions();
-      expect(typeof actions).toBe("object");
+      expect(typeof actions).toBe('object');
     });
 
-    it("should check action exists", () => {
+    it('should check action exists', () => {
       resource.actions = {
-        publish: { label: "Publish", title: "Publish action" },
+        publish: { label: 'Publish', title: 'Publish action' },
       };
-      expect(resource.hasAction("publish")).toBe(true);
-      expect(resource.hasAction("delete")).toBe(false);
+      expect(resource.hasAction('publish')).toBe(true);
+      expect(resource.hasAction('delete')).toBe(false);
     });
   });
 
-  describe("Fields", () => {
-    it("should get fields", () => {
+  describe('Fields', () => {
+    it('should get fields', () => {
       const fields = resource.getFields();
-      expect(typeof fields).toBe("object");
+      expect(typeof fields).toBe('object');
     });
 
-    it("should get primary keys", () => {
+    it('should get primary keys', () => {
       resource.fields = {
-        id: { name: "id", primaryKey: true, type: "text" } as IField,
+        id: { name: 'id', primaryKey: true, type: 'text' } as IField,
       };
       const keys = resource.getPrimaryKeys();
       expect(keys).toHaveLength(1);
     });
   });
 
-  describe("Events", () => {
-    it("should trigger event", () => {
+  describe('Events', () => {
+    it('should trigger event', () => {
       const spy = jest.fn();
-      Resource.events.on("customEvent", spy);
-      resource.trigger("customEvent" as any);
+      Resource.events.on('customEvent', spy);
+      resource.trigger('customEvent' as any);
       expect(spy).toHaveBeenCalled();
     });
 
-    it("should pass context", () => {
+    it('should pass context', () => {
       const spy = jest.fn();
-      Resource.events.on("find", spy);
-      resource.trigger("find" as any);
-      const arg = spy.mock.calls[0][0];
-      expect(arg).toHaveProperty("resourceName");
+      Resource.events.on('find', spy);
+      resource.trigger('find' as any);
+      const arg = spy.mock.calls[0];
+      const context = arg[0]; //context is the first argument
+      expect(context.resourceName).toBe('users');
+      expect(context.resourceLabel).toBe('Updated');
     });
   });
 
-  describe("Integration", () => {
-    it("should complete CRUD workflow", async () => {
+  describe('Integration', () => {
+    it('should complete CRUD workflow', async () => {
       Auth.setSignedUser(adminUser, false);
       const created = await resource.create({
-        name: "Test",
-        email: "test@test.com",
+        name: 'Test',
+        email: 'test@test.com',
+        id: '3',
       });
       const found = await resource.findOne(created.id);
-      expect(found?.name).toBe("Test");
-      const updated = await resource.update(created.id, { name: "Updated" });
-      expect(updated.name).toBe("Updated");
+      expect(found?.name).toBe('Test');
+      const updated = await resource.update(created.id, { name: 'Updated' });
+      expect(updated.name).toBe('Updated');
       const deleted = await resource.delete(created.id);
       expect(deleted).toBe(true);
     });
   });
 });
+
+declare module './types' {
+  interface IResourceMap {
+    users: IResource;
+  }
+}

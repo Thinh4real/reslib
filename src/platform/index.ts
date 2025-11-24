@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { IDict } from '../types';
 
 /**
@@ -21,7 +22,8 @@ function isWeb(): boolean {
    * Check if the window object is defined and has a document property.
    * This is a characteristic of web environments.
    */
-  const hasWindowDocument = typeof window !== 'undefined' && window?.document !== undefined;
+  const hasWindowDocument =
+    typeof window !== 'undefined' && window?.document !== undefined;
 
   /**
    * Check if the document object is defined.
@@ -67,7 +69,11 @@ const isNode: () => boolean = (): boolean => {
      * Check if the process object is defined and has a versions property with a node property.
      * This is a characteristic of Node.js environments.
      */
-    if (typeof process !== 'undefined' && process?.versions && process?.versions?.node) {
+    if (
+      typeof process !== 'undefined' &&
+      process?.versions &&
+      process?.versions?.node
+    ) {
       return true;
     }
 
@@ -75,7 +81,10 @@ const isNode: () => boolean = (): boolean => {
      * Check if the global object is defined and has a specific toString() method signature.
      * This is another characteristic of Node.js environments.
      */
-    if (typeof global === 'object' && '[object global]' === global?.toString.call(global)) {
+    if (
+      typeof global === 'object' &&
+      '[object global]' === global?.toString.call(global)
+    ) {
       return true;
     }
   } catch {
@@ -86,7 +95,7 @@ const isNode: () => boolean = (): boolean => {
    * If none of the above conditions are met, return false, indicating a non-Node.js environment.
    */
   return false;
-}
+};
 
 /**
  *@group Platform 
@@ -110,12 +119,15 @@ const isElectron: () => boolean = (): boolean => {
   /**
    * Check if we're in a renderer process in Electron.
    */
-  if (typeof window !== "undefined" && window) {
+  if (typeof window !== 'undefined' && window) {
     /**
      * Check if the window.process object is defined and has a type property set to 'renderer'.
      * This is a characteristic of Electron renderer processes.
      */
-    if (typeof window?.process === 'object' && (window?.process as IDict)?.type === 'renderer') {
+    if (
+      typeof window?.process === 'object' &&
+      (window?.process as IDict)?.type === 'renderer'
+    ) {
       return true;
     }
   }
@@ -123,7 +135,11 @@ const isElectron: () => boolean = (): boolean => {
   /**
    * Check if we're in the main process of Electron.
    */
-  if (typeof process !== 'undefined' && typeof process?.versions === 'object' && !!process.versions?.electron) {
+  if (
+    typeof process !== 'undefined' &&
+    typeof process?.versions === 'object' &&
+    !!process.versions?.electron
+  ) {
     /**
      * Check if the process.versions object has an electron property.
      * This is a characteristic of Electron main processes.
@@ -134,7 +150,11 @@ const isElectron: () => boolean = (): boolean => {
   /**
    * Check if the user agent string indicates we're in an Electron environment.
    */
-  if (typeof navigator === 'object' && navigator && typeof navigator.userAgent === 'string') {
+  if (
+    typeof navigator === 'object' &&
+    navigator &&
+    typeof navigator.userAgent === 'string'
+  ) {
     /**
      * Check if the user agent string contains the word 'electron' (case-insensitive).
      * This is another characteristic of Electron environments.
@@ -148,7 +168,7 @@ const isElectron: () => boolean = (): boolean => {
    * If none of the above conditions are met, return false, indicating a non-Electron environment.
    */
   return false;
-}
+};
 
 /**
   @group Platform
@@ -180,7 +200,7 @@ const isTouchDevice: () => boolean = (): boolean => {
       /**
        * If the browser supports TouchEvent, it's likely a touch device.
        */
-      document.createEvent("TouchEvent");
+      document.createEvent('TouchEvent');
       return true;
     } catch (e) {
       try {
@@ -191,21 +211,22 @@ const isTouchDevice: () => boolean = (): boolean => {
          * Check if the window object has an 'ontouchstart' property.
          * This is a common indicator of a touch device.
          */
-        return 'ontouchstart' in window
+        return (
+          'ontouchstart' in window ||
           /**
            * Check if the window object has an 'onmsgesturechange' property.
            * This is another indicator of a touch device, although it can have some false positives.
            */
-          || 'onmsgesturechange' in window;
-      } catch { }
+          'onmsgesturechange' in window
+        );
+      } catch {}
     }
   }
   /**
    * If none of the above conditions are met, return false, indicating a non-touch device.
    */
   return false;
-}
-
+};
 
 /**
    @group Platform
@@ -227,7 +248,7 @@ const isTouchDevice: () => boolean = (): boolean => {
  */
 const isServerSide: () => boolean = (): boolean => {
   return typeof window === 'undefined' && typeof process !== 'undefined';
-}
+};
 
 /**
  * Checks if the current environment is a client-side environment.
@@ -251,8 +272,8 @@ const isClientSide: () => boolean = (): boolean => {
    * Check if the window object is defined and is an object.
    * This is a characteristic of client-side environments.
    */
-  return typeof window !== "undefined" && typeof window === "object";
-}
+  return typeof window !== 'undefined' && typeof window === 'object';
+};
 
 /**
   @group Platform
@@ -283,16 +304,22 @@ const isMobileBrowser: () => boolean = (): boolean => {
   /**
    * Check if the navigator object is defined and has a userAgent property.
    */
-  if (typeof navigator !== 'object' || !navigator || typeof (navigator as { userAgent: string }).userAgent !== 'string') {
+  if (
+    typeof navigator !== 'object' ||
+    !navigator ||
+    typeof (navigator as { userAgent: string }).userAgent !== 'string'
+  ) {
     return false;
   }
 
   /**
    * Check if the user agent string matches a mobile browser pattern.
    */
-  const userAgent = (navigator as { userAgent: string }).userAgent.toLowerCase();
+  const userAgent = (
+    navigator as { userAgent: string }
+  ).userAgent.toLowerCase();
   return /android|webos|iphone|blackberry|iemobile|opera mini/i.test(userAgent);
-}
+};
 
 /**
   @group Platform
@@ -323,16 +350,22 @@ const isAndroidMobileBrowser: () => boolean = (): boolean => {
   /**
    * Check if the navigator object is defined and has a userAgent property.
    */
-  if (typeof navigator !== 'object' || !navigator || typeof (navigator as { userAgent: string }).userAgent !== 'string') {
+  if (
+    typeof navigator !== 'object' ||
+    !navigator ||
+    typeof (navigator as { userAgent: string }).userAgent !== 'string'
+  ) {
     return false;
   }
 
   /**
    * Check if the user agent string matches an Android pattern.
    */
-  const userAgent = (navigator as { userAgent: string }).userAgent.toLowerCase();
+  const userAgent = (
+    navigator as { userAgent: string }
+  ).userAgent.toLowerCase();
   return /android/i.test(userAgent);
-}
+};
 
 /**
   @group Platform
@@ -370,9 +403,10 @@ const isReactNativeWebview: () => boolean = (): boolean => {
   /**
    * Check if the ReactNativeWebView object has a postMessage method.
    */
-  return typeof (window as IDict)?.ReactNativeWebView?.postMessage === 'function';
-}
-
+  return (
+    typeof (window as IDict)?.ReactNativeWebView?.postMessage === 'function'
+  );
+};
 
 /**
   @group Platform
@@ -392,7 +426,8 @@ const isReactNativeWebview: () => boolean = (): boolean => {
  * }
  * ```
  */
-const isDarwin: () => boolean = (): boolean => isNode() && process.platform === 'darwin';
+const isDarwin: () => boolean = (): boolean =>
+  isNode() && process.platform === 'darwin';
 /**
    @group Platform
  * Checks if the current environment is a Windows (win32) environment.
@@ -411,7 +446,8 @@ const isDarwin: () => boolean = (): boolean => isNode() && process.platform === 
  * }
  * ```
  */
-const isWin32: () => boolean = (): boolean => isNode() && process.platform === 'win32';
+const isWin32: () => boolean = (): boolean =>
+  isNode() && process.platform === 'win32';
 
 /**
   @group Platform
@@ -436,6 +472,19 @@ const isLinux: () => boolean = (): boolean => {
    * Check if we're in a Node.js environment and the platform is 'linux'.
    */
   return isNode() && process.platform === 'linux';
-}
+};
 
-export const Platform = { isWeb, isLinux, isDarwin, isWin32, isNode, isElectron, isTouchDevice, isServerSide, isClientSide, isMobileBrowser, isAndroidMobileBrowser, isReactNativeWebview }
+export const Platform = {
+  isWeb,
+  isLinux,
+  isDarwin,
+  isWin32,
+  isNode,
+  isElectron,
+  isTouchDevice,
+  isServerSide,
+  isClientSide,
+  isMobileBrowser,
+  isAndroidMobileBrowser,
+  isReactNativeWebview,
+};

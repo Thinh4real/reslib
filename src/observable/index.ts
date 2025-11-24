@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 /**
  * @interface IObservableCallback
  * Represents the callback options for observable events.
@@ -63,7 +64,9 @@ export type IObservableCallback = (...args: any[]) => any;
  * flexible design, enabling developers to define only the events they are interested in
  * without requiring all possible events to be present.
  */
-export type IObservableCallbacks<EventType extends string = string> = Partial<Record<EventType | IObservableAllEventType, IObservableCallback[]>>;
+export type IObservableCallbacks<EventType extends string = string> = Partial<
+  Record<EventType | IObservableAllEventType, IObservableCallback[]>
+>;
 
 /**
  * Represents a wildcard event type for observable systems.
@@ -83,14 +86,23 @@ export type IObservableCallbacks<EventType extends string = string> = Partial<Re
  * global events that are not specific to a single event type. However, it should be used
  * judiciously, as it may lead to performance concerns if many events are emitted frequently.
  */
-export type IObservableAllEventType = "*";
+export type IObservableAllEventType = '*';
 
-export type IObservable<EventType extends string = string, Context = unknown> = {
+export type IObservable<
+  EventType extends string = string,
+  Context = unknown,
+> = {
   _____isObservable?: boolean;
   on: (event: EventType, fn: IObservableCallback) => { remove: () => any };
-  finally: (event: EventType, fn: IObservableCallback) => IObservable<EventType>;
+  finally: (
+    event: EventType,
+    fn: IObservableCallback
+  ) => IObservable<EventType>;
   off: (event: EventType, fn: IObservableCallback) => IObservable<EventType>;
-  trigger: (event: EventType | IObservableAllEventType, ...args: any[]) => IObservable<EventType>;
+  trigger: (
+    event: EventType | IObservableAllEventType,
+    ...args: any[]
+  ) => IObservable<EventType>;
   offAll: () => IObservable<EventType>;
   once: (event: EventType, fn: IObservableCallback) => { remove: () => any };
   getEventCallBacks: () => IObservableCallbacks<EventType>;
@@ -121,7 +133,10 @@ export type IObservable<EventType extends string = string, Context = unknown> = 
  * @see {@link IObservableAllEventType} for more information on the observable all event type.
  * @see {@link isObservable} for more information on the observable check function.
  */
-export const observableFactory = function <EventType extends string = string, Context = unknown>(context?: Context): IObservable<EventType, Context> {
+export const observableFactory = function <
+  EventType extends string = string,
+  Context = unknown,
+>(context?: Context): IObservable<EventType, Context> {
   /**
    * Private variables
    */
@@ -138,7 +153,10 @@ export const observableFactory = function <EventType extends string = string, Co
      * @param {IObservableCallback} fn - The callback function to execute.
      * @returns {{ remove: () => any }} An object with a `remove` method to remove the callback.
      */
-    on: function (event: EventType, fn: IObservableCallback): { remove: () => any } {
+    on: function (
+      event: EventType,
+      fn: IObservableCallback
+    ): { remove: () => any } {
       if (fn && event) {
         (callbacks[event] = callbacks[event] || []).push(fn);
       }
@@ -155,7 +173,10 @@ export const observableFactory = function <EventType extends string = string, Co
      * @param {IObservableCallback} fn - The callback function to execute.
      * @returns {IObservable<EventType>} The observable object.
      */
-    finally: function (event: EventType, fn: IObservableCallback): IObservable<EventType> {
+    finally: function (
+      event: EventType,
+      fn: IObservableCallback
+    ): IObservable<EventType> {
       if (fn && event) {
         (finallyCallback[event] = finallyCallback[event] || []).push(fn);
         return this;
@@ -172,9 +193,12 @@ export const observableFactory = function <EventType extends string = string, Co
      * @param {IObservableCallback} [fn] - The callback function to remove.
      * @returns {IObservable<EventType>} The observable object.
      */
-    off: function (event: EventType, fn: IObservableCallback): IObservable<EventType> {
+    off: function (
+      event: EventType,
+      fn: IObservableCallback
+    ): IObservable<EventType> {
       if (!event) return this;
-      if (event == "*" && !fn) callbacks = {};
+      if (event == '*' && !fn) callbacks = {};
       else {
         if (fn) {
           var arr = callbacks[event];
@@ -249,24 +273,27 @@ export const observableFactory = function <EventType extends string = string, Co
      * @param {...any[]} args - The arguments to pass to the callback functions.
      * @returns {IObservable<EventType>} The observable object.
      */
-    trigger: function (event: EventType | IObservableAllEventType, ...args: any[]): IObservable<EventType> {
+    trigger: function (
+      event: EventType | IObservableAllEventType,
+      ...args: any[]
+    ): IObservable<EventType> {
       if (!event) return this;
       // getting the arguments
       let fns, fn, i;
       let finaly = null;
-      if (typeof args[args.length - 1] == "function") {
+      if (typeof args[args.length - 1] == 'function') {
         finaly = args.pop();
       }
       fns = slice.call(callbacks[event] || [], 0);
       let fnsReturns = [];
       for (i = 0; (fn = fns[i]); ++i) {
-        if (typeof fn === "function") {
+        if (typeof fn === 'function') {
           fnsReturns.push(fn.apply(this, args));
         }
       }
-      if (typeof callbacks["*"] == "function" && event != "*") {
+      if (typeof callbacks['*'] == 'function' && event != '*') {
         this.trigger(event, ...args);
-        this.trigger("*", ...args);
+        this.trigger('*', ...args);
       }
       //finaly events callback
       var finalCals = slice.call(finallyCallback[event] || [], 0);
@@ -355,7 +382,9 @@ export const observableFactory = function <EventType extends string = string, Co
  * @see {@link IObservableAllEventType} for more information on the observable all event type.
  * @see {@link isObservable} for more information on the observable check function.
  */
-export const observable = function <EventType extends string = string>(element: any): IObservable<EventType> {
+export const observable = function <EventType extends string = string>(
+  element: any
+): IObservable<EventType> {
   /**
    * Check if the element is already observable.
    *
@@ -475,7 +504,9 @@ export const observable = function <EventType extends string = string>(element: 
  * of an application.
  * @template EventType - The type of the event. This can be any string or a custom type.
  */
-export class ObservableClass<EventType extends string = string> implements IObservable<EventType> {
+export class ObservableClass<EventType extends string = string>
+  implements IObservable<EventType>
+{
   /**
    * Flag indicating whether the object is observable.
    *
@@ -565,7 +596,10 @@ export class ObservableClass<EventType extends string = string> implements IObse
    * observable.trigger("dataReceived", { id: 1, value: "Hello" });
    * ```
    */
-  trigger(event: EventType | IObservableAllEventType, ...args: any[]): IObservable<EventType> {
+  trigger(
+    event: EventType | IObservableAllEventType,
+    ...args: any[]
+  ): IObservable<EventType> {
     return this._observable.trigger.call(this, event, ...args);
   }
 
@@ -650,13 +684,19 @@ export function isObservable(obj: any): boolean {
    * Check if the object is null or undefined, or if it's a primitive type (string, boolean, number).
    * If so, return false immediately.
    */
-  if (!obj || ["string", "boolean", "number"].includes(typeof obj)) return false;
+  if (!obj || ['string', 'boolean', 'number'].includes(typeof obj))
+    return false;
   try {
     /**
      * Check if the object has the required properties and methods.
      * If any of these checks fail, the object is not observable.
      */
-    return obj?._____isObservable === true && typeof obj?.on === "function" && typeof obj?.trigger === "function" && typeof obj?.off === "function";
+    return (
+      obj?._____isObservable === true &&
+      typeof obj?.on === 'function' &&
+      typeof obj?.trigger === 'function' &&
+      typeof obj?.off === 'function'
+    );
   } catch (e) {
     /**
      * If an error occurs during the checks, return false.

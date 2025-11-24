@@ -1,17 +1,18 @@
-import { ICurrency } from "@/currency/types";
-import { i18n } from "@/i18n";
-import { defaultStr } from "@utils/defaultStr";
-import { isNonNullString } from "@utils/isNonNullString";
-import { extendObj, isObj } from "@utils/object";
-import countries from "./countries";
-import { ICountry, ICountryCode } from "./types";
+import { ICurrency } from '@/currency/types';
+import { i18n } from '@/i18n';
+import { defaultStr } from '@utils/defaultStr';
+import { isNonNullString } from '@utils/isNonNullString';
+import { extendObj, isObj } from '@utils/object';
+import 'reflect-metadata';
+import countries from './countries';
+import { ICountry, ICountryCode } from './types';
 const countriesByDialCodes = {};
 Object.keys(countries).map((countryCode) => {
   const country = countries[countryCode as keyof typeof countries];
   (countriesByDialCodes as any)[country.dialCode] = country.code;
 });
 
-export * from "./types";
+export * from './types';
 
 /**
  * Class representing a collection of countries with their associated properties.
@@ -36,7 +37,8 @@ export class CountriesManager {
    * @private
    * @type {Record<ICountryCode, ICountry>}
    */
-  private static countries: Record<ICountryCode, ICountry> = countries as unknown as Record<ICountryCode, ICountry>;
+  private static countries: Record<ICountryCode, ICountry> =
+    countries as unknown as Record<ICountryCode, ICountry>;
 
   /**
    * Checks if a given country object is valid.
@@ -145,7 +147,11 @@ export class CountriesManager {
    */
   static getCountry(code: ICountryCode): ICountry | undefined {
     if (!isNonNullString(code)) return undefined;
-    return extendObj<ICountry>({} as ICountry, i18n.t(`countries.${code}`), this.countries[code]);
+    return extendObj<ICountry>(
+      {} as ICountry,
+      i18n.t(`countries.${code}`),
+      this.countries[code]
+    );
   }
 
   /**
@@ -160,7 +166,7 @@ export class CountriesManager {
    * ```
    */
   static getCountries(): Record<ICountryCode, ICountry> {
-    const countries = i18n.t("countries");
+    const countries = i18n.t('countries');
     if (isObj(countries)) {
       return extendObj({}, countries, this.countries);
     }
@@ -195,12 +201,18 @@ export class CountriesManager {
    * });
    * ```
    */
-  static setCountries(countries: Partial<Record<ICountryCode, ICountry>>): Record<ICountryCode, ICountry> {
+  static setCountries(
+    countries: Partial<Record<ICountryCode, ICountry>>
+  ): Record<ICountryCode, ICountry> {
     if (!isObj(countries)) return this.countries;
     for (const countryCode in countries) {
       const country = countries[countryCode as keyof typeof countries];
       if (this.isValid(country as any)) {
-        this.countries[countryCode as keyof typeof countries] = extendObj({}, this.countries[countryCode as keyof typeof countries], country);
+        this.countries[countryCode as keyof typeof countries] = extendObj(
+          {},
+          this.countries[countryCode as keyof typeof countries],
+          country
+        );
       }
     }
     return this.countries;

@@ -1,20 +1,21 @@
-import { CountriesManager, ICountryCode } from "@countries/index";
-import { Logger } from "@logger";
-import { DateHelper } from "@utils/date/dateHelper";
-import { defaultStr } from "@utils/defaultStr";
-import { isEmpty } from "@utils/isEmpty";
-import { isNonNullString } from "@utils/isNonNullString";
-import { isNullable } from "@utils/isNullable";
-import { isNumber } from "@utils/isNumber";
-import { isPrimitive } from "@utils/isPrimitive";
-import { isRegExp } from "@utils/isRegex";
-import { stringify } from "@utils/stringify";
+import { CountriesManager, ICountryCode } from '@countries/index';
+import { Logger } from '@logger';
+import { DateHelper } from '@utils/date/dateHelper';
+import { defaultStr } from '@utils/defaultStr';
+import { isEmpty } from '@utils/isEmpty';
+import { isNonNullString } from '@utils/isNonNullString';
+import { isNullable } from '@utils/isNullable';
+import { isNumber } from '@utils/isNumber';
+import { isPrimitive } from '@utils/isPrimitive';
+import { isRegExp } from '@utils/isRegex';
+import { stringify } from '@utils/stringify';
 import libPhoneNumber, {
   PhoneNumber,
   PhoneNumberFormat,
-} from "google-libphonenumber";
-import moment from "moment";
-import "../utils/numbers";
+} from 'google-libphonenumber';
+import moment from 'moment';
+import 'reflect-metadata';
+import '../utils/numbers';
 import {
   IInputFormatterMask,
   IInputFormatterMaskArray,
@@ -23,7 +24,7 @@ import {
   IInputFormatterMaskWithValidation,
   IInputFormatterOptions,
   IInputFormatterResult,
-} from "./types";
+} from './types';
 
 const phoneUtil = libPhoneNumber.PhoneNumberUtil.getInstance();
 const asYouTypeFormatter = libPhoneNumber.AsYouTypeFormatter;
@@ -31,7 +32,7 @@ const asYouTypeFormatter = libPhoneNumber.AsYouTypeFormatter;
 const DIGIT_REGEX = /\d/;
 const LETTER_REGEX = /[a-zA-Z]/;
 
-export * from "./types";
+export * from './types';
 
 export class InputFormatter {
   /**
@@ -83,11 +84,11 @@ export class InputFormatter {
   }: IInputFormatterOptions): IInputFormatterResult {
     const canValueBeDecimal =
       type &&
-      ["decimal", "numeric", "number"].includes(String(type).toLowerCase());
+      ['decimal', 'numeric', 'number'].includes(String(type).toLowerCase());
     let parsedValue = value;
     const result: Partial<IInputFormatterResult> = {};
     // Normalize the value: if it's undefined, null, or empty, set it to an empty string.
-    value = isNullable(value) ? "" : value;
+    value = isNullable(value) ? '' : value;
     if (!value) {
       // If the value is empty and can be decimal, set parsedValue to 0; otherwise, set it to an empty string.
       parsedValue = canValueBeDecimal ? 0 : String(value);
@@ -106,7 +107,7 @@ export class InputFormatter {
         : stringify(value, { escapeString: false });
 
     // If a format function is provided, use it to format the value.
-    if (typeof format === "function") {
+    if (typeof format === 'function') {
       formattedValue = format({
         ...rest,
         dateFormat,
@@ -118,12 +119,12 @@ export class InputFormatter {
       const typeText = String(type).toLowerCase();
       let hasFoundDate = false;
       // Format dates if the value is a valid date object.
-      if (dateFormat || ["time", "date", "datetime"].includes(typeText)) {
+      if (dateFormat || ['time', 'date', 'datetime'].includes(typeText)) {
         dateFormat = defaultStr(
           dateFormat,
-          typeText === "time"
+          typeText === 'time'
             ? DateHelper.getDefaultTimeFormat()
-            : typeText === "date"
+            : typeText === 'date'
               ? DateHelper.getDefaultDateFormat()
               : DateHelper.getDefaultDateTimeFormat()
         );
@@ -134,7 +135,7 @@ export class InputFormatter {
           result.dateValue = parsedDate;
         }
         result.dateFormat = dateFormat;
-      } else if ("tel" === typeText) {
+      } else if ('tel' === typeText) {
         const phoneNumber = InputFormatter.formatPhoneNumber(
           value,
           phoneCountryCode
@@ -146,7 +147,7 @@ export class InputFormatter {
           phoneCountryCode
         );
         if (parsed) {
-          result.dialCode = parsed.getCountryCode() + "";
+          result.dialCode = parsed.getCountryCode() + '';
           result.phoneCountryCode = defaultStr(
             phoneUtil.getRegionCodeForNumber(parsed),
             phoneCountryCode
@@ -157,21 +158,21 @@ export class InputFormatter {
         result.phoneNumber = InputFormatter.prefixPhoneNumberWithDialCode(
           formattedValue,
           result.dialCode as string
-        ).replace(/\s/g, "");
+        ).replace(/\s/g, '');
       }
       if (hasFoundDate) {
       }
       // Format numbers based on the specified format.
       else if (isNumber(parsedValue)) {
-        const abreviateFnStr = `abreviate2${defaultStr(format, "FormatNumber").trim().upperFirst()}`;
+        const abreviateFnStr = `abreviate2${defaultStr(format, 'FormatNumber').trim().upperFirst()}`;
         if (
           abreviateNumber &&
-          typeof (Number.prototype as any)[abreviateFnStr] === "function"
+          typeof (Number.prototype as any)[abreviateFnStr] === 'function'
         ) {
           formattedValue = (parsedValue as any)[abreviateFnStr]();
         } else if (
           isNonNullString(format) &&
-          typeof Number.prototype[format as keyof Number] === "function"
+          typeof Number.prototype[format as keyof Number] === 'function'
         ) {
           formattedValue = (parsedValue as number)[format as keyof Number]();
         } else {
@@ -186,7 +187,7 @@ export class InputFormatter {
       value,
       format,
       parsedValue,
-      decimalValue: typeof parsedValue == "number" ? parsedValue : 0,
+      decimalValue: typeof parsedValue == 'number' ? parsedValue : 0,
       ...result,
     };
   }
@@ -213,7 +214,7 @@ export class InputFormatter {
         return countryCallingCode.toString();
       }
     } catch (error) {}
-    return "";
+    return '';
   }
   /**
    * @description
@@ -251,7 +252,7 @@ export class InputFormatter {
    * @return {boolean} Wheather the mask is valid or not
    */
   static isValidMask(mask?: IInputFormatterMask) {
-    return Array.isArray(mask) || typeof mask === "function";
+    return Array.isArray(mask) || typeof mask === 'function';
   }
   /**
    * Parses a given value and converts it into a decimal number.
@@ -282,17 +283,17 @@ export class InputFormatter {
    * ```
    */
   static parseDecimal = (value: any): number => {
-    if (typeof value === "number") return value;
+    if (typeof value === 'number') return value;
     if (
       value == undefined ||
       value == null ||
       !value ||
-      typeof value !== "string"
+      typeof value !== 'string'
     ) {
       return 0;
     }
     const v = parseFloat(InputFormatter.normalizeNumber(value));
-    return typeof v === "number" && !Number.isNaN(v) ? v : 0;
+    return typeof v === 'number' && !Number.isNaN(v) ? v : 0;
   };
   /***
     Normalize a value to a string. 
@@ -302,14 +303,14 @@ export class InputFormatter {
     @param {any} value - The value to normalize
     @param {string} decimalSeparator - The decimal separator to use
   */
-  static normalizeNumber(value: any, decimalSeparator: string = ".") {
-    if (typeof value == "number") {
+  static normalizeNumber(value: any, decimalSeparator: string = '.') {
+    if (typeof value == 'number') {
       return value.toString();
     }
-    if (!value || value == undefined || value == null) return "0";
+    if (!value || value == undefined || value == null) return '0';
     return String(value)
       .trim()
-      .replace(/\s/g, "")
+      .replace(/\s/g, '')
       .replace(/[,٫·]/g, decimalSeparator);
   }
   /***
@@ -318,8 +319,8 @@ export class InputFormatter {
    * @returns {boolean} Whether the value ends with a decimal separator
    */
   static endsWithDecimalSeparator = (value: any): boolean => {
-    const val = String(value).trim().replace(/\s/g, "");
-    return val.endsWith(".") || val.endsWith(",") || val.endsWith("٫");
+    const val = String(value).trim().replace(/\s/g, '');
+    return val.endsWith('.') || val.endsWith(',') || val.endsWith('٫');
   };
   /**
    * Formats a value with a mask.
@@ -361,23 +362,23 @@ export class InputFormatter {
       obfuscationCharacter /* maskAutoComplete = false*/,
     } = options;
     const stValue = isEmpty(customValue)
-      ? ""
+      ? ''
       : customValue === undefined
-        ? ""
-        : ["number", "boolean", "string"].includes(typeof customValue)
+        ? ''
+        : ['number', 'boolean', 'string'].includes(typeof customValue)
           ? customValue.toString()
           : customValue === null
-            ? ""
+            ? ''
             : customValue?.toString() || String(customValue);
     const value = defaultStr(stValue);
     const mArray =
-      typeof mask === "function" ? mask({ ...options, value }) : mask;
+      typeof mask === 'function' ? mask({ ...options, value }) : mask;
     const maskArray = Array.isArray(mArray) ? mArray : [];
     const placeholderCharacter = defaultStr(
       customPlaceholderCharacter,
-      "_"
+      '_'
     ).charAt(0);
-    let placeholder = "";
+    let placeholder = '';
     maskArray.map((mask) => {
       placeholder += String(
         isNonNullString(mask)
@@ -390,7 +391,7 @@ export class InputFormatter {
     let maskedPlaceholder = placeholder;
     let isValid = true;
     const calValidate = (value: string) =>
-      typeof validate === "function" ? validate(value) : true;
+      typeof validate === 'function' ? validate(value) : true;
     // make sure it'll not break with null or undefined inputs
     if (!maskArray.length || !value) {
       return {
@@ -405,14 +406,14 @@ export class InputFormatter {
         nonRegexReplacedChars: [],
       };
     }
-    let masked = "";
-    let obfuscated = "";
-    let unmasked = "";
+    let masked = '';
+    let obfuscated = '';
+    let unmasked = '';
     let maskCharIndex = 0;
     let valueCharIndex = 0;
     let maskHasObfuscation = false;
     const placeholderLength = placeholder.length;
-    const nonRegexReplacedChars: IInputFormatterMaskResult["nonRegexReplacedChars"] =
+    const nonRegexReplacedChars: IInputFormatterMaskResult['nonRegexReplacedChars'] =
       [];
     while (maskCharIndex < maskArray.length) {
       if (valueCharIndex >= value.length) {
@@ -420,7 +421,7 @@ export class InputFormatter {
       }
       const maskChar = maskArray[maskCharIndex];
       const valueChar = value[valueCharIndex];
-      const customNonRegexReplacedChars: IInputFormatterMaskResult["nonRegexReplacedChars"] =
+      const customNonRegexReplacedChars: IInputFormatterMaskResult['nonRegexReplacedChars'] =
         [];
       let {
         isValid: customIsValid,
@@ -505,55 +506,55 @@ export class InputFormatter {
    */
   static MOMENT_MASKS_MAP = {
     // Year tokens
-    YYYY: Array(4).fill([DIGIT_REGEX, "Y"]),
-    YY: Array(2).fill([DIGIT_REGEX, "Y"]),
+    YYYY: Array(4).fill([DIGIT_REGEX, 'Y']),
+    YY: Array(2).fill([DIGIT_REGEX, 'Y']),
 
     // Month tokens
-    MM: Array(2).fill([DIGIT_REGEX, "M"]),
-    M: [[DIGIT_REGEX, "M"]],
-    MMMM: Array(9).fill([LETTER_REGEX, "M"]), // Longest month name (September)
-    MMM: Array(3).fill([LETTER_REGEX, "M"]),
+    MM: Array(2).fill([DIGIT_REGEX, 'M']),
+    M: [[DIGIT_REGEX, 'M']],
+    MMMM: Array(9).fill([LETTER_REGEX, 'M']), // Longest month name (September)
+    MMM: Array(3).fill([LETTER_REGEX, 'M']),
 
     // Day tokens
-    DD: Array(2).fill([DIGIT_REGEX, "D"]),
-    D: [[DIGIT_REGEX, "D"]],
+    DD: Array(2).fill([DIGIT_REGEX, 'D']),
+    D: [[DIGIT_REGEX, 'D']],
 
     // Hour tokens
-    HH: Array(2).fill([DIGIT_REGEX, "H"]), // 24-hour
-    H: [[DIGIT_REGEX, "H"]], // 24-hour
-    hh: Array(2).fill([DIGIT_REGEX, "h"]), // 12-hour
-    h: [[DIGIT_REGEX, "h"]], // 12-hour
+    HH: Array(2).fill([DIGIT_REGEX, 'H']), // 24-hour
+    H: [[DIGIT_REGEX, 'H']], // 24-hour
+    hh: Array(2).fill([DIGIT_REGEX, 'h']), // 12-hour
+    h: [[DIGIT_REGEX, 'h']], // 12-hour
 
     // Minute tokens
-    mm: Array(2).fill([DIGIT_REGEX, "m"]),
-    m: [[DIGIT_REGEX, "m"]],
+    mm: Array(2).fill([DIGIT_REGEX, 'm']),
+    m: [[DIGIT_REGEX, 'm']],
 
     // Second tokens
-    ss: Array(2).fill([DIGIT_REGEX, "s"]),
-    s: [[DIGIT_REGEX, "s"]],
+    ss: Array(2).fill([DIGIT_REGEX, 's']),
+    s: [[DIGIT_REGEX, 's']],
 
     // Millisecond token
-    SSS: Array(3).fill([DIGIT_REGEX, "S"]),
+    SSS: Array(3).fill([DIGIT_REGEX, 'S']),
 
     // Timezone tokens
     Z: [/[+-]/, DIGIT_REGEX, DIGIT_REGEX, DIGIT_REGEX, DIGIT_REGEX],
     ZZ: [/[+-]/, DIGIT_REGEX, DIGIT_REGEX, DIGIT_REGEX, DIGIT_REGEX],
 
     // AM/PM
-    A: ["A", "M"],
-    a: ["a", "m"],
+    A: ['A', 'M'],
+    a: ['a', 'm'],
   };
   /***
    * A map of moment separators and their corresponding characters.
    * The keys of the object are the separators, and the values are the corresponding characters.
    */
   static MOMENT_SEPARATOR_MAP = {
-    "/": "/",
-    "-": "-",
-    ".": ".",
-    " ": " ",
-    ":": ":",
-    T: "T",
+    '/': '/',
+    '-': '-',
+    '.': '.',
+    ' ': ' ',
+    ':': ':',
+    T: 'T',
   };
   /***
    * Creates a date mask, based on the specified moment format.
@@ -569,14 +570,14 @@ export class InputFormatter {
     const separatorMap = InputFormatter.MOMENT_SEPARATOR_MAP;
 
     let result: IInputFormatterMaskArray = [];
-    let currentToken = "";
+    let currentToken = '';
     let i: number = 0;
     while (i < momentDateFormat.length) {
       // Handle separators
       if (separatorMap[momentDateFormat[i] as keyof typeof separatorMap]) {
         if (currentToken) {
           result.push(...(maskMap[currentToken as keyof typeof maskMap] || []));
-          currentToken = "";
+          currentToken = '';
         }
         result.push(
           separatorMap[momentDateFormat[i] as keyof typeof separatorMap]
@@ -591,7 +592,7 @@ export class InputFormatter {
       // Check if we have a complete token
       if (maskMap[currentToken as keyof typeof maskMap]) {
         result.push(...maskMap[currentToken as keyof typeof maskMap]);
-        currentToken = "";
+        currentToken = '';
         i++;
         continue;
       }
@@ -604,8 +605,8 @@ export class InputFormatter {
       ) {
         if (currentToken) {
           // Handle unknown token as literal characters
-          result.push(...currentToken.split(""));
-          currentToken = "";
+          result.push(...currentToken.split(''));
+          currentToken = '';
         }
         i++;
       } else {
@@ -637,7 +638,7 @@ export class InputFormatter {
    * A mask for single facilitative space.
    * @description A mask for a single facilitative space.
    */
-  static SINGLE_SPACE_MASK = " "; //:[mask: RegExp, placeholderCharacter: string] = [/^ ?$/, ' '];
+  static SINGLE_SPACE_MASK = ' '; //:[mask: RegExp, placeholderCharacter: string] = [/^ ?$/, ' '];
   /**
    * Generates a phone number mask based on the country code.
    * @param countryCode - The country code (e.g., "US", "FR", "IN").
@@ -679,7 +680,7 @@ export class InputFormatter {
       // Get formatted version
       const formattedNumber = phoneUtil.format(exampleNumber, toFormat);
       // Get dial code
-      const dialCode = exampleNumber.getCountryCode() + "";
+      const dialCode = exampleNumber.getCountryCode() + '';
       return {
         dialCode,
         mask: generatePhoneNumberMaskArray(formattedNumber, dialCode),
@@ -787,17 +788,17 @@ export class InputFormatter {
         /\d/,
         /\d/,
         /\d/,
-        " ",
+        ' ',
         [/\d/],
         [/\d/],
         [/\d/],
         [/\d/],
-        " ",
+        ' ',
         [/\d/],
         [/\d/],
         [/\d/],
         [/\d/],
-        " ",
+        ' ',
         /\d/,
         /\d/,
         /\d/,
@@ -842,14 +843,14 @@ export class InputFormatter {
     phoneNumber: string,
     dialCode: string
   ): string {
-    if (typeof phoneNumber !== "string") return "";
+    if (typeof phoneNumber !== 'string') return '';
     if (!isNonNullString(dialCode)) return phoneNumber;
-    dialCode = "+" + dialCode.ltrim("+");
+    dialCode = '+' + dialCode.ltrim('+');
     if (
       !phoneNumber.startsWith(dialCode) &&
-      !phoneNumber.trim().startsWith("+")
+      !phoneNumber.trim().startsWith('+')
     )
-      return dialCode.trim() + " " + phoneNumber.ltrim(" ");
+      return dialCode.trim() + ' ' + phoneNumber.ltrim(' ');
     return phoneNumber;
   }
 
@@ -911,13 +912,13 @@ export class InputFormatter {
       ); // eslint-disable-line new-cap
       // Clear any previous state in the formatter
       formatter.clear();
-      let formatted = "";
+      let formatted = '';
       phoneNumber
-        .replace(/-/g, "")
-        .replace(/ /g, "")
-        .replace(/\(/g, "")
-        .replace(/\)/g, "")
-        .split("")
+        .replace(/-/g, '')
+        .replace(/ /g, '')
+        .replace(/\(/g, '')
+        .replace(/\)/g, '')
+        .split('')
         .forEach((n) => {
           formatted = formatter.inputDigit(n);
         });
@@ -925,9 +926,9 @@ export class InputFormatter {
     } catch (e) {
       Logger.log(
         e,
-        " input formatter formatting phone number phoneNumber =",
+        ' input formatter formatting phone number phoneNumber =',
         phoneNumber,
-        ", countryCode=",
+        ', countryCode=',
         countryCode
       );
       return null;
@@ -941,8 +942,8 @@ export class InputFormatter {
    * @returns The cleaned phone number string
    */
   static cleanPhoneNumber(phoneNumber: string): string {
-    if (!isNonNullString(phoneNumber)) return "";
-    return phoneNumber.trim().replace(/\s/g, "");
+    if (!isNonNullString(phoneNumber)) return '';
+    return phoneNumber.trim().replace(/\s/g, '');
   }
   /**
    * Extracts the country dial code from international phone numbers.
@@ -991,10 +992,10 @@ export class InputFormatter {
       );
       if (parsedNumber) {
         // Get dial code
-        return parsedNumber.getCountryCode() + "";
+        return parsedNumber.getCountryCode() + '';
       }
     } catch (e) {}
-    return "";
+    return '';
   }
 
   /***
@@ -1026,8 +1027,8 @@ export class InputFormatter {
    * ```
    */
   static extractNumbersFromString(str: string) {
-    if (!isNonNullString(str)) return "";
-    return str.replace(/\D/g, "");
+    if (!isNonNullString(str)) return '';
+    return str.replace(/\D/g, '');
   }
 }
 
@@ -1037,7 +1038,7 @@ const generatePhoneNumberMaskArray = (
 ): IInputFormatterMaskArray => {
   dialCode = defaultStr(dialCode);
   if (dialCode) {
-    dialCode = "+" + dialCode.ltrim("+");
+    dialCode = '+' + dialCode.ltrim('+');
   }
   if (!InputFormatter.cleanPhoneNumber(phoneNumber).startsWith(dialCode)) {
     dialCode;
@@ -1064,16 +1065,16 @@ function handleMaskAtIndex({
   maskCharIndex: number;
   valueChar: string;
   obfuscationCharacter?: string;
-  nonRegexReplacedChars: IInputFormatterMaskResult["nonRegexReplacedChars"];
+  nonRegexReplacedChars: IInputFormatterMaskResult['nonRegexReplacedChars'];
 }) {
   let maskHasObfuscation = false,
     isValid = true;
-  let masked = "",
-    obfuscated = "";
+  let masked = '',
+    obfuscated = '';
   let mask = maskChar,
     isMaskRegex = false;
   // it's a regex maskChar: let's advance on value index and validate the value within the regex
-  if (typeof maskChar === "object") {
+  if (typeof maskChar === 'object') {
     const obfuscatedCharacter = defaultStr(
       Array.isArray(maskChar) ? maskChar[2] : undefined,
       obfuscationCharacter
@@ -1154,7 +1155,7 @@ function genPhoneNumberMask(
       if (isNonNullString(formattedNumber)) {
         // Get region code
         const regionCode = phoneUtil.getRegionCodeForNumber(parsedNumber);
-        const dialCode = parsedNumber.getCountryCode() + "";
+        const dialCode = parsedNumber.getCountryCode() + '';
         return {
           dialCode,
           mask: generatePhoneNumberMaskArray(formattedNumber, dialCode),

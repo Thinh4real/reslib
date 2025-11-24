@@ -1,6 +1,7 @@
-import { DateHelper } from "@utils/date";
-import { defaultStr } from "@utils/defaultStr";
-import { IClassConstructor, IDict } from "../types/index";
+import { DateHelper } from '@utils/date';
+import { defaultStr } from '@utils/defaultStr';
+import 'reflect-metadata';
+import { IClassConstructor, IDict } from '../types/index';
 
 /**
  * Represents a logger that provides logging functionalities with different log levels.
@@ -25,7 +26,7 @@ export class Logger {
    * Metadata key used to store logger information.
    * This is useful for dynamically registering a logger instance.
    */
-  static readonly loggerMetaData = Symbol("logger-meta-data");
+  static readonly loggerMetaData = Symbol('logger-meta-data');
 
   /**
    * Internal reference to the currently registered logger.
@@ -88,10 +89,10 @@ export class Logger {
   static _log(level: ILoggerLevel, ...data: any[]) {
     const logger = Logger.logger;
     level = defaultStr(level);
-    if (level && typeof ((logger as any)[level] as any) === "function") {
+    if (level && typeof ((logger as any)[level] as any) === 'function') {
       (logger as any)[level](Logger.getDateTimeString(), ...data);
     } else {
-      console.log("Logger level not found : [", level, "]", ...data);
+      console.log('Logger level not found : [', level, ']', ...data);
     }
   }
   /**
@@ -107,16 +108,16 @@ export class Logger {
   static getDateTimeString() {
     const { day, year, hours, minutes, seconds, dayNameShort, monthName } =
       DateHelper.getUTCDateTimeDetails();
-    const dayString = day < 10 ? "0" + day : day;
-    const hoursString = hours < 10 ? "0" + hours : hours;
-    const minutesString = minutes < 10 ? "0" + minutes : minutes;
-    const secondsString = seconds < 10 ? "0" + seconds : seconds;
+    const dayString = day < 10 ? '0' + day : day;
+    const hoursString = hours < 10 ? '0' + hours : hours;
+    const minutesString = minutes < 10 ? '0' + minutes : minutes;
+    const secondsString = seconds < 10 ? '0' + seconds : seconds;
     return (
-      "[" +
-      [dayNameShort, dayString, monthName, year].join(" ") +
-      " " +
-      [hoursString, minutesString, secondsString].join(":") +
-      "]"
+      '[' +
+      [dayNameShort, dayString, monthName, year].join(' ') +
+      ' ' +
+      [hoursString, minutesString, secondsString].join(':') +
+      ']'
     );
   }
 
@@ -125,7 +126,7 @@ export class Logger {
    * @param {...any[]} data - Data to log.
    */
   static log(...data: any[]): void {
-    this._log("log", ...data);
+    this._log('log', ...data);
   }
 
   /**
@@ -133,7 +134,7 @@ export class Logger {
    * @param {...any[]} data - Data to log.
    */
   static info(...data: any[]): void {
-    this._log("info", ...data);
+    this._log('info', ...data);
   }
 
   /**
@@ -141,7 +142,7 @@ export class Logger {
    * @param {...any[]} data - Data to log.
    */
   static debug(...data: any[]): void {
-    this._log("debug", ...data);
+    this._log('debug', ...data);
   }
 
   /**
@@ -149,7 +150,7 @@ export class Logger {
    * @param {...any[]} data - Data to log.
    */
   static warn(...data: any[]): void {
-    this._log("warn", ...data);
+    this._log('warn', ...data);
   }
 
   /**
@@ -157,7 +158,7 @@ export class Logger {
    * @param {...any[]} data - Data to log.
    */
   static error(...data: any[]): void {
-    this._log("error", ...data);
+    this._log('error', ...data);
   }
 }
 
@@ -169,7 +170,7 @@ export class Logger {
  * const level: ILoggerLevel = "info";
  * ```
  */
-export type ILoggerLevel = "info" | "debug" | "warn" | "error" | string;
+export type ILoggerLevel = 'info' | 'debug' | 'warn' | 'error' | string;
 
 /**
  * Interface for a logger that provides methods for logging messages at different levels.
@@ -294,8 +295,8 @@ export interface ILogger {
 const isValidLogger = (logger?: ILogger): boolean => {
   if (!logger) return false;
   try {
-    return ["warn", "info", "error"].every(
-      (value) => typeof (logger as IDict)[value] === "function"
+    return ['warn', 'info', 'error'].every(
+      (value) => typeof (logger as IDict)[value] === 'function'
     );
   } catch {
     return false;
@@ -325,7 +326,7 @@ export function AttachLogger() {
       }
       Logger.logger = logger;
     } catch (error) {
-      console.error(error, " registering logger");
+      console.error(error, ' registering logger');
     }
   };
 }

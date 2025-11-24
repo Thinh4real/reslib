@@ -1,10 +1,11 @@
-import { IAuthUser } from "@/auth/types";
-import { i18n } from "@/i18n";
-import { observableFactory } from "@/observable";
-import { Scope, TranslateOptions } from "i18n-js";
-import { Auth } from "../auth";
-import { Logger } from "../logger";
-import { IClassConstructor } from "../types/index";
+import { IAuthUser } from '@/auth/types';
+import { i18n } from '@/i18n';
+import { observableFactory } from '@/observable';
+import { Scope, TranslateOptions } from 'i18n-js';
+import 'reflect-metadata';
+import { Auth } from '../auth';
+import { Logger } from '../logger';
+import { IClassConstructor } from '../types/index';
 import {
   defaultStr,
   extendObj,
@@ -13,9 +14,9 @@ import {
   isNonNullString,
   isObj,
   stringify,
-} from "../utils/index";
-import { getFields } from "./fields";
-import { ResourcePaginationHelper } from "./ResourcePaginationHelper";
+} from '../utils/index';
+import { getFields } from './fields';
+import { ResourcePaginationHelper } from './ResourcePaginationHelper';
 import {
   IField,
   IResource,
@@ -31,16 +32,16 @@ import {
   IResourcePaginatedResult,
   IResourcePrimaryKey,
   IResourceQueryOptions,
-} from "./types";
+} from './types';
 
-export * from "./decorators";
-export * from "./fields";
-export * from "./filters";
-export * from "./ResourcePaginationHelper";
-export * from "./types";
+export * from './decorators';
+export * from './fields';
+export * from './filters';
+export * from './ResourcePaginationHelper';
+export * from './types';
 
-const resourcesMetaDataKey = Symbol("resources");
-const resourcesClassNameMetaData = Symbol("resourceFromClassName");
+const resourcesMetaDataKey = Symbol('resources');
+const resourcesClassNameMetaData = Symbol('resourceFromClassName');
 
 export abstract class Resource<
   Name extends IResourceName = IResourceName,
@@ -64,11 +65,11 @@ export abstract class Resource<
   private _onLocaleChangeListener?: { remove: () => any };
   constructor() {
     this._onDictionaryChangedListener = i18n.on(
-      "translations-changed",
+      'translations-changed',
       this.onI18nChange.bind(this)
     );
     this._onLocaleChangeListener = i18n.on(
-      "locale-changed",
+      'locale-changed',
       this.onI18nChange.bind(this)
     );
     this.init();
@@ -165,17 +166,17 @@ export abstract class Resource<
    * @returns {string} the message to display when the DataProvider for the resource is invalid
    */
   get INVALID_DATA_PROVIDER_ERROR(): string {
-    return i18n.t("resources.invalidDataProvider", this.getResourceContext());
+    return i18n.t('resources.invalidDataProvider', this.getResourceContext());
   }
   hasDataService(): boolean {
     const dataService = this.getDataService();
     return (
       dataService != null &&
-      typeof dataService?.update === "function" &&
-      typeof dataService?.create === "function" &&
-      typeof dataService?.find === "function" &&
-      typeof dataService?.update === "function" &&
-      typeof dataService?.delete === "function"
+      typeof dataService?.update === 'function' &&
+      typeof dataService?.create === 'function' &&
+      typeof dataService?.find === 'function' &&
+      typeof dataService?.update === 'function' &&
+      typeof dataService?.delete === 'function'
     );
   }
   /**
@@ -216,16 +217,16 @@ export abstract class Resource<
 
     // Map action names to permission methods
     switch (action) {
-      case "read":
+      case 'read':
         hasPermission = this.canUserRead();
         break;
-      case "create":
+      case 'create':
         hasPermission = this.canUserCreate();
         break;
-      case "update":
+      case 'update':
         hasPermission = this.canUserUpdate();
         break;
-      case "delete":
+      case 'delete':
         hasPermission = this.canUserDelete();
         break;
       default:
@@ -237,7 +238,7 @@ export abstract class Resource<
     if (!hasPermission) {
       throw new Error(
         i18n.t(
-          this.buildTranslationPath("forbiddenError"),
+          this.buildTranslationPath('forbiddenError'),
           this.getResourceContext({ action })
         )
       );
@@ -249,11 +250,11 @@ export abstract class Resource<
    * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the list operation.
    */
   async find(options?: IResourceQueryOptions<DataType>) {
-    return this.authorizeAction("read").then(() => {
+    return this.authorizeAction('read').then(() => {
       return this.getDataService()
         ?.find(options)
         .then((result) => {
-          this.trigger("find" as EventType, result);
+          this.trigger('find' as EventType, result);
           return result;
         });
     });
@@ -264,11 +265,11 @@ export abstract class Resource<
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the list operation.
    */
   async findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>) {
-    return this.authorizeAction("read").then(() => {
+    return this.authorizeAction('read').then(() => {
       return this.getDataService()
         .findOne(options)
         .then((result) => {
-          this.trigger("findOne" as EventType, result);
+          this.trigger('findOne' as EventType, result);
           return result;
         });
     });
@@ -294,9 +295,9 @@ export abstract class Resource<
    */
   buildTranslationPath(key?: string): string {
     const name = this.getName();
-    const prefix = `resources${isNonNullString(name) ? `.${name}` : ""}.`;
+    const prefix = `resources${isNonNullString(name) ? `.${name}` : ''}.`;
     if (isNonNullString(key)) {
-      return `${prefix}${key.trim().ltrim(".")}`;
+      return `${prefix}${key.trim().ltrim('.')}`;
     }
     return prefix;
   }
@@ -312,7 +313,7 @@ export abstract class Resource<
     if (!isObj(result) || !result) {
       throw new Error(
         i18n.t(
-          this.buildTranslationPath("notFoundError"),
+          this.buildTranslationPath('notFoundError'),
           Object.assign(
             {},
             { options: JSON.stringify(options) },
@@ -442,13 +443,13 @@ export abstract class Resource<
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
    */
   async create<T extends DataType>(record: T): Promise<DataType> {
-    return this.authorizeAction("create").then(() => {
+    return this.authorizeAction('create').then(() => {
       return this.beforeCreate(record).then(() => {
         return this.getDataService()
           .create(record)
           .then((result) => {
             return this.afterCreate(result).then(() => {
-              this.trigger("create" as EventType, result);
+              this.trigger('create' as EventType, result);
               return result;
             });
           });
@@ -469,7 +470,7 @@ export abstract class Resource<
     primaryKey: PrimaryKeyType,
     dataToUpdate: T
   ) {
-    return this.authorizeAction("update").then(async () => {
+    return this.authorizeAction('update').then(async () => {
       return this.beforeUpdate(primaryKey, dataToUpdate).then(() => {
         return this.getDataService()
           ?.update(primaryKey, dataToUpdate)
@@ -477,7 +478,7 @@ export abstract class Resource<
             return this.afterUpdate(result, primaryKey, dataToUpdate).then(
               () => {
                 this.trigger(
-                  "update" as EventType,
+                  'update' as EventType,
                   result,
                   primaryKey,
                   dataToUpdate
@@ -500,13 +501,13 @@ export abstract class Resource<
    * @returns Promise<number> A promise that resolves to the result of the delete operation.
    */
   async delete(primaryKey: PrimaryKeyType) {
-    return this.authorizeAction("delete").then(() => {
+    return this.authorizeAction('delete').then(() => {
       return this.beforeDelete(primaryKey).then(() => {
         return this.getDataService()
           ?.delete(primaryKey)
           .then((result) => {
             return this.afterDelete(result, primaryKey).then(() => {
-              this.trigger("delete" as EventType, result, primaryKey);
+              this.trigger('delete' as EventType, result, primaryKey);
               return result;
             });
           });
@@ -523,11 +524,11 @@ export abstract class Resource<
    * @returns A promise that resolves to an object containing the list of records and the total count.
    */
   async findAndCount(options?: IResourceQueryOptions<DataType>) {
-    return this.authorizeAction("read").then(() => {
+    return this.authorizeAction('read').then(() => {
       return this.getDataService()
         .findAndCount(options)
         .then((result) => {
-          this.trigger("findAndCount" as EventType, result);
+          this.trigger('findAndCount' as EventType, result);
           return result;
         });
     });
@@ -562,13 +563,13 @@ export abstract class Resource<
    * @returns A promise that resolves to the result of the create operation.
    */
   async createMany<T extends DataType>(data: T[]) {
-    return this.authorizeAction("create").then(() => {
+    return this.authorizeAction('create').then(() => {
       return this.beforeCreateMany(data).then(() => {
         return this.getDataService()
           .createMany(data)
           .then((result) => {
             return this.afterCreateMany(result, data).then(() => {
-              this.trigger("createMany" as EventType, result, data);
+              this.trigger('createMany' as EventType, result, data);
               return result;
             });
           });
@@ -589,7 +590,7 @@ export abstract class Resource<
     criteria: IResourceManyCriteria<DataType, PrimaryKeyType>,
     data: T
   ) {
-    return this.authorizeAction("update").then(() => {
+    return this.authorizeAction('update').then(() => {
       return this.beforeUpdateMany(criteria, data).then(() => {
         return this.getDataService()
           .updateMany(criteria, data)
@@ -597,7 +598,7 @@ export abstract class Resource<
             return this.afterUpdateMany(affectedRows, criteria, data).then(
               () => {
                 this.trigger(
-                  "updateMany" as EventType,
+                  'updateMany' as EventType,
                   affectedRows,
                   criteria,
                   data
@@ -618,13 +619,13 @@ export abstract class Resource<
    * @returns A promise that resolves to the result of the delete operation.
    */
   async deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) {
-    return this.authorizeAction("delete").then(() => {
+    return this.authorizeAction('delete').then(() => {
       return this.beforeDeleteMany(criteria).then(() => {
         return this.getDataService()
           .deleteMany(criteria)
           .then((affectedRows) => {
             return this.afterDeleteMany(affectedRows, criteria).then(() => {
-              this.trigger("deleteMany" as EventType, affectedRows, criteria);
+              this.trigger('deleteMany' as EventType, affectedRows, criteria);
               return affectedRows;
             });
           });
@@ -642,11 +643,11 @@ export abstract class Resource<
    * @returns {Promise<number>} A promise that resolves to the result of the count operation.
    */
   async count(options?: IResourceQueryOptions<DataType>) {
-    return this.authorizeAction("read").then(() => {
+    return this.authorizeAction('read').then(() => {
       return this.getDataService()
         .count(options)
         .then((result) => {
-          this.trigger("read" as EventType, result);
+          this.trigger('read' as EventType, result);
           return result;
         });
     });
@@ -660,11 +661,11 @@ export abstract class Resource<
    * @returns {Promise<boolean>} A promise that resolves to the result of the exists operation.
    */
   async exists(primaryKey: PrimaryKeyType): Promise<boolean> {
-    return this.authorizeAction("read").then(() => {
+    return this.authorizeAction('read').then(() => {
       return this.getDataService()
         .exists(primaryKey)
         .then((result) => {
-          this.trigger("exits" as EventType, result);
+          this.trigger('exits' as EventType, result);
           return result;
         });
     });
@@ -727,7 +728,7 @@ export abstract class Resource<
     locale = defaultStr(locale, i18n.getLocale());
     const nameStr = String(this.getName()).trim();
     if (!isNonNullString(nameStr)) return {};
-    const t = i18n.getNestedTranslation(["resources", nameStr], locale) as any;
+    const t = i18n.getNestedTranslation(['resources', nameStr], locale) as any;
     return isObj(t) && t ? t : {};
   }
 
@@ -766,15 +767,15 @@ export abstract class Resource<
    */
   translate<T = string>(scope: Scope, options?: TranslateOptions): string | T {
     const scopeArray = isNonNullString(scope)
-      ? scope.trim().split(".")
+      ? scope.trim().split('.')
       : Array.isArray(scope)
         ? scope
         : [];
     if (
-      scopeArray[0] !== "resources" &&
+      scopeArray[0] !== 'resources' &&
       !ResourcesManager.hasResource(scopeArray[1] as IResourceName)
     ) {
-      scopeArray.unshift(this.getName(), "resources");
+      scopeArray.unshift(this.getName(), 'resources');
     }
     return i18n.translate<T>(scopeArray, options);
   }
@@ -904,7 +905,7 @@ export abstract class Resource<
       const translatedValue = stringify(i18n.t(propertyName, options));
       if (
         isNonNullString(translatedValue) &&
-        translatedValue.includes("." + propertyName.ltrim("."))
+        translatedValue.includes('.' + propertyName.ltrim('.'))
       ) {
         return translatedValue;
       }
@@ -922,10 +923,10 @@ export abstract class Resource<
   getLabel(): string {
     const labelMetaData = this.getMetaData().label;
     const label = this.translateProperty(
-      "label",
+      'label',
       defaultStr(labelMetaData, this.label, this.getName())
     );
-    return String(label).toLowerCase().trim() != "label"
+    return String(label).toLowerCase().trim() != 'label'
       ? label
       : defaultStr(this.getName());
   }
@@ -939,7 +940,7 @@ export abstract class Resource<
    */
   getTitle(): string {
     return this.translateProperty(
-      "title",
+      'title',
       defaultStr(this.getMetaData().title, this.title, this.getLabel())
     );
   }
@@ -958,7 +959,7 @@ export abstract class Resource<
       this.fields = getFields(this) as Record<string, IField>;
       return this.fields;
     } catch (e) {
-      Logger.log(e, " getting resources fieldss");
+      Logger.log(e, ' getting resources fieldss');
     }
     return {};
   }
@@ -1122,7 +1123,7 @@ export abstract class Resource<
  * }
  */
 export class ResourcesManager {
-  static resourceMetaData = Symbol("resource");
+  static resourceMetaData = Symbol('resource');
   /**
    * A global constant storing a record of all instantiated resources.
    *
@@ -1297,7 +1298,7 @@ export class ResourcesManager {
   public static getResource<ResourceInstanceType extends Resource = Resource>(
     name: IResourceName
   ): ResourceInstanceType | null {
-    if (typeof name === "string" && name) {
+    if (typeof name === 'string' && name) {
       return this.resources[name] as ResourceInstanceType;
     }
     return null;
@@ -1332,7 +1333,7 @@ export class ResourcesManager {
     resource: Resource<Name, DataType>
   ) {
     if (
-      typeof name === "string" &&
+      typeof name === 'string' &&
       name &&
       resource &&
       resource instanceof Resource
@@ -1363,7 +1364,7 @@ export class ResourcesManager {
   public static removeResource(
     name: IResourceName
   ): Record<IResourceName, Resource> {
-    if (typeof name === "string") {
+    if (typeof name === 'string') {
       delete (this.resources as any)[name];
     }
     return this.resources;
@@ -1427,7 +1428,7 @@ export function ResourceMeta<
   return function (target: typeof Resource<Name, DataType, PrimaryKeyType>) {
     metaData = Object.assign({}, metaData);
     metaData.className = defaultStr(metaData.className, target?.name);
-    if (typeof target == "function") {
+    if (typeof target == 'function') {
       if (metaData?.instanciate) {
         try {
           const resource = new (target as any)() as Resource<Name, DataType>;
