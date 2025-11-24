@@ -240,11 +240,5 @@
     "url": "https://github.com/boris-fouomene/reslib/issues"
   },
   "homepage": "https://github.com/boris-fouomene/reslib#readme",
-  "npmClient": "npm",
-  "lint-staged": {
-    "src/**/*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
-  }
+  "npmClient": "npm"
 }
