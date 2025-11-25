@@ -342,16 +342,121 @@ export type ValidatorOptionalOrEmptyRuleNames =
   ExtractOptionalOrEmptyKeys<ValidatorRuleParamTypes>;
 
 /**
- * Helper that returns true when a tuple type allows an empty invocation.
- * Examples:
- * - []                         => true
- * - [A?]                       => true (can be called with no args)
- * - [A?, B?]                   => true (all optional)
- * - [A, B?]                    => false (A required)
- * - [A]                        => false (A required)
+ * ## Tuple Allows Empty Type
+ *
+ * A conditional type that determines if a tuple type allows empty invocation (no arguments).
+ * This type is fundamental to the validator's parameter system, enabling type-safe determination
+ * of which validation rules can be called without supplying arguments.
+ *
+ * ### Purpose
+ * Provides compile-time type safety for determining whether validation rule parameter tuples
+ * support empty invocation. This is crucial for distinguishing between rules that require
+ * parameters (like `MinLength[5]`) and rules that can be called without them (like `Required`).
+ *
+ * ### Type Logic
+ * The type uses conditional type checking to evaluate tuple structures:
+ * - **Empty tuples `[]`**: Always allow empty invocation (returns `true`)
+ * - **Non-empty tuples**: Check if empty array is assignable using `[] extends T`
+ *   - If assignable: All parameters are optional (returns `true`)
+ *   - If not assignable: At least one parameter is required (returns `false`)
+ *
+ * ### Examples
+ *
+ * #### Empty Parameter Rules (returns `true`)
+ * ```typescript
+ * // Rules with no parameters - can be called without arguments
+ * type EmailParams = [];                                    // true
+ * type RequiredParams = [];                                 // true
+ * type PhoneParams = [countryCode?: string];               // true (optional param)
+ * type NullableParams = [];                                 // true
+ * ```
+ *
+ * #### Required Parameter Rules (returns `false`)
+ * ```typescript
+ * // Rules with required parameters - must be called with arguments
+ * type MinLengthParams = [number];                          // false
+ * type MaxLengthParams = [number];                          // false
+ * type LengthParams = [number, number?];                   // false (first param required)
+ * type NumberBetweenParams = [number, number];             // false
+ * ```
+ *
+ * ### Usage in Validation System
+ * This type is used internally by the validator to:
+ * - **Generate rule unions**: Create {@link ValidatorOptionalOrEmptyRuleNames}
+ * - **Type parameter extraction**: Determine which rules can be called without args
+ * - **Rule registry filtering**: Separate parameterless from parameterized rules
+ *
+ * ### Advanced Type-Level Operations
+ * ```typescript
+ * // Extract rules that can be called without parameters
+ * type ParameterlessRules = {
+ *   [K in keyof ValidatorRuleParamTypes]: ValidatorTupleAllowsEmpty<
+ *     ValidatorRuleParamTypes[K]
+ *   > extends true ? K : never;
+ * }[keyof ValidatorRuleParamTypes];
+ *
+ * // Extract rules that require parameters
+ * type ParameterizedRules = {
+ *   [K in keyof ValidatorRuleParamTypes]: ValidatorTupleAllowsEmpty<
+ *     ValidatorRuleParamTypes[K]
+ *   > extends false ? K : never;
+ * }[keyof ValidatorRuleParamTypes];
+ * ```
+ *
+ * ### Relationship to Validation System
+ * - **Used by**: {@link ExtractOptionalOrEmptyKeys} to filter rule parameter types
+ * - **Enables**: {@link ValidatorOptionalOrEmptyRuleNames} union type creation
+ * - **Supports**: Type-safe rule invocation without parameters
+ * - **Foundation**: Core type for parameter validation logic
+ *
+ * ### Type Safety Benefits
+ * - **Compile-time validation**: Prevents calling parameterized rules without args
+ * - **IDE support**: Better autocomplete for parameterless rules
+ * - **Refactoring safety**: Changes to rule parameters are caught by TypeScript
+ * - **Runtime safety**: Ensures proper parameter handling in rule implementations
+ *
+ * ### Implementation Details
+ * The type uses advanced TypeScript conditional types and assignability checks:
+ * - `T extends []`: Direct check for empty tuple literals
+ * - `[] extends T`: Covariant assignability check for optional parameters
+ * - This correctly handles both mutable and readonly array types
+ *
+ * ### Best Practices
+ *
+ * #### When Adding New Rules
+ * ```typescript
+ * // ✅ Parameterless rules (can be called as "RuleName")
+ * Required: [];                    // No parameters needed
+ * Email: [];                       // No parameters needed
+ * PhoneNumber: [countryCode?: string]; // Optional parameter
+ *
+ * // ❌ Parameterized rules (must be called as "RuleName[param]")
+ * MinLength: [number];             // Required parameter
+ * MaxLength: [number];             // Required parameter
+ * Length: [number, number?];       // First parameter required
+ * ```
+ *
+ * #### Type-Level Programming
+ * ```typescript
+ * // Create union of parameterless rule names
+ * type ParameterlessRuleNames = {
+ *   [K in keyof ValidatorRuleParamTypes]: ValidatorTupleAllowsEmpty<
+ *     ValidatorRuleParamTypes[K]
+ *   > extends true ? K : never;
+ * }[keyof ValidatorRuleParamTypes];
+ * // Result: "Required" | "Email" | "PhoneNumber" | "Empty" | "Nullable" | "Optional"
+ * ```
+ *
+ * @template T - The tuple type to check (must extend Array<any>)
+ *
+ * @public
+ *
+ * @see {@link ValidatorOptionalOrEmptyRuleNames} - Union type created using this
+ * @see {@link ExtractOptionalOrEmptyKeys} - Helper type that uses this
+ * @see {@link ValidatorRuleParamTypes} - Rule parameter definitions checked by this
+ * @see {@link ValidatorRuleName} - Rule names validated by this type
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type TupleAllowsEmpty<T extends Array<any>> = T extends []
+export type ValidatorTupleAllowsEmpty<T extends Array<unknown>> = T extends []
   ? true
   : [] extends T
     ? true
@@ -362,9 +467,8 @@ type TupleAllowsEmpty<T extends Array<any>> = T extends []
  * This correctly captures cases like `[countryCode?: CountryCode]`.
  */
 type ExtractOptionalOrEmptyKeys<T> = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [K in keyof T]: T[K] extends any[]
-    ? TupleAllowsEmpty<T[K]> extends true
+  [K in keyof T]: T[K] extends Array<unknown>
+    ? ValidatorTupleAllowsEmpty<T[K]> extends true
       ? K
       : never
     : never;
