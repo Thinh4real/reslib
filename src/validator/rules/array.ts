@@ -1,9 +1,32 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { ValidatorRuleParams } from '../types';
-import { ValidatorValidateOptions } from '../types';
+import { ValidatorRuleParamTypes, ValidatorValidateOptions } from '../types';
 import { Validator } from '../validator';
 
-function _Array({
+/**
+ * ### Array Rule
+ *
+ * Validates that the field under validation is an array.
+ *
+ * @example
+ * ```typescript
+ * // Class validation
+ * class DataCollection {
+ *   @IsRequired()
+ *   @IsArray
+ *   items: any[];
+ * }
+ * ```
+ *
+ * @param options - Validation options containing value and context
+ * @returns Promise resolving to true if valid, rejecting with error message if invalid
+ *
+ *
+ * @public
+ */
+export const IsArray = Validator.buildRuleDecorator<
+  ValidatorRuleParamTypes['Array']
+>(function IsArray({
   value,
   fieldName,
   translatedPropertyName,
@@ -22,33 +45,35 @@ function _Array({
     });
     return message;
   }
-}
-Validator.registerRule('Array', _Array);
+}, 'Array');
 
 /**
- * ### Array Rule
+ * ### ArrayMinLength Rule
  *
- * Validates that the field under validation is an array.
+ * Validates that the array has at least the specified minimum length.
+ *
+ * #### Parameters
+ * - Minimum length (number)
  *
  * @example
  * ```typescript
  * // Class validation
- * class DataCollection {
- *   @IsRequired
- *   @IsArray
- *   items: any[];
+ * class ShoppingCart {
+ *   @ArrayMinLength(1)
+ *   items: Product[];
  * }
  * ```
  *
- * @param options - Validation options containing value and context
+ * @param options - Validation options with rule parameters
+ * @param options.ruleParams - Array containing minimum length
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
  *
  * @public
  */
-export const IsArray = Validator.buildPropertyDecorator(['Array']);
-
-function _ArrayMinLength({
+export const ArrayMinLength = Validator.buildRuleDecorator<
+  ValidatorRuleParamTypes['ArrayMinLength']
+>(function ArrayMinLength({
   value,
   ruleParams,
   fieldName,
@@ -88,37 +113,35 @@ function _ArrayMinLength({
     });
     return message;
   }
-}
-Validator.registerRule('ArrayMinLength', _ArrayMinLength);
+});
 
 /**
- * ### ArrayMinLength Rule
+ * ### ArrayMaxLength Rule
  *
- * Validates that the array has at least the specified minimum length.
+ * Validates that the array has at most the specified maximum length.
  *
  * #### Parameters
- * - Minimum length (number)
+ * - Maximum length (number)
  *
  * @example
  * ```typescript
  * // Class validation
- * class ShoppingCart {
- *   @ArrayMinLength(1)
- *   items: Product[];
+ * class LimitedList {
+ *   @ArrayMaxLength(10)
+ *   tags: string[];
  * }
  * ```
  *
  * @param options - Validation options with rule parameters
- * @param options.ruleParams - Array containing minimum length
+ * @param options.ruleParams - Array containing maximum length
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
  *
  * @public
  */
-export const ArrayMinLength =
-  Validator.buildRuleDecorator<[number]>(_ArrayMinLength);
-
-function _ArrayMaxLength({
+export const ArrayMaxLength = Validator.buildRuleDecorator<
+  ValidatorRuleParamTypes['ArrayMaxLength']
+>(function ArrayMaxLength({
   value,
   ruleParams,
   fieldName,
@@ -158,37 +181,35 @@ function _ArrayMaxLength({
     });
     return message;
   }
-}
-Validator.registerRule('ArrayMaxLength', _ArrayMaxLength);
+});
 
 /**
- * ### ArrayMaxLength Rule
+ * ### ArrayLength Rule
  *
- * Validates that the array has at most the specified maximum length.
+ * Validates that the array has exactly the specified length.
  *
  * #### Parameters
- * - Maximum length (number)
+ * - Exact length (number)
  *
  * @example
  * ```typescript
  * // Class validation
- * class LimitedList {
- *   @ArrayMaxLength(10)
- *   tags: string[];
+ * class FixedSizeArray {
+ *   @ArrayLength(3)
+ *   coordinates: number[];
  * }
  * ```
  *
  * @param options - Validation options with rule parameters
- * @param options.ruleParams - Array containing maximum length
+ * @param options.ruleParams - Array containing exact length
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
  *
  * @public
  */
-export const ArrayMaxLength =
-  Validator.buildRuleDecorator<[number]>(_ArrayMaxLength);
-
-function _ArrayLength({
+export const ArrayLength = Validator.buildRuleDecorator<
+  ValidatorRuleParamTypes['ArrayLength']
+>(function ArrayLength({
   value,
   ruleParams,
   fieldName,
@@ -228,36 +249,35 @@ function _ArrayLength({
     });
     return message;
   }
-}
-Validator.registerRule('ArrayLength', _ArrayLength);
+});
 
 /**
- * ### ArrayLength Rule
+ * ### ArrayContains Rule
  *
- * Validates that the array has exactly the specified length.
+ * Validates that the array contains all of the specified values.
  *
  * #### Parameters
- * - Exact length (number)
+ * - Values that must be present in the array
  *
  * @example
  * ```typescript
  * // Class validation
- * class FixedSizeArray {
- *   @ArrayLength(3)
- *   coordinates: number[];
+ * class Permissions {
+ *   @ArrayContains(['read'])
+ *   userPermissions: string[];
  * }
  * ```
  *
  * @param options - Validation options with rule parameters
- * @param options.ruleParams - Array containing exact length
+ * @param options.ruleParams - Array of values that must be contained
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
  *
  * @public
  */
-export const ArrayLength = Validator.buildRuleDecorator<[number]>(_ArrayLength);
-
-function _ArrayContains({
+export const ArrayContains = Validator.buildRuleDecorator<
+  ValidatorRuleParamTypes['ArrayContains']
+>(function ArrayContains({
   value,
   ruleParams,
   fieldName,
@@ -307,38 +327,31 @@ function _ArrayContains({
     });
     return message;
   }
-}
-Validator.registerRule('ArrayContains', _ArrayContains);
+});
 
 /**
- * ### ArrayContains Rule
+ * ### ArrayUnique Rule
  *
- * Validates that the array contains all of the specified values.
- *
- * #### Parameters
- * - Values that must be present in the array
+ * Validates that all elements in the array are unique.
  *
  * @example
  * ```typescript
  * // Class validation
- * class Permissions {
- *   @ArrayContains(['read'])
- *   userPermissions: string[];
+ * class UniqueTags {
+ *   @ArrayUnique
+ *   tags: string[];
  * }
  * ```
  *
- * @param options - Validation options with rule parameters
- * @param options.ruleParams - Array of values that must be contained
+ * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
  *
  * @public
  */
-export const ArrayContains =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Validator.buildRuleDecorator<any[]>(_ArrayContains);
-
-function _ArrayUnique({
+export const ArrayUnique = Validator.buildRuleDecorator<
+  ValidatorRuleParamTypes['ArrayUnique']
+>(function ArrayUnique({
   value,
   fieldName,
   translatedPropertyName,
@@ -384,90 +397,7 @@ function _ArrayUnique({
     });
     return message;
   }
-}
-Validator.registerRule('ArrayUnique', _ArrayUnique);
-
-/**
- * ### ArrayUnique Rule
- *
- * Validates that all elements in the array are unique.
- *
- * @example
- * ```typescript
- * // Class validation
- * class UniqueTags {
- *   @ArrayUnique
- *   tags: string[];
- * }
- * ```
- *
- * @param options - Validation options containing value and context
- * @returns Promise resolving to true if valid, rejecting with error message if invalid
- *
- *
- * @public
- */
-export const ArrayUnique = Validator.buildPropertyDecorator(['ArrayUnique']);
-
-function _ArrayAllStrings({
-  value,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: ValidatorValidateOptions): boolean | string {
-  if (!Array.isArray(value)) {
-    return i18n.t('validator.array', {
-      field: translatedPropertyName || fieldName,
-      value,
-      ...rest,
-    });
-  }
-
-  const allStrings = value.every((item) => typeof item === 'string');
-  if (allStrings) {
-    return true;
-  }
-
-  const message = i18n.t('validator.arrayAllStrings', {
-    field: translatedPropertyName || fieldName,
-    value,
-    ...rest,
-  });
-  return message;
-}
-Validator.registerRule('ArrayAllStrings', _ArrayAllStrings);
-
-function _ArrayAllNumbers({
-  value,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: ValidatorValidateOptions): boolean | string {
-  if (!Array.isArray(value)) {
-    return i18n.t('validator.array', {
-      field: translatedPropertyName || fieldName,
-      value,
-      ...rest,
-    });
-  }
-
-  const allNumbers = value.every(
-    (item) => typeof item === 'number' && !Number.isNaN(item)
-  );
-  if (allNumbers) {
-    return true;
-  }
-
-  const message = i18n.t('validator.arrayAllNumbers', {
-    field: translatedPropertyName || fieldName,
-    value,
-    ...rest,
-  });
-  return message;
-}
-Validator.registerRule('ArrayAllNumbers', _ArrayAllNumbers);
+}, 'ArrayUnique');
 
 /**
  * ### ArrayAllStrings Rule
@@ -495,9 +425,35 @@ Validator.registerRule('ArrayAllNumbers', _ArrayAllNumbers);
  *
  * @public
  */
-export const ArrayAllStrings = Validator.buildPropertyDecorator([
-  'ArrayAllStrings',
-]);
+export const ArrayAllStrings = Validator.buildRuleDecorator<
+  ValidatorRuleParamTypes['ArrayAllStrings']
+>(function ArrayAllStrings({
+  value,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}: ValidatorValidateOptions): boolean | string {
+  if (!Array.isArray(value)) {
+    return i18n.t('validator.array', {
+      field: translatedPropertyName || fieldName,
+      value,
+      ...rest,
+    });
+  }
+
+  const allStrings = value.every((item) => typeof item === 'string');
+  if (allStrings) {
+    return true;
+  }
+
+  const message = i18n.t('validator.arrayAllStrings', {
+    field: translatedPropertyName || fieldName,
+    value,
+    ...rest,
+  });
+  return message;
+}, 'ArrayAllStrings');
 
 /**
  * ### ArrayAllNumbers Rule
@@ -526,9 +482,37 @@ export const ArrayAllStrings = Validator.buildPropertyDecorator([
  *
  * @public
  */
-export const ArrayAllNumbers = Validator.buildPropertyDecorator([
-  'ArrayAllNumbers',
-]);
+export const ArrayAllNumbers = Validator.buildRuleDecorator<
+  ValidatorRuleParamTypes['ArrayAllNumbers']
+>(function _ArrayAllNumbers({
+  value,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}: ValidatorValidateOptions): boolean | string {
+  if (!Array.isArray(value)) {
+    return i18n.t('validator.array', {
+      field: translatedPropertyName || fieldName,
+      value,
+      ...rest,
+    });
+  }
+
+  const allNumbers = value.every(
+    (item) => typeof item === 'number' && !Number.isNaN(item)
+  );
+  if (allNumbers) {
+    return true;
+  }
+
+  const message = i18n.t('validator.arrayAllNumbers', {
+    field: translatedPropertyName || fieldName,
+    value,
+    ...rest,
+  });
+  return message;
+}, 'ArrayAllNumbers');
 
 declare module '../types' {
   export interface ValidatorRuleParamTypes {

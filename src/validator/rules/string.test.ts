@@ -101,7 +101,7 @@ describe('String Validation Rules', () => {
     describe('Decorator', () => {
       it('should validate class with IsString decorator', async () => {
         class TestClass {
-          @IsString
+          @IsString()
           text: string = '';
         }
 
@@ -116,7 +116,7 @@ describe('String Validation Rules', () => {
 
       it('should reject non-string with IsString decorator', async () => {
         class TestClass {
-          @IsString
+          @IsString()
           text: string = '';
         }
 
@@ -132,7 +132,7 @@ describe('String Validation Rules', () => {
 
       it('should validate empty string with decorator', async () => {
         class TestClass {
-          @IsString
+          @IsString()
           text: string = '';
         }
 
@@ -227,7 +227,7 @@ describe('String Validation Rules', () => {
     describe('Decorator', () => {
       it('should validate non-empty string with decorator', async () => {
         class TestClass {
-          @IsNonNullString
+          @IsNonNullString()
           title: string = '';
         }
 
@@ -242,7 +242,7 @@ describe('String Validation Rules', () => {
 
       it('should reject empty string', async () => {
         class TestClass {
-          @IsNonNullString
+          @IsNonNullString()
           title: string = '';
         }
 
@@ -257,7 +257,7 @@ describe('String Validation Rules', () => {
 
       it('should reject null', async () => {
         class TestClass {
-          @IsNonNullString
+          @IsNonNullString()
           title: string = '';
         }
 
@@ -310,7 +310,7 @@ describe('String Validation Rules', () => {
     describe('Decorator', () => {
       it('should validate with MinLength decorator', async () => {
         class TestClass {
-          @MinLength([3])
+          @MinLength(3)
           username: string = '';
         }
 
@@ -325,7 +325,7 @@ describe('String Validation Rules', () => {
 
       it('should reject with MinLength decorator', async () => {
         class TestClass {
-          @MinLength([5])
+          @MinLength(5)
           username: string = '';
         }
 
@@ -378,7 +378,7 @@ describe('String Validation Rules', () => {
     describe('Decorator', () => {
       it('should validate with MaxLength decorator', async () => {
         class TestClass {
-          @MaxLength([10])
+          @MaxLength(10)
           bio: string = '';
         }
 
@@ -393,7 +393,7 @@ describe('String Validation Rules', () => {
 
       it('should reject with MaxLength decorator', async () => {
         class TestClass {
-          @MaxLength([5])
+          @MaxLength(5)
           bio: string = '';
         }
 
@@ -472,7 +472,7 @@ describe('String Validation Rules', () => {
     describe('Decorator', () => {
       it('should validate with Length range decorator', async () => {
         class TestClass {
-          @Length([2, 10])
+          @Length(2, 10)
           code: string = '';
         }
 
@@ -487,7 +487,7 @@ describe('String Validation Rules', () => {
 
       it('should reject below range', async () => {
         class TestClass {
-          @Length([5, 10])
+          @Length(5, 10)
           code: string = '';
         }
 
@@ -502,7 +502,7 @@ describe('String Validation Rules', () => {
 
       it('should reject above range', async () => {
         class TestClass {
-          @Length([2, 5])
+          @Length(2, 5)
           code: string = '';
         }
 
@@ -607,7 +607,7 @@ describe('String Validation Rules', () => {
     describe('Decorator', () => {
       it('should validate with StartsWithOneOf decorator', async () => {
         class ApiConfig {
-          @StartsWithOneOf(['http://', 'https://'])
+          @StartsWithOneOf('http://', 'https://')
           apiUrl: string = '';
         }
 
@@ -622,7 +622,7 @@ describe('String Validation Rules', () => {
 
       it('should reject invalid prefix with decorator', async () => {
         class ApiConfig {
-          @StartsWithOneOf(['http://', 'https://'])
+          @StartsWithOneOf('http://', 'https://')
           apiUrl: string = '';
         }
 
@@ -637,7 +637,7 @@ describe('String Validation Rules', () => {
 
       it('should work with multiple prefixes in decorator', async () => {
         class Environment {
-          @StartsWithOneOf(['prod', 'staging', 'dev'])
+          @StartsWithOneOf('prod', 'staging', 'dev')
           environmentName: string = '';
         }
 
@@ -746,7 +746,7 @@ describe('String Validation Rules', () => {
     describe('Decorator', () => {
       it('should validate with EndsWithOneOf decorator', async () => {
         class FileUpload {
-          @EndsWithOneOf(['jpg', 'png', 'gif'])
+          @EndsWithOneOf('jpg', 'png', 'gif')
           imageFile: string = '';
         }
 
@@ -761,7 +761,7 @@ describe('String Validation Rules', () => {
 
       it('should reject invalid extension', async () => {
         class FileUpload {
-          @EndsWithOneOf(['jpg', 'png', 'gif'])
+          @EndsWithOneOf('jpg', 'png', 'gif')
           imageFile: string = '';
         }
 
@@ -779,9 +779,9 @@ describe('String Validation Rules', () => {
   describe('Integration Tests', () => {
     it('should combine String with MinLength and MaxLength', async () => {
       class Profile {
-        @IsString
-        @MinLength([2])
-        @MaxLength([50])
+        @IsString()
+        @MinLength(2)
+        @MaxLength(50)
         username: string = '';
       }
 
@@ -796,9 +796,9 @@ describe('String Validation Rules', () => {
 
     it('should fail when combining multiple constraints', async () => {
       class Profile {
-        @IsString
-        @MinLength([10])
-        @MaxLength([20])
+        @IsString()
+        @MinLength(10)
+        @MaxLength(20)
         username: string = '';
       }
 
@@ -813,16 +813,16 @@ describe('String Validation Rules', () => {
 
     it('should validate complex string scenarios', async () => {
       class Document {
-        @IsString
-        @MinLength([5])
+        @IsString()
+        @MinLength(5)
         title: string = '';
 
-        @IsString
-        @MaxLength([1000])
+        @IsString()
+        @MaxLength(1000)
         content: string = '';
 
-        @IsString
-        @EndsWithOneOf(['.pdf', '.doc', '.docx'])
+        @IsString()
+        @EndsWithOneOf('.pdf', '.doc', '.docx')
         filename: string = '';
       }
 

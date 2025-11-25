@@ -39,21 +39,21 @@ import { Validator } from '../validator';
  *
  * class User {
  *   // Accept either a valid email OR a valid phone number
- *   @OneOf(["Email", "PhoneNumber"])
+ *   @OneOf("Email", "PhoneNumber")
  *   contact: string;
  *
  *   // Accept either a UUID OR a custom ID format
- *   @OneOf([
+ *   @OneOf(
  *     "UUID",
  *     ({ value }) => value.startsWith('CUSTOM-') || 'Must start with CUSTOM-'
- *   ])
+ *   )
  *   identifier: string;
  *
  *   // Accept either a string name OR a number ID
- *   @OneOf([
+ *   @OneOf(
  *     "IsNonNullString",
  *     "IsNumber"
- *   ])
+ *   )
  *   flexibleId: string | number;
  * }
  *
@@ -77,7 +77,7 @@ import { Validator } from '../validator';
  * }
  *
  * class Entity {
- *   @OneOf([
+ *   @OneOf(
  *     "Email",
  *     "UUID",
  *     ({ value, context }) => {
@@ -88,7 +88,7 @@ import { Validator } from '../validator';
  *       }
  *       return false; // Skip this rule for non-admins
  *     }
- *   ])
+ *   )
  *   identifier: string;
  * }
  *
@@ -104,17 +104,17 @@ import { Validator } from '../validator';
  * ```typescript
  * class Product {
  *   // Accept either a valid URL OR a relative path starting with '/'
- *   @OneOf([
+ *   @OneOf(
  *     "IsUrl",
  *     ({ value }) => value.startsWith('/') || 'Path must start with /'
- *   ])
+ *   )
  *   imagePath: string;
  *
  *   // Accept either a standard email OR an internal company email
- *   @OneOf([
+ *   @OneOf(
  *     "Email",
  *     ({ value }) => value.endsWith('@company.com') || 'Must be company email'
- *   ])
+ *   )
  *   contactEmail: string;
  * }
  * ```
@@ -122,7 +122,7 @@ import { Validator } from '../validator';
  * ### Error Handling
  * ```typescript
  * class FlexibleForm {
- *   @OneOf(["Email", "PhoneNumber", "UUID"])
+ *   @OneOf("Email", "PhoneNumber", "UUID")
  *   identifier: string;
  * }
  *
@@ -146,18 +146,18 @@ import { Validator } from '../validator';
  * ### Integration with Other Decorators
  * ```typescript
  * class ComprehensiveUser {
- *   @IsRequired  // Must be present
- *   @OneOf([     // And must satisfy at least one of these
+ *   @IsRequired()  // Must be present
+ *   @OneOf([    // And must satisfy at least one of these
  *     "Email",
  *     "PhoneNumber"
- *   ])
+ *   )
  *   contact: string;
  *
- *   @IsOptional  // Can be omitted
- *   @OneOf([     // But if present, must satisfy one of these
+ *   @IsOptional()  // Can be omitted
+ *   @OneOf(    // But if present, must satisfy one of these
  *     "IsUrl",
  *     ({ value }) => value.startsWith('file://') || 'Must be file:// URL'
- *   ])
+ *   )
  *   avatarUrl?: string;
  * }
  * ```
@@ -199,7 +199,7 @@ Validator.markRuleWithSymbol(AllOf, Symbol.for('validatorAllOfRuleMarker'));
  *
  * @example
  * class Model {
- *   @ArrayOf(["Email"]) emails!: string[];
+ *   @ArrayOf("Email") emails!: string[];
  * }
  */
 export const ArrayOf = Validator.buildMultiRuleDecorator(

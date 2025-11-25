@@ -29,7 +29,6 @@ import {
   ValidatorRules,
   ValidatorSanitizedRuleObject,
   ValidatorSanitizedRules,
-  ValidatorTupleAllowsEmpty,
   ValidatorValidateFailure,
   ValidatorValidateMultiRuleOptions,
   ValidatorValidateOptions,
@@ -125,12 +124,12 @@ function markRuleWithSymbol(ruleFunc: any, marker: symbol): void {
  *
  * // Use with decorators
  * class User {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsEmail()
  *   email: string;
  *
- *   @IsRequired
- *   @MinLength([3])
+ *   @IsRequired()
+ *   @MinLength(3)
  *   name: string;
  * }
  *
@@ -258,7 +257,7 @@ export class Validator {
    * @template TParams - Array type for rule parameters
    * @template Context - Type for validation context
    *
-   * @param ruleName - Unique identifier for the validation rule (must be non-empty string)
+   * @param {ValidatorOptionalOrEmptyRuleNames} ruleName - Unique identifier for the validation rule (must be non-empty string)
    * @param ruleHandler - Function that performs the validation logic
    *
    * @throws {Error} When ruleName is not a non-empty string
@@ -273,7 +272,7 @@ export class Validator {
     TParams extends ValidatorDefaultArray = ValidatorDefaultArray,
     Context = unknown,
   >(
-    ruleName: ValidatorRuleName,
+    ruleName: ValidatorOptionalOrEmptyRuleNames,
     ruleHandler: ValidatorRuleFunction<TParams, Context>
   ): void {
     if (!isNonNullString(ruleName)) {
@@ -1027,7 +1026,7 @@ export class Validator {
     ...extra
   }: MakeOptional<
     ValidatorValidateOptions<ValidatorDefaultArray, Context>,
-    'i18n'
+    'i18n' | 'ruleParams'
   >): Promise<ValidatorValidateResult<Context>> {
     const i18n = this.getI18n(extra);
     const startTime = Date.now();
@@ -1293,10 +1292,15 @@ export class Validator {
         Optional: (value: Primitive) => value === undefined,
       };
       for (const rule of rules) {
+        let ruleName: ValidatorRuleName | undefined = undefined;
         if (typeof rule == 'function') {
-          continue;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ruleName = rule.name as any;
+        } else if (typeof rule == 'object' && rule) {
+          ruleName = (rule as ValidatorSanitizedRuleObject).ruleName;
+        } else {
+          ruleName = typeof rule == 'string' ? rule : undefined;
         }
-        let ruleName = typeof rule == 'string' ? rule : undefined;
         if (
           !isNonNullString(ruleName) &&
           typeof rule === 'object' &&
@@ -1527,17 +1531,17 @@ export class Validator {
    * ### Example
    * ```typescript
    * class Address {
-   *   @IsRequired
-   *   @MinLength([5])
+   *   @IsRequired()
+   *   @MinLength(5)
    *   street: string;
    *
-   *   @IsRequired
+   *   @IsRequired()
    *   @IsPostalCode
    *   postalCode: string;
    * }
    *
    * class User {
-   *   @IsRequired
+   *   @IsRequired()
    *   name: string;
    *
    *   @ValidateNested([Address])
@@ -1956,7 +1960,7 @@ export class Validator {
     RulesFunctions extends
       ValidatorDefaultMultiRule<Context> = ValidatorDefaultMultiRule<Context>,
   >(
-    ruleParams: RulesFunctions
+    ...ruleParams: RulesFunctions
   ): ValidatorRuleFunction<RulesFunctions, Context> {
     return function OneOf(
       options: ValidatorValidateMultiRuleOptions<Context, RulesFunctions>
@@ -1994,7 +1998,7 @@ export class Validator {
     RulesFunctions extends
       ValidatorDefaultMultiRule<Context> = ValidatorDefaultMultiRule<Context>,
   >(
-    ruleParams: RulesFunctions
+    ...ruleParams: RulesFunctions
   ): ValidatorRuleFunction<RulesFunctions, Context> {
     return function AllOf(
       options: ValidatorValidateMultiRuleOptions<Context, RulesFunctions>
@@ -2076,15 +2080,15 @@ export class Validator {
    * #### Direct Factory Usage
    * ```typescript
    * class Address {
-   *   @IsRequired
+   *   @IsRequired()
    *   street: string;
    *
-   *   @IsRequired
+   *   @IsRequired()
    *   postalCode: string;
    * }
    *
    * class UserForm {
-   *   @IsRequired
+   *   @IsRequired()
    *   @IsEmail()
    *   email: string;
    *
@@ -2121,13 +2125,13 @@ export class Validator {
    * ```typescript
    * // Using ValidateNested within OneOf (e.g., either Address or simplified Location)
    * class Location {
-   *   @IsRequired
+   *   @IsRequired()
    *   coordinates: string; // e.g., "40.7128,-74.0060"
    * }
    *
    * const addressOrLocation = Validator.oneOf([
-   *   Validator.validateNested([Address]),
-   *   Validator.validateNested([Location])
+   *   Validator.validateNested(Address),
+   *   Validator.validateNested(Location)
    * ]);
    * ```
    *
@@ -2139,10 +2143,10 @@ export class Validator {
    * }
    *
    * class AdminProfile {
-   *   @IsRequired
+   *   @IsRequired()
    *   role: string;
    *
-   *   @IsRequired
+   *   @IsRequired()
    *   permissions: string[];
    * }
    *
@@ -2158,7 +2162,7 @@ export class Validator {
    * - `Context` - Optional validation context type passed through nested validations
    *
    * ### Parameters
-   * @param ruleParams - Tuple containing the nested class constructor at position [0].
+   * @param Target - The nested class constructor.
    *                     Must be a class decorated with validation rules.
    *
    * ### Returns
@@ -2227,12 +2231,12 @@ export class Validator {
    * ```typescript
    * // Simple nested validation
    * class Contact {
-   *   @IsRequired @IsEmail() email: string;
-   *   @IsRequired @IsPhoneNumber phone: string;
+   *   @IsRequired() @IsEmail() email: string;
+   *   @IsRequired() @IsPhoneNumber phone: string;
    * }
    *
    * class Person {
-   *   @IsRequired @MinLength([2]) name: string;
+   *   @IsRequired() @MinLength(2) name: string;
    *   @ValidateNested([Contact]) contact: Contact;
    * }
    *
@@ -2267,15 +2271,13 @@ export class Validator {
   static validateNested<
     Target extends ClassConstructor = ClassConstructor,
     Context = unknown,
-  >(
-    ruleParams: [target: Target]
-  ): ValidatorRuleFunction<[target: Target], Context> {
+  >(target: Target): ValidatorRuleFunction<[target: Target], Context> {
     return function ValidateNested(
       options: ValidatorValidateOptions<[target: Target], Context>
     ) {
       return Validator.validateNestedRule({
         ...options,
-        ruleParams,
+        ruleParams: [target],
       });
     };
   }
@@ -2305,7 +2307,7 @@ export class Validator {
    * This method supports complex, multi-field validation with field-level error accumulation.
    *
    * ### Key Features
-   * - **Decorator Support**: Uses @IsEmail(), @IsRequired, @MinLength, etc. decorators
+   * - **Decorator Support**: Uses @IsEmail(), @IsRequired(), @MinLength, etc. decorators
    * - **Multi-FieldMeta Validation**: Validates all decorated properties in parallel
    * - **Error Accumulation**: Collects all field validation errors into a single result
    * - **FieldMeta Mapping**: Maps validated data back to original structure with proper types
@@ -2342,35 +2344,35 @@ export class Validator {
    * - `status`: "error"
    *
    * ### Supported Decorators
-   * - `@IsRequired` / `@IsNullable` / `@IsEmpty` / `@IsOptional` - Conditional rules
+   * - `@IsRequired()` / `@IsNullable` / `@IsEmpty()` / `@IsOptional()` - Conditional rules
    * - `@IsEmail()` / `@IsUrl` / `@IsPhoneNumber()` - Format validators
-   * - `@MinLength[n]` / `@MaxLength[n]` - Length validators
-   * - `@IsNumber` / `@IsNonNullString` - Type validators
+   * - `@MinLength(3)` / `@MaxLength(50)` - Length validators
+   * - `@IsNumber()` / `@IsNonNullString()` - Type validators
    * - `@ Length[n]` - Exact length validator
    * - Custom decorators created with `Validator.buildPropertyDecorator()`
    *
    * ### Nullable Rule Behavior
-   * - **@IsEmpty**: Skips remaining rules if value is empty string ""
+   * - **@IsEmpty()**: Skips remaining rules if value is empty string ""
    * - **@IsNullable**: Skips remaining rules if value is null or undefined
-   * - **@IsOptional**: Skips remaining rules if value is undefined only
-   * - **Skip if Absent**: @IsOptional fields can be omitted from data entirely
+   * - **@IsOptional()**: Skips remaining rules if value is undefined only
+   * - **Skip if Absent**: @IsOptional() fields can be omitted from data entirely
    *
    * ### Examples
    *
    * #### Basic Class Validation
    * ```typescript
    * class UserForm {
-   *   @IsRequired
+   *   @IsRequired()
    *   @IsEmail()
    *   email: string;
    *
-   *   @IsRequired
-   *   @MinLength([3])
-   *   @MaxLength([50])
+   *   @IsRequired()
+   *   @MinLength(3)
+   *   @MaxLength(50)
    *   name: string;
    *
    *   @IsNullable
-   *   @IsNumber
+   *   @IsNumber()
    *   age?: number;
    * }
    *
@@ -2392,20 +2394,20 @@ export class Validator {
    * #### Complex Multi-FieldMeta Validation
    * ```typescript
    * class ProductForm {
-   *   @IsRequired
-   *   @MinLength([3])
+   *   @IsRequired()
+   *   @MinLength(3)
    *   title: string;
    *
-   *   @IsRequired
-   *   @IsNumber
-   *   @NumberGreaterThan([0])
+   *   @IsRequired()
+   *   @IsNumber()
+   *   @NumberGreaterThan(0)
    *   price: number;
    *
-   *   @IsEmpty // Product description can be empty
-   *   @MaxLength([1000])
+   *   @IsEmpty() // Product description can be empty
+   *   @MaxLength(1000)
    *   description?: string;
    *
-   *   @IsOptional // Can be omitted entirely
+   *   @IsOptional() // Can be omitted entirely
    *   @IsUrl
    *   imageUrl?: string;
    * }
@@ -2415,7 +2417,7 @@ export class Validator {
    *  title: "Awesome Product",
    *   price: 29.99,
    *   description: "",
-   *   // imageUrl omitted (valid with @IsOptional)
+   *   // imageUrl omitted (valid with @IsOptional())
    *   }
    * });
    * ```
@@ -2438,10 +2440,10 @@ export class Validator {
    * }
    *
    * class AdminAction {
-   *   @IsRequired
+   *   @IsRequired()
    *   action: string;
    *
-   *   @IsRequired
+   *   @IsRequired()
    *   targetId: number;
    * }
    *
@@ -2546,7 +2548,7 @@ export class Validator {
    *
    * @remarks
    * - Validation is performed in parallel for all decorated fields using Promise.all()
-   * - Fields decorated with @IsOptional can be omitted entirely from input data\n   * - Nullable/Empty rules prevent other rules from executing for that field
+   * - Fields decorated with @IsOptional() can be omitted entirely from input data\n   * - Nullable/Empty rules prevent other rules from executing for that field
    * - Property names are translated using i18n if available (via i18n.translateTarget method)
    * - Errors include field-specific information: propertyName, translatedPropertyName, message, ruleName, value
    * - Custom errorMessageBuilder allows field-level error message customization
@@ -2572,7 +2574,10 @@ export class Validator {
     Context = unknown,
   >(
     target: Target,
-    options: Omit<ValidatorValidateTargetOptions<Target, Context>, 'i18n'> & {
+    options: Omit<
+      ValidatorValidateTargetOptions<Target, Context>,
+      'i18n' | 'ruleParams'
+    > & {
       i18n?: I18n;
     }
   ): Promise<ValidatorValidateTargetResult<Context>> {
@@ -2716,17 +2721,17 @@ export class Validator {
    * @example
    * ```typescript
    * class User {
-   *   @IsRequired
+   *   @IsRequired()
    *   @IsEmail()
    *   email: string;
    *
-   *   @IsRequired
-   *   @MinLength([3])
-   *   @MaxLength([50])
+   *   @IsRequired()
+   *   @MinLength(3)
+   *   @MaxLength(50)
    *   name: string;
    *
-   *   @IsOptional
-   *   @IsNumber
+   *   @IsOptional()
+   *   @IsNumber()
    *   age?: number;
    * }
    *
@@ -2994,7 +2999,7 @@ export class Validator {
    *   }
    * })
    * class CustomUser {
-   *   @IsRequired
+   *   @IsRequired()
    *   @IsEmail()
    *   email: string;
    * }
@@ -3162,10 +3167,10 @@ export class Validator {
    *
    * // Usage with different parameters
    * class User {
-   *   @MinLength([3])      // Requires 3+ characters
+   *   @MinLength(3)      // Requires 3+ characters
    *   username: string;
    *
-   *   @MinLength([8])      // Requires 8+ characters
+   *   @MinLength(8)      // Requires 8+ characters
    *   password: string;
    * }
    * ```
@@ -3266,7 +3271,7 @@ export class Validator {
    * const IsUniqueEmail = Validator.buildRuleDecorator(uniqueEmailRule);
    *
    * class Registration {
-   *   @IsRequired
+   *   @IsRequired()
    *   @IsEmail()
    *   @IsUniqueEmail([])  // Empty array since no parameters needed
    *   email: string;
@@ -3339,17 +3344,17 @@ export class Validator {
    * @MinLength(5)  // TypeScript error: expected array
    *
    * // ✅ Correct: Array parameter
-   * @MinLength([5])
+   * @MinLength(5)
    * ```
    *
    * ```typescript
    * // ❌ Wrong: Missing parameters for required rule
    * const RequiredRule = ({ value }) => !!value || 'Required';
    * const IsRequired = Validator.buildRuleDecorator(RequiredRule);
-   * @IsRequired()  // Runtime error: undefined parameters
+   * @IsRequired()()  // Runtime error: undefined parameters
    *
    * // ✅ Correct: Use buildRuleDecoratorOptional or provide empty array
-   * @IsRequired([])
+   * @IsRequired()([])
    * ```
    *
    * #### Debugging Tips
@@ -3364,9 +3369,9 @@ export class Validator {
    * Multiple decorators on the same property are accumulated:
    * ```typescript
    * class RobustField {
-   *   @IsRequired([])      // Rule 1: Required check
-   *   @MinLength([3])      // Rule 2: Length check
-   *   @IsAlphanumeric([])  // Rule 3: Content check
+   *   @IsRequired()()      // Rule 1: Required check
+   *   @MinLength(3)      // Rule 2: Length check
+   *   @IsAlphanumeric()  // Rule 3: Content check
    *   username: string;
    * }
    * ```
@@ -3516,10 +3521,8 @@ export class Validator {
    *   This function receives normalized validation options and returns validation results.
    *   Function signature: `(options: ValidationOptions<TRuleParams, Context>) => ValidationResult`
    *
-   * @returns A decorator factory function that accepts rule parameters and returns a property decorator.
-   *   The factory function signature varies based on `ValidatorTupleAllowsEmpty`:
-   *   - When parameters are required: `(ruleParameters: TRuleParams) => PropertyDecorator`
-   *   - When parameters are optional: `(ruleParameters?: TRuleParams) => PropertyDecorator`
+   * @returns A decorator factory function that accepts rule parameters as rest parameters and returns a property decorator.
+   *   The signature is: `(...ruleParameters: TRuleParams) => PropertyDecorator`
    *
    * @example
    * ```typescript
@@ -3532,7 +3535,7 @@ export class Validator {
    * const MinLength = Validator.buildRuleDecorator(minLengthRule);
    *
    * class User {
-   *   @MinLength([8])
+   *   @MinLength(8)
    *   password: string;
    * }
    * ```
@@ -3560,7 +3563,7 @@ export class Validator {
    * const IsUnique = Validator.buildRuleDecorator<DatabaseContext>(uniqueRule);
    *
    * class User {
-   *   @IsUnique(['users', 'email'])
+   *   @IsUnique('users', 'email')
    *   email: string;
    * }
    * ```
@@ -3579,15 +3582,12 @@ export class Validator {
   >(
     ruleFunction: ValidatorRuleFunction<TRuleParams, Context>,
     ruleName?: ValidatorOptionalOrEmptyRuleNames
-  ): ValidatorTupleAllowsEmpty<TRuleParams> extends true
-    ? (ruleParameters?: TRuleParams) => PropertyDecorator
-    : (ruleParameters: TRuleParams) => PropertyDecorator {
+  ): (...ruleParameters: TRuleParams) => PropertyDecorator {
     if (isNonNullString(ruleName)) {
       Validator.registerRule(ruleName, ruleFunction);
     }
-    return function (ruleParameters?: TRuleParams) {
-      const finalRuleParameters =
-        ruleParameters ?? ([] as unknown as TRuleParams);
+    return function (...ruleParameters: TRuleParams) {
+      const finalRuleParameters = ruleParameters;
       const enhancedValidatorFunction: ValidatorRuleFunction<
         TRuleParams,
         Context
@@ -3679,15 +3679,15 @@ export class Validator {
    *
    * // Use the decorator with a target class
    * class Address {
-   *   @IsRequired
+   *   @IsRequired()
    *   street: string;
    *
-   *   @IsRequired
+   *   @IsRequired()
    *   city: string;
    * }
    *
    * class User {
-   *   @IsRequired
+   *   @IsRequired()
    *   name: string;
    *
    *   @ValidateNested([Address])
@@ -3698,17 +3698,17 @@ export class Validator {
    * ### Advanced Usage with Validation Options
    * ```typescript
    * class Coordinates {
-   *   @IsRequired
-   *   @IsNumber
+   *   @IsRequired()
+   *   @IsNumber()
    *   latitude: number;
    *
-   *   @IsRequired
-   *   @IsNumber
+   *   @IsRequired()
+   *   @IsNumber()
    *   longitude: number;
    * }
    *
    * class Location {
-   *   @IsRequired
+   *   @IsRequired()
    *   name: string;
    *
    *   @ValidateNested([Coordinates])
@@ -3716,7 +3716,7 @@ export class Validator {
    * }
    *
    * class Event {
-   *   @IsRequired
+   *   @IsRequired()
    *   name: string;
    *
    *   @ValidateNested([Location])
@@ -3790,7 +3790,7 @@ export class Validator {
    *   - Can be synchronous or asynchronous
    *
    * @returns Decorator factory function that:
-   *   - Accepts [TargetClass] array parameter
+   *   - Accepts the target class constructor
    *   - Returns a property decorator
    *   - Attaches target-based validation to class properties
    *   - Works with class validation via validateTarget()
@@ -3817,10 +3817,10 @@ export class Validator {
    * will receive an empty parameter array, letting you write:
    *
    * ```ts
-   * @IsRequired        // no params
-   * @MinLength([5])    // with params
+   * @IsRequired()        // no params
+   * @MinLength(5)    // with params
    * @PhoneNumber()          // optional-params version
-   * @IsPhoneNumber(["US"]) // with params
+   * @IsPhoneNumber("US") // with params
    * ```
    *
    * @param ruleFunction  The validation rule to wrap
@@ -3836,7 +3836,7 @@ export class Validator {
   >(ruleFunction: ValidatorRuleFunction<TRuleParams, Context>) {
     return function (ruleParameters?: TRuleParams) {
       return Validator.buildRuleDecorator<TRuleParams, Context>(ruleFunction)(
-        ruleParameters as TRuleParams
+        ...((ruleParameters ?? []) as unknown as TRuleParams)
       );
     };
   }
@@ -3977,11 +3977,11 @@ export class Validator {
  *   }
  * })
  * class DetailedUser {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsEmail()
  *   email: string;
  *
- *   @IsRequired
+ *   @IsRequired()
  *   name: string;
  * }
  * ```
@@ -4004,7 +4004,7 @@ export class Validator {
  *   }
  * })
  * class AdminUser {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsEmail()
  *   email: string;
  *
@@ -4037,7 +4037,7 @@ export class Validator {
  *   }
  * })
  * class InternationalUser {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsEmail()
  *   email: string;
  *

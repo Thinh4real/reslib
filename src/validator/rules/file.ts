@@ -61,7 +61,7 @@ Validator.registerRule('File', _IsFile);
  * ```typescript
  * // Class validation
  * class UploadForm {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsFile
  *   document: File;
  * }

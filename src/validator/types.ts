@@ -1,7 +1,6 @@
 import { I18n } from '@/i18n';
 import { InputFormatterResult } from '@/inputFormatter/types';
 import { ClassConstructor, Dictionary } from '@/types';
-import { CountryCode } from '@countries/types';
 
 /**
  * ## Validation Result Type
@@ -988,11 +987,11 @@ export type ValidatorRuleParams<
  * ### Usage in Nested Validation
  * ```typescript
  * class UserProfile {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsEmail()
  *   email: string;
  *
- *   @IsRequired
+ *   @IsRequired()
  *   @ValidateNested
  *   address: Address;
  * }
@@ -1220,108 +1219,8 @@ export type ValidatorRuleName = keyof ValidatorRuleParamTypes & string;
  * @see {@link ValidatorRuleParams} - Base parameter type for all rules
  * @see {@link Validator} - Main validator class that uses these rules
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface ValidatorRuleParamTypes<Context = unknown> {
-  /**
-   * Validator rule that checks if a number is less than or equals a specified value.
-   */
-  NumberLessThanOrEqual: ValidatorRuleParams<[number]>;
-
-  /**
-   * Validator rule that checks if a number is less than a specified value.
-   */
-  NumberLessThan: ValidatorRuleParams<[number]>;
-
-  /**
-   * Validator rule that checks if a number is greater than or equals a specified value.
-   */
-  NumberGreaterThanOrEqual: ValidatorRuleParams<[number]>;
-
-  /**
-   * Validator rule that checks if a number is greater than a specified value.
-   */
-  NumberGreaterThan: ValidatorRuleParams<[number]>;
-
-  /**
-   * Validator rule that checks if a number is equal to a specified value.
-   */
-  NumberEqual: ValidatorRuleParams<[number]>;
-
-  /**
-   * Validator rule that checks if a number is different from a specified value.
-   */
-  NumberIsDifferentFrom: ValidatorRuleParams<[number]>;
-
-  /**
-   * Validator rule that checks if a value is present and not empty.
-   */
-  Required: ValidatorRuleParams<[]>;
-
-  /**
-   * Validator rule that validates the length of a string.
-   */
-  Length: ValidatorRuleParams<[lengthOrMinLength: number, maxLength?: number]>;
-
-  /**
-   * Validator rule that checks if a string meets a minimum length requirement.
-   */
-  MinLength: ValidatorRuleParams<[minLength: number]>;
-
-  /**
-   * Validator rule that checks if a string does not exceed a maximum length.
-   */
-  MaxLength: ValidatorRuleParams<[maxLength: number]>;
-
-  /**
-   * Validator rule that checks if a value is a valid URL format.
-   */
-  Url: ValidatorRuleParams<[]>;
-
-  /**
-   * Validator rule that checks if a value is a valid file name.
-   */
-  FileName: ValidatorRuleParams<[]>;
-
-  /**
-   * Validator rule that checks if a value is a number.
-   */
-  Number: ValidatorRuleParams<[]>;
-
-  /**
-   * Validator rule that checks if a value is a non-null string.
-   */
-  NonNullString: ValidatorRuleParams<[]>;
-
-  /**
-   * Validator rule that checks if a value is a string.
-   */
-  String: ValidatorRuleParams<[]>;
-
-  /**
-   * Validator rule that checks if a value is a valid phone number.
-   */
-  PhoneNumber: ValidatorRuleParams<[countryCode?: CountryCode]>;
-
-  /**
-   * Validator rule that checks if a value is a valid email or phone number.
-   */
-  EmailOrPhoneNumber: ValidatorRuleParams<[]>;
-
-  /**
-   * Validator rule that marks a field as allowing empty strings (validation skipped if "").
-   */
-  Empty: ValidatorRuleParams<[]>;
-
-  /**
-   * Validator rule that marks a field as nullable (validation skipped if null or undefined).
-   */
-  Nullable: ValidatorRuleParams<[]>;
-
-  /**
-   * Validator rule that marks a field as sometimes validated (validation skipped if undefined).
-   */
-  Optional: ValidatorRuleParams<[]>;
-}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type
+export interface ValidatorRuleParamTypes<Context = unknown> {}
 
 export interface ValidatorValidateOptions<
   TParams extends ValidatorRuleParams = ValidatorRuleParams,
@@ -1416,7 +1315,7 @@ export interface ValidatorValidateOptions<
    * };
    * ```
    */
-  ruleParams?: TParams;
+  ruleParams: TParams;
 
   /**
    * The name of the validation rule
@@ -1744,8 +1643,7 @@ export interface ValidatorValidateMultiRuleOptions<
  */
 export type ValidatorDefaultMultiRule<
   Context = unknown,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ParamsTypes extends ValidatorRuleParams = any,
+  ParamsTypes extends ValidatorRuleParams = ValidatorRuleParams,
 > = Array<ValidatorRule<ParamsTypes, Context>>;
 
 /**
@@ -1838,15 +1736,15 @@ export type ValidatorMultiRuleFunction<
  * ### Usage in Target Validation
  * ```typescript
  * class UserForm {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsEmail()
  *   email: string;
  *
- *   @IsRequired
- *   @MinLength([3])
+ *   @IsRequired()
+ *   @MinLength(3)
  *   name: string;
  *
- *   @IsOptional
+ *   @IsOptional()
  *   age?: number;
  * }
  *
@@ -1954,12 +1852,12 @@ export type ValidatorValidateTargetData<
  * ### Usage in Target Validation
  * ```typescript
  * class UserProfile {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsEmail()
  *   email: string;
  *
- *   @IsRequired
- *   @MinLength([2])
+ *   @IsRequired()
+ *   @MinLength(2)
  *   name: string;
  *
  *   @ValidateNested
@@ -2183,7 +2081,7 @@ export interface ValidatorValidateTargetOptions<
  * | Operation | One condition | Multiple conditions |
  * | Logic | Direct validation | Logical combination |
  * | Use Case | Basic validation | Complex conditional validation |
- * | Example | "IsEmail" | "OneOf(IsEmail, IsEmpty)" |
+ * | Example | "IsEmail" | "OneOf(IsEmail, IsEmpty())" |
  *
  * ### Runtime Behavior
  * - **OneOf**: Returns success if any sub-rule passes, failure if all fail
@@ -2817,12 +2715,12 @@ export type ValidatorValidateResult<Context = unknown> =
  * ### Example
  * ```typescript
  * class UserForm {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsEmail()
  *   email: string;
  *
- *   @IsRequired
- *   @MinLength([3])
+ *   @IsRequired()
+ *   @MinLength(3)
  *   name: string;
  * }
  *
@@ -2953,12 +2851,12 @@ export interface ValidatorValidateTargetFailure<Context = unknown>
  *
  * ```typescript
  * class UserForm {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsEmail()
  *   email: string;
  *
- *   @IsRequired
- *   @MinLength([3])
+ *   @IsRequired()
+ *   @MinLength(3)
  *   name: string;
  * }
  *
@@ -3109,15 +3007,15 @@ export interface ValidatorValidateTargetSuccess<Context = unknown>
  * ### Real-World Example
  * ```typescript
  * class RegistrationForm {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsEmail()
  *   email: string;
  *
- *   @IsRequired
- *   @MinLength([8])
+ *   @IsRequired()
+ *   @MinLength(8)
  *   password: string;
  *
- *   @IsRequired
+ *   @IsRequired()
  *   @Equals([{{ value: "password" }}])
  *   confirmPassword: string;
  * }

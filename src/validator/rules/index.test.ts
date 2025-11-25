@@ -281,33 +281,33 @@ describe('Validator Rules', () => {
           //console.log(error, " instance of Entity");
         }
       }
-      @IsNumber
+      @IsNumber()
       @Translate('validator.tests.entity.id')
       @IsNumberDifferentFrom([10])
       id?: number;
 
-      @IsRequired
-      @IsNonNullString
+      @IsRequired()
+      @IsNonNullString()
       @Translate('validator.tests.entity.name')
       name?: string;
 
       @Translate('validator.tests.entity.Email')
       @IsEmail()
-      @IsRequired
+      @IsRequired()
       email?: string;
 
       @Translate('validator.tests.entity.Url')
-      @IsUrl
+      @IsUrl()
       url?: string;
 
-      @IsRequired
+      @IsRequired()
       @IsNumberLessThan([10])
       @IsNumberGreaterThan([5])
       @Translate('validator.tests.entity.note')
       note?: number;
 
       @Translate('validator.tests.entity.aString')
-      @IsRequired
+      @IsRequired()
       @Length([10])
       @Length([5, 20])
       aString?: string;
@@ -409,11 +409,11 @@ describe('Validator Rules', () => {
 
       describe('Decorator', () => {
         class TestEntity {
-          @IsEmpty
-          @IsRequired
+          @IsEmpty()
+          @IsRequired()
           emptyField?: string;
 
-          @IsEmpty
+          @IsEmpty()
           @IsEmail()
           optionalEmail?: string;
         }
@@ -523,7 +523,7 @@ describe('Validator Rules', () => {
       describe('Decorator', () => {
         class TestEntity {
           @IsNullable
-          @IsRequired
+          @IsRequired()
           nullableField?: string;
 
           @IsNullable
@@ -531,7 +531,7 @@ describe('Validator Rules', () => {
           optionalEmail?: string;
 
           @IsNullable
-          @IsNonNullString
+          @IsNonNullString()
           strictString?: string;
         }
 
@@ -675,16 +675,16 @@ describe('Validator Rules', () => {
 
       describe('Decorator', () => {
         class TestEntity {
-          @IsOptional
-          @IsRequired
+          @IsOptional()
+          @IsRequired()
           sometimesField?: string;
 
-          @IsOptional
+          @IsOptional()
           @IsEmail()
           optionalEmail?: string;
 
-          @IsOptional
-          @IsNonNullString
+          @IsOptional()
+          @IsNonNullString()
           strictString?: string;
         }
 
@@ -830,11 +830,11 @@ describe('Validator Rules', () => {
 
     describe('Integration with validateTarget', () => {
       class ComprehensiveEntity {
-        @IsRequired
+        @IsRequired()
         @IsEmail()
         requiredEmail: string = '';
 
-        @IsEmpty
+        @IsEmpty()
         @IsEmail()
         emptyEmail?: string;
 
@@ -842,20 +842,20 @@ describe('Validator Rules', () => {
         @IsEmail()
         nullableEmail?: string;
 
-        @IsOptional
+        @IsOptional()
         @IsEmail()
         sometimesEmail?: string;
 
-        @IsEmpty
-        @IsRequired
+        @IsEmpty()
+        @IsRequired()
         emptyRequired?: string;
 
         @IsNullable
-        @IsRequired
+        @IsRequired()
         nullableRequired?: string;
 
-        @IsOptional
-        @IsRequired
+        @IsOptional()
+        @IsRequired()
         sometimesRequired?: string;
       }
 

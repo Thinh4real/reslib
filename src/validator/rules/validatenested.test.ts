@@ -117,7 +117,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should fail when nested object is undefined without @IsOptional if nested class has no decorators', async () => {
+    it('should fail when nested object is undefined without @IsOptional() if nested class has no decorators', async () => {
       class Address {
         street: string = '';
       }
@@ -163,13 +163,13 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
   // ============================================================================
 
   describe('@ValidateNested Combined with Other Decorators', () => {
-    it('should work with @IsRequired on nested property', async () => {
+    it('should work with @IsRequired() on nested property', async () => {
       class Address {
         street: string = '';
       }
 
       class User {
-        @IsRequired
+        @IsRequired()
         @ValidateNested([Address])
         address: Address = new Address();
       }
@@ -189,7 +189,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
       }
 
       class User {
-        @IsRequired
+        @IsRequired()
         @ValidateNested([Address])
         address: Address = new Address();
       }
@@ -201,13 +201,13 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should work with @IsOptional on nested property', async () => {
+    it('should work with @IsOptional() on nested property', async () => {
       class Address {
         street: string = '';
       }
 
       class User {
-        @IsOptional
+        @IsOptional()
         @ValidateNested([Address])
         address?: Address;
       }
@@ -234,7 +234,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
       class User {
         name: string = '';
 
-        @IsOptional
+        @IsOptional()
         @ValidateNested([Contact])
         contact?: Contact;
       }
@@ -255,7 +255,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
       }
 
       class User {
-        @IsOptional
+        @IsOptional()
         @ValidateNested([Address])
         address?: Address;
       }
@@ -269,7 +269,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
 
     it('should combine nested validation with decorators in nested class', async () => {
       class Contact {
-        @IsRequired
+        @IsRequired()
         email: string = '';
       }
 
@@ -291,7 +291,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
 
     it('should validate nested class with MinLength on property', async () => {
       class Profile {
-        @IsRequired
+        @IsRequired()
         bio: string = '';
       }
 
@@ -313,7 +313,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
 
     it('should pass when required decorated field has valid value', async () => {
       class Address {
-        @IsRequired
+        @IsRequired()
         street: string = '';
       }
 
@@ -333,10 +333,10 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
 
     it('should fail when nested class field validation fails', async () => {
       class Address {
-        @IsRequired
+        @IsRequired()
         street: string = '';
 
-        @IsRequired
+        @IsRequired()
         city: string = '';
       }
 
@@ -398,7 +398,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
 
     it('should report errors from deeply nested objects with decorated fields', async () => {
       class Country {
-        @IsRequired
+        @IsRequired()
         name: string = '';
       }
 
@@ -500,12 +500,12 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
 
     it('should fail when multiple nested properties have invalid decorated fields', async () => {
       class Address {
-        @IsRequired
+        @IsRequired()
         street: string = '';
       }
 
       class Company {
-        @IsRequired
+        @IsRequired()
         name: string = '';
       }
 
@@ -662,7 +662,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
       }
 
       class User {
-        @IsOptional
+        @IsOptional()
         @ValidateNested([Contact])
         contact?: Contact;
       }
@@ -811,7 +811,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
 
     it('should handle Array value of nested properties', async () => {
       class Address {
-        @IsNonNullString
+        @IsNonNullString()
         street: string = '';
       }
 
@@ -831,10 +831,10 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
 
     it('should report errors for multiple required decorated fields', async () => {
       class Address {
-        @IsRequired
+        @IsRequired()
         street: string = '';
 
-        @IsRequired
+        @IsRequired()
         city: string = '';
       }
 
@@ -967,10 +967,10 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
       }
 
       class User {
-        @IsRequired
+        @IsRequired()
         name: string = '';
 
-        @IsOptional
+        @IsOptional()
         @ValidateNested([Address])
         address?: Address;
       }
@@ -1022,13 +1022,13 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
 
     it('should fail when nested field validation fails', async () => {
       class Address {
-        @IsRequired
-        @MinLength([5])
+        @IsRequired()
+        @MinLength(5)
         street: string = '';
       }
 
       class User {
-        @ValidateNested([Address])
+        @ValidateNested(Address)
         address: Address = new Address();
       }
 
@@ -1045,7 +1045,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
 
     it('should provide error messages for nested validation failures', async () => {
       class Address {
-        @IsRequired
+        @IsRequired()
         street: string = '';
       }
 
@@ -1063,12 +1063,12 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
 
     it('should report all nested validation errors', async () => {
       class Address {
-        @IsRequired
+        @IsRequired()
         street: string = '';
       }
 
       class Company {
-        @IsRequired
+        @IsRequired()
         name: string = '';
       }
 

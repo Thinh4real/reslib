@@ -32,30 +32,30 @@ describe('AllOf Validation Rules', () => {
     });
     class RegisterDto {
       @IsEmail()
-      @IsRequired
-      @MaxLength([120])
+      @IsRequired()
+      @MaxLength(120)
       @Translate('auth.register.dto.email')
       email: string = '';
 
-      @IsRequired
-      @MinLength([8])
+      @IsRequired()
+      @MinLength(8)
       @Translate('auth.register.dto.password')
       password: string = '';
 
-      @IsOptional
-      @IsString
-      @MaxLength([50])
+      @IsOptional()
+      @IsString()
+      @MaxLength(50)
       @Translate('auth.register.dto.firstName')
       firstName?: string;
 
-      @IsOptional
-      @IsString
-      @MaxLength([50])
+      @IsOptional()
+      @IsString()
+      @MaxLength(50)
       @Translate('auth.register.dto.lastName')
       lastName?: string;
 
-      @IsOptional
-      @IsString
+      @IsOptional()
+      @IsString()
       @IsPhoneNumber()
       @Translate('auth.register.dto.phoneNumber')
       phoneNumber?: string;
@@ -446,12 +446,12 @@ describe('AllOf Validation Rules', () => {
   describe('allOf Factory Method', () => {
     describe('Basic Factory Creation', () => {
       it('should create a valid rule function', () => {
-        const rule = Validator.allOf(['Required', 'Email']);
+        const rule = Validator.allOf('Required', 'Email');
         expect(typeof rule).toBe('function');
       });
 
       it('should create rule that returns validation result', async () => {
-        const rule = Validator.allOf(['Required', 'Email']);
+        const rule = Validator.allOf('Required', 'Email');
         const result = await rule({
           value: 'user@example.com',
           ruleParams: ['Required', 'Email'],
@@ -461,12 +461,12 @@ describe('AllOf Validation Rules', () => {
       });
 
       it('should create rule from empty array', () => {
-        const rule = Validator.allOf([]);
+        const rule = Validator.allOf();
         expect(typeof rule).toBe('function');
       });
 
       it('should create rule with single item', async () => {
-        const rule = Validator.allOf(['Email']);
+        const rule = Validator.allOf('Email');
         const result = await rule({
           value: 'test@example.com',
           ruleParams: ['Email'],
@@ -476,7 +476,7 @@ describe('AllOf Validation Rules', () => {
       });
 
       it('should create rule with multiple items', async () => {
-        const rule = Validator.allOf(['Required', 'Email', { MinLength: [5] }]);
+        const rule = Validator.allOf('Required', 'Email', { MinLength: [5] });
         const result = await rule({
           value: 'user@example.com',
           ruleParams: ['Required', 'Email', { MinLength: [5] }],
@@ -488,7 +488,7 @@ describe('AllOf Validation Rules', () => {
 
     describe('Factory with Different Rule Types', () => {
       it('should create rule from string rules only', async () => {
-        const rule = Validator.allOf(['Required', 'Email']);
+        const rule = Validator.allOf('Required', 'Email');
         const result = await rule({
           value: 'test@example.com',
           ruleParams: ['Required', 'Email'],
@@ -498,7 +498,7 @@ describe('AllOf Validation Rules', () => {
       });
 
       it('should create rule from object rules only', async () => {
-        const rule = Validator.allOf([{ MinLength: [3] }, { MaxLength: [10] }]);
+        const rule = Validator.allOf({ MinLength: [3] }, { MaxLength: [10] });
         const result = await rule({
           value: 'hello',
           ruleParams: [{ MinLength: [3] }, { MaxLength: [10] }],
@@ -508,10 +508,10 @@ describe('AllOf Validation Rules', () => {
       });
 
       it('should create rule from function rules only', async () => {
-        const rule = Validator.allOf([
+        const rule = Validator.allOf(
           ({ value }: any) => value.length > 5,
-          ({ value }: any) => value.includes('@'),
-        ]);
+          ({ value }: any) => value.includes('@')
+        );
         const result = await rule({
           value: 'user@example.com',
           ruleParams: [
@@ -526,11 +526,11 @@ describe('AllOf Validation Rules', () => {
       it('should create rule from mixed rule types', async () => {
         const customRule = ({ value }: any) => value.includes('@');
 
-        const rule = Validator.allOf([
+        const rule = Validator.allOf(
           'Required',
           { MinLength: [5] },
-          customRule,
-        ]);
+          customRule
+        );
         const result = await rule({
           value: 'user@example.com',
           ruleParams: ['Required', { MinLength: [5] }, customRule],
@@ -547,10 +547,10 @@ describe('AllOf Validation Rules', () => {
           isAdmin: boolean;
         }
 
-        const rule = Validator.allOf<MyContext>([
+        const rule = Validator.allOf<MyContext>(
           'Required',
-          ({ value, context }) => (context?.isAdmin ? true : 'Not admin'),
-        ]);
+          ({ value, context }) => (context?.isAdmin ? true : 'Not admin')
+        );
 
         const result = await rule({
           value: 'test',
@@ -572,7 +572,7 @@ describe('AllOf Validation Rules', () => {
 
     describe('Factory Rule Registration', () => {
       it('should create rule that can be registered', async () => {
-        const strictContactRule = Validator.allOf(['Required', 'Email']);
+        const strictContactRule = Validator.allOf('Required', 'Email');
         Validator.registerRule('StrictContact' as any, strictContactRule);
 
         const result = await Validator.validate({
@@ -583,7 +583,7 @@ describe('AllOf Validation Rules', () => {
         expect(result.success).toBe(true);
       });
       it('should work with registered rule in validation', async () => {
-        const strictIdRule = Validator.allOf(['Required', 'UUID']);
+        const strictIdRule = Validator.allOf('Required', 'UUID');
         Validator.registerRule('StrictID' as any, strictIdRule);
 
         const result = await Validator.validate({
@@ -598,7 +598,7 @@ describe('AllOf Validation Rules', () => {
     describe('Factory Immutability', () => {
       it('should not modify original rule params', async () => {
         const originalRules: ValidatorRule[] = ['Required', 'Email'];
-        const rule = Validator.allOf(originalRules);
+        const rule = Validator.allOf(...originalRules);
 
         await rule({
           value: 'test@example.com',
@@ -610,8 +610,8 @@ describe('AllOf Validation Rules', () => {
       });
 
       it('should create independent rule instances', async () => {
-        const rule1 = Validator.allOf(['Required']);
-        const rule2 = Validator.allOf(['Required', 'Email']);
+        const rule1 = Validator.allOf('Required');
+        const rule2 = Validator.allOf('Required', 'Email');
 
         const result1 = await rule1({
           value: 'test',
@@ -631,10 +631,6 @@ describe('AllOf Validation Rules', () => {
     });
   });
 
-  // ============================================================================
-  // Section 3: buildMultiRuleDecorator Method Tests
-  // ============================================================================
-
   describe('buildMultiRuleDecorator Method', () => {
     describe('Decorator Factory Creation', () => {
       it('should create a decorator factory function', () => {
@@ -652,7 +648,7 @@ describe('AllOf Validation Rules', () => {
             return Validator.validateAllOfRule(options);
           }
         );
-        const decorator = decoratorFactory(['Required', 'Email']);
+        const decorator = decoratorFactory('Required', 'Email');
         expect(typeof decorator).toBe('function');
       });
 
@@ -664,7 +660,7 @@ describe('AllOf Validation Rules', () => {
         );
 
         class TestEntity {
-          @CustomDecorator(['Required', 'Email'])
+          @CustomDecorator('Required', 'Email')
           contact: string = '';
         }
 
@@ -682,7 +678,7 @@ describe('AllOf Validation Rules', () => {
         );
 
         class TestEntity {
-          @StringRuleDecorator(['Required', 'Email'])
+          @StringRuleDecorator('Required', 'Email')
           field: string = '';
         }
 
@@ -704,7 +700,7 @@ describe('AllOf Validation Rules', () => {
         );
 
         class TestEntity {
-          @ObjectRuleDecorator([{ MinLength: [5] }, { MaxLength: [20] }])
+          @ObjectRuleDecorator({ MinLength: [5] }, { MaxLength: [20] })
           field: string = '';
         }
 
@@ -721,7 +717,7 @@ describe('AllOf Validation Rules', () => {
         const customRule = ({ value }: any) => value.length > 3;
 
         class TestEntity {
-          @FunctionRuleDecorator([customRule, 'Required'])
+          @FunctionRuleDecorator(customRule, 'Required')
           field: string = '';
         }
 
@@ -743,7 +739,7 @@ describe('AllOf Validation Rules', () => {
           });
 
         class TestEntity {
-          @ContextAwareDecorator(['Required'])
+          @ContextAwareDecorator('Required')
           field: string = '';
         }
 
@@ -760,7 +756,7 @@ describe('AllOf Validation Rules', () => {
         );
 
         class User {
-          @TestDecorator(['Required', 'Email'])
+          @TestDecorator('Required', 'Email')
           contact: string = '';
         }
 
@@ -783,7 +779,7 @@ describe('AllOf Validation Rules', () => {
         );
 
         class User {
-          @TestDecorator(['Required', 'Email'])
+          @TestDecorator('Required', 'Email')
           contact: string = '';
         }
 
@@ -805,10 +801,10 @@ describe('AllOf Validation Rules', () => {
         );
 
         class Form {
-          @TestDecorator(['Required', 'Email'])
+          @TestDecorator('Required', 'Email')
           email: string = '';
 
-          @TestDecorator(['Required', 'Number'])
+          @TestDecorator('Required', 'Number')
           age: number = 0;
         }
 
@@ -831,10 +827,10 @@ describe('AllOf Validation Rules', () => {
         );
 
         class Form {
-          @TestDecorator(['Required', 'Email'])
+          @TestDecorator('Required', 'Email')
           email: string = '';
 
-          @TestDecorator(['Required', 'Number'])
+          @TestDecorator('Required', 'Number')
           age: number = 0;
         }
 
@@ -860,7 +856,7 @@ describe('AllOf Validation Rules', () => {
     describe('Decorator Application', () => {
       it('should apply AllOf decorator to property', () => {
         class User {
-          @AllOf(['Required', 'Email'])
+          @AllOf('Required', 'Email')
           contact: string = '';
         }
 
@@ -870,7 +866,7 @@ describe('AllOf Validation Rules', () => {
 
       it('should validate decorated property', async () => {
         class User {
-          @AllOf(['Required', 'Email'])
+          @AllOf('Required', 'Email')
           contact: string = '';
         }
 
@@ -887,7 +883,7 @@ describe('AllOf Validation Rules', () => {
 
       it('should fail when AllOf validation fails', async () => {
         class User {
-          @AllOf(['Required', 'Email'])
+          @AllOf('Required', 'Email')
           contact: string = '';
         }
 
@@ -905,7 +901,7 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf with String Rules', () => {
       it('should validate required email', async () => {
         class Contact {
-          @AllOf(['Required', 'Email'])
+          @AllOf('Required', 'Email')
           info: string = '';
         }
 
@@ -921,7 +917,7 @@ describe('AllOf Validation Rules', () => {
 
       it('should validate required UUID', async () => {
         class Identifier {
-          @AllOf(['Required', 'UUID'])
+          @AllOf('Required', 'UUID')
           id: string = '';
         }
 
@@ -939,7 +935,7 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf with Object Rules', () => {
       it('should validate with MinLength and MaxLength', async () => {
         class FieldMeta {
-          @AllOf([{ MinLength: [3] }, { MaxLength: [10] }])
+          @AllOf({ MinLength: [3] }, { MaxLength: [10] })
           value: string = '';
         }
 
@@ -957,10 +953,10 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf with Function Rules', () => {
       it('should validate with custom function rules', async () => {
         class CustomField {
-          @AllOf([
+          @AllOf(
             ({ value }) => value.length > 0,
-            ({ value }) => value.startsWith('ADMIN-'),
-          ])
+            ({ value }) => value.startsWith('ADMIN-')
+          )
           field: string = '';
         }
 
@@ -978,11 +974,9 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf with Mixed Rule Types', () => {
       it('should validate with mixed string, object, and function rules', async () => {
         class MixedRules {
-          @AllOf([
-            'Required',
-            { MinLength: [8] },
-            ({ value }) => value.includes('@'),
-          ])
+          @AllOf('Required', { MinLength: [8] }, ({ value }) =>
+            value.includes('@')
+          )
           value: string = '';
         }
 
@@ -1000,7 +994,7 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf with Other Decorators', () => {
       it('should work with IsOptional decorator', async () => {
         class OptionalAllOf {
-          @AllOf(['Email', { MinLength: [5] }])
+          @AllOf('Email', { MinLength: [5] })
           contact?: string;
         }
 
@@ -1018,7 +1012,7 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf Error Messages', () => {
       it('should provide meaningful error when rules fail', async () => {
         class ErrorTest {
-          @AllOf(['Required', 'Email'])
+          @AllOf('Required', 'Email')
           value: string = '';
         }
 
@@ -1036,7 +1030,7 @@ describe('AllOf Validation Rules', () => {
 
       it('should include multiple error messages in aggregation', async () => {
         class MultiError {
-          @AllOf(['Required', 'Email', 'PhoneNumber'])
+          @AllOf('Required', 'Email', 'PhoneNumber')
           value: string = '';
         }
 
@@ -1056,7 +1050,7 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf with Empty Rules Array', () => {
       it('should validate with empty rules', async () => {
         class EmptyRules {
-          @AllOf([])
+          @AllOf()
           value: string = '';
         }
 
@@ -1074,7 +1068,7 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf with Single Rule', () => {
       it('should validate with single rule', async () => {
         class SingleRule {
-          @AllOf(['Email'])
+          @AllOf('Email')
           email: string = '';
         }
 
@@ -1090,7 +1084,7 @@ describe('AllOf Validation Rules', () => {
 
       it("should fail with single rule when it doesn't match", async () => {
         class SingleRule {
-          @AllOf(['Email'])
+          @AllOf('Email')
           email: string = '';
         }
 
@@ -1108,13 +1102,13 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf with Multiple Properties', () => {
       it('should validate multiple AllOf decorated properties', async () => {
         class MultiProperty {
-          @AllOf(['Required', 'Email'])
+          @AllOf('Required', 'Email')
           contact: string = '';
 
-          @AllOf(['Required', 'UUID'])
+          @AllOf('Required', 'UUID')
           id: string = '';
 
-          @AllOf([{ MinLength: [3] }, { MaxLength: [10] }])
+          @AllOf({ MinLength: [3] }, { MaxLength: [10] })
           code: string = '';
         }
 
@@ -1135,10 +1129,10 @@ describe('AllOf Validation Rules', () => {
 
       it('should track individual field errors', async () => {
         class MultiProperty {
-          @AllOf(['Required', 'Email'])
+          @AllOf('Required', 'Email')
           contact: string = '';
 
-          @AllOf(['Required', 'UUID'])
+          @AllOf('Required', 'UUID')
           id: string = '';
         }
 
@@ -1166,7 +1160,7 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf with Different Data Types', () => {
       it('should validate numeric values', async () => {
         class NumericAllOf {
-          @AllOf(['Number', ({ value }) => value > 0])
+          @AllOf('Number', ({ value }) => value > 0)
           value: number = 0;
         }
 
@@ -1183,10 +1177,10 @@ describe('AllOf Validation Rules', () => {
 
       it('should validate boolean values', async () => {
         class BooleanAllOf {
-          @AllOf([
+          @AllOf(
             ({ value }) => typeof value === 'boolean',
-            ({ value }) => value === true,
-          ])
+            ({ value }) => value === true
+          )
           value: boolean = false;
         }
 
@@ -1202,7 +1196,7 @@ describe('AllOf Validation Rules', () => {
 
       it('should validate array values', async () => {
         class ArrayAllOf {
-          @AllOf(['Array', ({ value }) => value.length > 0])
+          @AllOf('Array', ({ value }) => value.length > 0)
           value: any[] = [];
         }
 
@@ -1220,7 +1214,7 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf with Null and Undefined', () => {
       it('should handle null value', async () => {
         class NullTest {
-          @AllOf(['Required', 'Email'])
+          @AllOf('Required', 'Email')
           value: string | null = '';
         }
 
@@ -1236,7 +1230,7 @@ describe('AllOf Validation Rules', () => {
 
       it('should handle undefined value', async () => {
         class UndefinedTest {
-          @AllOf(['Required', 'Email'])
+          @AllOf('Required', 'Email')
           value?: string = '';
         }
 
@@ -1254,10 +1248,10 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf with Empty String', () => {
       it('should handle empty string value', async () => {
         class EmptyStringTest {
-          @AllOf([
+          @AllOf(
             ({ value }) => value === '',
-            ({ value }) => typeof value === 'string',
-          ])
+            ({ value }) => typeof value === 'string'
+          )
           value: string = '';
         }
 
@@ -1279,13 +1273,10 @@ describe('AllOf Validation Rules', () => {
         }
 
         class AdminField {
-          @AllOf([
-            'Required',
-            ({ value, context }) => {
-              const ctx = context as AdminContext;
-              return ctx?.isAdmin || 'Admin only';
-            },
-          ])
+          @AllOf('Required', ({ value, context }) => {
+            const ctx = context as AdminContext;
+            return ctx?.isAdmin || 'Admin only';
+          })
           field: string = '';
         }
 
@@ -1324,13 +1315,13 @@ describe('AllOf Validation Rules', () => {
     describe('Complex Validation Scenarios', () => {
       it('should handle deeply nested AllOf rules', async () => {
         class ComplexEntity {
-          @AllOf([
+          @AllOf(
             'Required',
             'Email',
             { MinLength: [5] },
             ({ value }) => value.includes('@'),
-            ({ value }) => value.length < 50,
-          ])
+            ({ value }) => value.length < 50
+          )
           multiField: string = '';
         }
 
@@ -1350,10 +1341,10 @@ describe('AllOf Validation Rules', () => {
 
       it('should handle AllOf with both required and optional fields', async () => {
         class UserProfile {
-          @AllOf(['Required', 'Email'])
+          @AllOf('Required', 'Email')
           contact: string = '';
 
-          @AllOf([{ MinLength: [3] }, { MaxLength: [10] }])
+          @AllOf({ MinLength: [3] }, { MaxLength: [10] })
           code?: string;
         }
 
@@ -1380,7 +1371,7 @@ describe('AllOf Validation Rules', () => {
     describe('Error Handling and Recovery', () => {
       it('should provide useful error messages for debugging', async () => {
         class DebugEntity {
-          @AllOf(['Required', 'Email', { MinLength: [20] }])
+          @AllOf('Required', 'Email', { MinLength: [20] })
           field: string = '';
         }
 
@@ -1400,7 +1391,7 @@ describe('AllOf Validation Rules', () => {
 
       it('should correctly report which rules failed', async () => {
         class ErrorReporting {
-          @AllOf(['Required', 'Email', 'UUID'])
+          @AllOf('Required', 'Email', 'UUID')
           value: string = '';
         }
 
@@ -1420,7 +1411,7 @@ describe('AllOf Validation Rules', () => {
     describe('Performance and Optimization', () => {
       it('should complete validation within reasonable time', async () => {
         class Performance {
-          @AllOf(['Required', 'Email', { MinLength: [5] }, { MaxLength: [50] }])
+          @AllOf('Required', 'Email', { MinLength: [5] }, { MaxLength: [50] })
           value: string = '';
         }
 
@@ -1445,7 +1436,7 @@ describe('AllOf Validation Rules', () => {
         manyRules[1] = 'Email';
 
         class LargeRuleSet {
-          @AllOf(manyRules)
+          @AllOf(...manyRules)
           value: string = '';
         }
 

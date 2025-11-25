@@ -10,15 +10,15 @@ import { Validator } from '../validator';
  * @usage Basic Example:
  * ```typescript
  * class Address {
- *   @IsRequired
+ *   @IsRequired()
  *   street: string;
  *
- *   @IsRequired
+ *   @IsRequired()
  *   city: string;
  * }
  *
  * class User {
- *   @IsRequired
+ *   @IsRequired()
  *   name: string;
  *
  *   @ValidateNested([Address])
@@ -36,23 +36,23 @@ import { Validator } from '../validator';
  * @usage Multi-level Nesting Example:
  * ```typescript
  * class Coordinates {
- *   @IsRequired
- *   @IsNumber
+ *   @IsRequired()
+ *   @IsNumber()
  *   latitude: number;
  *
- *   @IsRequired
- *   @IsNumber
+ *   @IsRequired()
+ *   @IsNumber()
  *   longitude: number;
  * }
  *
  * class Location {
- *   @IsRequired
+ *   @IsRequired()
  *   @ValidateNested([Coordinates])
  *   coordinates: Coordinates;
  * }
  *
  * class Event {
- *   @IsRequired
+ *   @IsRequired()
  *   name: string;
  *
  *   @ValidateNested([Location])
@@ -63,16 +63,16 @@ import { Validator } from '../validator';
  * @usage Optional Nested Objects:
  * ```typescript
  * class Contact {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsEmail()
  *   email: string;
  * }
  *
  * class Person {
- *   @IsRequired
+ *   @IsRequired()
  *   name: string;
  *
- *   @IsOptional
+ *   @IsOptional()
  *   @ValidateNested([Contact])
  *   contact?: Contact;
  * }
@@ -103,7 +103,7 @@ import { Validator } from '../validator';
  * - Recursive nesting support for complex object hierarchies
  * - Context propagation through validation layers
  * - Parallel validation of multiple nested properties
- * - Works with @IsOptional for optional nested objects
+ * - Works with @IsOptional() for optional nested objects
  * - Compatible with all other validation decorators
  * - Custom error messages via errorMessageBuilder callback
  *

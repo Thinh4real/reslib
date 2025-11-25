@@ -45,7 +45,7 @@ Validator.registerRule('Date', _Date);
  * ```typescript
  * // Class validation
  * class Event {
- *   @IsRequired
+ *   @IsRequired()
  *   @IsDate
  *   eventDate: Date;
  * }
