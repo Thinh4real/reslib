@@ -64,7 +64,7 @@ import { Validator } from '../validator';
  * ```typescript
  * class Contact {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  * }
  *

@@ -292,7 +292,7 @@ describe('Validator Rules', () => {
       name?: string;
 
       @Translate('validator.tests.entity.Email')
-      @IsEmail
+      @IsEmail()
       @IsRequired
       email?: string;
 
@@ -314,6 +314,7 @@ describe('Validator Rules', () => {
     }
 
     const allRules = Validator.getTargetRules(Entity);
+    console.log(allRules, ' are all rules heein');
     it('Getting validation rules', async () => {
       expect(allRules).toMatchObject({
         id: expect.arrayContaining(['Number', expect.any(Function)]),
@@ -413,7 +414,7 @@ describe('Validator Rules', () => {
           emptyField?: string;
 
           @IsEmpty
-          @IsEmail
+          @IsEmail()
           optionalEmail?: string;
         }
 
@@ -526,7 +527,7 @@ describe('Validator Rules', () => {
           nullableField?: string;
 
           @IsNullable
-          @IsEmail
+          @IsEmail()
           optionalEmail?: string;
 
           @IsNullable
@@ -679,7 +680,7 @@ describe('Validator Rules', () => {
           sometimesField?: string;
 
           @IsOptional
-          @IsEmail
+          @IsEmail()
           optionalEmail?: string;
 
           @IsOptional
@@ -830,19 +831,19 @@ describe('Validator Rules', () => {
     describe('Integration with validateTarget', () => {
       class ComprehensiveEntity {
         @IsRequired
-        @IsEmail
+        @IsEmail()
         requiredEmail: string = '';
 
         @IsEmpty
-        @IsEmail
+        @IsEmail()
         emptyEmail?: string;
 
         @IsNullable
-        @IsEmail
+        @IsEmail()
         nullableEmail?: string;
 
         @IsOptional
-        @IsEmail
+        @IsEmail()
         sometimesEmail?: string;
 
         @IsEmpty

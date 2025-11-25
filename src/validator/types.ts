@@ -989,7 +989,7 @@ export type ValidatorRuleParams<
  * ```typescript
  * class UserProfile {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   @IsRequired
@@ -1271,11 +1271,6 @@ export interface ValidatorRuleParamTypes<Context = unknown> {
    * Validator rule that checks if a string does not exceed a maximum length.
    */
   MaxLength: ValidatorRuleParams<[maxLength: number]>;
-
-  /**
-   * Validator rule that checks if a value is a valid email address format.
-   */
-  Email: ValidatorRuleParams<[]>;
 
   /**
    * Validator rule that checks if a value is a valid URL format.
@@ -1844,7 +1839,7 @@ export type ValidatorMultiRuleFunction<
  * ```typescript
  * class UserForm {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   @IsRequired
@@ -1960,7 +1955,7 @@ export type ValidatorValidateTargetData<
  * ```typescript
  * class UserProfile {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   @IsRequired
@@ -2823,7 +2818,7 @@ export type ValidatorValidateResult<Context = unknown> =
  * ```typescript
  * class UserForm {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   @IsRequired
@@ -2959,7 +2954,7 @@ export interface ValidatorValidateTargetFailure<Context = unknown>
  * ```typescript
  * class UserForm {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   @IsRequired
@@ -3115,7 +3110,7 @@ export interface ValidatorValidateTargetSuccess<Context = unknown>
  * ```typescript
  * class RegistrationForm {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   @IsRequired

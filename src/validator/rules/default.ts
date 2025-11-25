@@ -25,7 +25,7 @@ Validator.registerRule('Required', function Required(options) {
  *   username: string;
  *
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   // Optional field - no @IsRequired
@@ -64,7 +64,7 @@ Validator.registerRule('Empty', function Empty() {
  * ```typescript
  * class User {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   @IsEmpty
@@ -94,7 +94,7 @@ Validator.registerRule('Nullable', function Nullable() {
  * ```typescript
  * class User {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   @IsNullable
@@ -125,7 +125,7 @@ Validator.registerRule('Optional', function Optional() {
  * ```typescript
  * class User {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   @IsOptional

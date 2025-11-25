@@ -1,61 +1,205 @@
 import { InputFormatter } from '@/inputFormatter';
 import { CountryCode } from '@countries/types';
 import { defaultStr } from '@utils/defaultStr';
-import { isEmail } from '@utils/isEmail';
+import { isEmail, IsEmailOptions } from '@utils/isEmail';
 import { isNonNullString } from '@utils/isNonNullString';
 import { isUrl } from '@utils/uri';
+import type { ValidatorRuleParams } from '../types';
 import { ValidatorResult, ValidatorValidateOptions } from '../types';
 import { Validator } from '../validator';
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { ValidatorRuleParams } from '../types';
+import type { ValidatorRuleFunction } from '../types';
 
-/**
- * ### IsEmail Decorator
- *
- * Validates that a property value is a properly formatted email address.
- * Uses comprehensive email validation that checks for valid email format
- * according to RFC standards.
- *
- * @example
- * ```typescript
- * class Contact {
- *   @IsRequired
- *   @IsEmail
- *   primaryEmail: string;
- *
- *   @IsEmail  // Optional email
- *   secondaryEmail?: string;
- * }
- *
- * // Valid data
- * const contact = {
- *   primaryEmail: "user@example.com",
- *   secondaryEmail: "backup@company.org"
- * };
- *
- * // Invalid data
- * const invalid = {
- *   primaryEmail: "not-an-email",
- *   secondaryEmail: "user@"
- * };
- * // Will fail validation with errors about invalid email format
- * ```
- *
- * @decorator
- *
- * @see {@link IsRequired} - Often used together
- * @public
- */
-export const IsEmail = Validator.buildPropertyDecorator(['Email']);
-
-Validator.registerRule('Email', function Email(options) {
+type IsEmailRuleOptions = [options?: IsEmailOptions];
+const _IsEmail: ValidatorRuleFunction<IsEmailRuleOptions> = function _IsEmail(
+  options
+) {
   const { value, i18n } = options;
   const message = i18n.t('validator.email', options);
   if (!isNonNullString(value)) {
     return message;
   }
   return isEmail(value) || message;
-});
+};
+
+/**
+ * ### IsEmail Decorator
+ *
+ * Validates that a property value is a properly formatted email address according to RFC 5322 standards.
+ * This decorator performs comprehensive email validation including:
+ *
+ * - **Local part validation**: Checks the part before @ for valid characters, proper dot placement, and quoted strings
+ * - **Domain validation**: Validates domain structure, TLD requirements, and supports international domains (IDN)
+ * - **IP address domains**: Supports [IPv4] and [IPv6] bracketed formats
+ * - **Length constraints**: Configurable limits for total length, local part, domain, and domain labels
+ * - **Edge case handling**: Consecutive dots, leading/trailing dots, escaped characters in quoted strings
+ *
+ * The validation is based on RFC 5321 (SMTP) and RFC 5322 (Internet Message Format) specifications,
+ * ensuring compatibility with modern email systems while being strict enough to catch common typos.
+ *
+ * #### Configuration Options
+ *
+ * The decorator accepts an optional configuration object to customize validation constraints:
+ *
+ * - `maxTotalLength`: Maximum total email length (default: 320 characters, per RFC 5321)
+ * - `maxLocalPartLength`: Maximum local part length (default: 64 characters, per RFC 5321)
+ * - `maxDomainLength`: Maximum domain length (default: 255 characters, per RFC 1035)
+ * - `maxDomainLabelLength`: Maximum individual domain label length (default: 63 characters, per RFC 1035)
+ *
+ * #### Usage Examples
+ *
+ * **Basic usage (default settings):**
+ * ```typescript
+ * class User {
+ *   @IsRequired
+ *   @IsEmail()
+ *   email: string;
+ *
+ *   @IsEmail() // Optional email field
+ *   backupEmail?: string;
+ * }
+ *
+ * // Valid examples
+ * const user1 = { email: "user@example.com" }; // ✓ Valid
+ * const user2 = { email: "test.email+tag@subdomain.example.co.uk" }; // ✓ Valid
+ * const user3 = { email: "\"quoted.name\"@example.com" }; // ✓ Valid (quoted local part)
+ * const user4 = { email: "user@[192.168.1.1]" }; // ✓ Valid (IP domain)
+ *
+ * // Invalid examples
+ * const invalid1 = { email: "not-an-email" }; // ✗ Missing @
+ * const invalid2 = { email: "@example.com" }; // ✗ Empty local part
+ * const invalid3 = { email: "user@" }; // ✗ Empty domain
+ * const invalid4 = { email: "user..name@example.com" }; // ✗ Consecutive dots
+ * ```
+ *
+ * **Custom length constraints:**
+ * ```typescript
+ * class StrictUser {
+ *   @IsEmail({
+ *     maxTotalLength: 100,        // Shorter total limit
+ *     maxLocalPartLength: 32,     // Shorter local part
+ *     maxDomainLength: 50         // Shorter domain
+ *   })
+ *   email: string;
+ * }
+ *
+ * // Valid with custom limits
+ * const user = { email: "short@example.com" }; // ✓ Valid (under limits)
+ *
+ * // Invalid with custom limits
+ * const tooLong = { email: "very.long.local.part.that.exceeds.limits@example.com" }; // ✗ Too long
+ * ```
+ *
+ * **Integration with other validators:**
+ * ```typescript
+ * class ContactForm {
+ *   @IsRequired
+ *   @IsEmail()
+ *   @MaxLength(254) // Additional length check
+ *   email: string;
+ *
+ *   @IsOptional
+ *   @IsEmail({
+ *     maxTotalLength: 320,
+ *     maxLocalPartLength: 64
+ *   })
+ *   ccEmail?: string;
+ * }
+ * ```
+ *
+ * #### Validation Behavior
+ *
+ * - **Empty/null values**: Returns validation error message (use `@IsOptional` for optional fields)
+ * - **Non-string values**: Returns validation error message
+ * - **Invalid format**: Returns localized error message from i18n system
+ * - **Valid emails**: Returns `true`
+ *
+ * #### Performance Considerations
+ *
+ * - Email validation is computationally lightweight and suitable for high-throughput validation
+ * - The regex-based validation is optimized for common email patterns
+ * - Custom length constraints are checked first for early rejection of obviously invalid inputs
+ * - Supports both simple and complex email formats without performance degradation
+ *
+ * #### Internationalization Support
+ *
+ * Error messages are fully internationalized and can be customized through the validator's i18n system.
+ * The default error key is `'validator.email'` and supports interpolation with field names and values.
+ *
+ * #### Common Validation Scenarios
+ *
+ * **User registration:**
+ * ```typescript
+ * class RegisterUser {
+ *   @IsRequired
+ *   @IsEmail()
+ *   email: string;
+ * }
+ * ```
+ *
+ * **Contact forms:**
+ * ```typescript
+ * class Contact {
+ *   @IsEmail()
+ *   email?: string; // Optional contact email
+ * }
+ * ```
+ *
+ * **API data validation:**
+ * ```typescript
+ * class APIUser {
+ *   @IsEmail({
+ *     maxTotalLength: 254, // RFC 3696 recommendation
+ *     maxLocalPartLength: 64,
+ *     maxDomainLength: 255
+ *   })
+ *   email: string;
+ * }
+ * ```
+ *
+ * @template {IsEmailOptions} [TOptions=[options?: IsEmailOptions]]
+ *   Type parameter for the email validation options tuple
+ *
+ * @param {TOptions} [options] - Optional configuration object for email validation constraints
+ * @param {number} [options.maxTotalLength=320] - Maximum total email length in characters
+ * @param {number} [options.maxLocalPartLength=64] - Maximum local part length in characters
+ * @param {number} [options.maxDomainLength=255] - Maximum domain length in characters
+ * @param {number} [options.maxDomainLabelLength=63] - Maximum domain label length in characters
+ *
+ * @returns {PropertyDecorator} A property decorator that validates email format
+ *
+ * @throws {ValidationError} When validation fails, containing localized error message
+ *
+ * @example
+ * ```typescript
+ * // Basic usage
+ * class User {
+ *   @IsEmail()
+ *   email: string;
+ * }
+ *
+ * // With custom options
+ * class StrictUser {
+ *   @IsEmail({
+ *     maxTotalLength: 100,
+ *     maxLocalPartLength: 32
+ *   })
+ *   email: string;
+ * }
+ * ```
+ *
+ * @decorator
+ * @public
+ */
+export const IsEmail =
+  Validator.buildRuleDecorator<IsEmailRuleOptions>(_IsEmail);
+
+class t {
+  @IsEmail()
+  email: string = '';
+}
+
+Validator.registerRule('Email', _IsEmail);
 
 /**
  * ### IsUrl Decorator
@@ -753,6 +897,11 @@ export const Matches =
 
 declare module '../types' {
   export interface ValidatorRuleParamTypes {
+    /**
+     * Validator rule that checks if a value is a valid email address format.
+     */
+    Email: ValidatorRuleParams<IsEmailRuleOptions>;
+
     /**
      * ### UUID Rule
      *

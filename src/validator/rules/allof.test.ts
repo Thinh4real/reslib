@@ -21,10 +21,6 @@ describe('AllOf Validation Rules', () => {
     await i18n.setLocale('en');
   });
 
-  // ============================================================================
-  // Section 1: validateAllOfRule Method Tests
-  // ============================================================================
-
   describe('Validate oneOf rule', () => {
     it('should return true when all rules pass', async () => {
       const result = await Validator.validateOneOfRule({
@@ -35,7 +31,7 @@ describe('AllOf Validation Rules', () => {
       expect(result).toBe(true);
     });
     class RegisterDto {
-      @IsEmail
+      @IsEmail()
       @IsRequired
       @MaxLength([120])
       @Translate('auth.register.dto.email')

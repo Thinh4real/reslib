@@ -18,6 +18,7 @@ import {
   ValidatorMultiRuleFunction,
   ValidatorMultiRuleNames,
   ValidatorNestedRuleFunctionOptions,
+  ValidatorOptionalOrEmptyRuleNames,
   ValidatorResult,
   ValidatorRule,
   ValidatorRuleFunction,
@@ -125,7 +126,7 @@ function markRuleWithSymbol(ruleFunc: any, marker: symbol): void {
  * // Use with decorators
  * class User {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   @IsRequired
@@ -2084,7 +2085,7 @@ export class Validator {
    *
    * class UserForm {
    *   @IsRequired
-   *   @IsEmail
+   *   @IsEmail()
    *   email: string;
    *
    *   @ValidateNested([Address])
@@ -2226,7 +2227,7 @@ export class Validator {
    * ```typescript
    * // Simple nested validation
    * class Contact {
-   *   @IsRequired @IsEmail email: string;
+   *   @IsRequired @IsEmail() email: string;
    *   @IsRequired @IsPhoneNumber phone: string;
    * }
    *
@@ -2304,7 +2305,7 @@ export class Validator {
    * This method supports complex, multi-field validation with field-level error accumulation.
    *
    * ### Key Features
-   * - **Decorator Support**: Uses @IsEmail, @IsRequired, @MinLength, etc. decorators
+   * - **Decorator Support**: Uses @IsEmail(), @IsRequired, @MinLength, etc. decorators
    * - **Multi-FieldMeta Validation**: Validates all decorated properties in parallel
    * - **Error Accumulation**: Collects all field validation errors into a single result
    * - **FieldMeta Mapping**: Maps validated data back to original structure with proper types
@@ -2342,7 +2343,7 @@ export class Validator {
    *
    * ### Supported Decorators
    * - `@IsRequired` / `@IsNullable` / `@IsEmpty` / `@IsOptional` - Conditional rules
-   * - `@IsEmail` / `@IsUrl` / `@IsPhoneNumber()` - Format validators
+   * - `@IsEmail()` / `@IsUrl` / `@IsPhoneNumber()` - Format validators
    * - `@MinLength[n]` / `@MaxLength[n]` - Length validators
    * - `@IsNumber` / `@IsNonNullString` - Type validators
    * - `@ Length[n]` - Exact length validator
@@ -2360,7 +2361,7 @@ export class Validator {
    * ```typescript
    * class UserForm {
    *   @IsRequired
-   *   @IsEmail
+   *   @IsEmail()
    *   email: string;
    *
    *   @IsRequired
@@ -2623,7 +2624,7 @@ export class Validator {
           fieldName: propertyKey,
           propertyName: propertyKey,
           rules: targetRules[propertyKey],
-          fieldLabel: defaultStr(translatedPropertyName, propertyKey),
+          fieldLabel: translatedPropertyName,
         }).then((validationResult) => {
           if (validationResult.success) {
             validatedFieldCount++;
@@ -2716,7 +2717,7 @@ export class Validator {
    * ```typescript
    * class User {
    *   @IsRequired
-   *   @IsEmail
+   *   @IsEmail()
    *   email: string;
    *
    *   @IsRequired
@@ -2994,7 +2995,7 @@ export class Validator {
    * })
    * class CustomUser {
    *   @IsRequired
-   *   @IsEmail
+   *   @IsEmail()
    *   email: string;
    * }
    *
@@ -3027,114 +3028,6 @@ export class Validator {
       Reflect.getMetadata(VALIDATOR_TARGET_OPTIONS_METADATA_KEY, target) || {}
     );
   }
-
-  /**
-   * ## Build Rule Decorator Factory
-   *
-   * Creates a decorator factory that can be used to apply validation rules to class
-   * properties. This method provides a way to create reusable decorators from
-   * validation rule functions with enhanced type safety and parameter handling.
-   *
-   * ### Decorator Factory Pattern
-   * The returned function is a decorator factory that accepts parameters and returns
-   * a property decorator. This allows for flexible rule configuration while maintaining
-   * type safety and proper parameter validation.
-   *
-   * ### Parameter Handling
-   * Parameters passed to the decorator factory are automatically forwarded to the
-   * validation rule function during validation. This enables parameterized validation
-   * rules that can be configured at decoration time.
-   *
-   * @example
-   * ```typescript
-   * // Create a custom validation rule
-   * const validateAge = ({ value, ruleParams }) => {
-   *   const [minAge, maxAge] = ruleParams;
-   *   if (value < minAge) return `Must be at least ${minAge} years old`;
-   *   if (value > maxAge) return `Must be no more than ${maxAge} years old`;
-   *   return true;
-   * };
-   *
-   * // Create a decorator factory
-   * const AgeRange = Validator.buildRuleDecorator(validateAge);
-   *
-   * // Use the decorator
-   * class Person {
-   *   @IsRequired
-   *   name: string;
-   *
-   *   @IsRequired
-   *   @IsNumber
-   *   @AgeRange([18, 120])  // Min 18, Max 120
-   *   age: number;
-   * }
-   *
-   * // Create specialized decorators
-   * const IsAdult = AgeRange([18, 150]);
-   * const IsChild = AgeRange([0, 17]);
-   *
-   * class User {
-   *   @IsAdult
-   *   userAge: number;
-   * }
-   *
-   * class Student {
-   *   @IsChild
-   *   studentAge: number;
-   * }
-   * ```
-   *
-   * ### Advanced Usage with Context
-   * ```typescript
-   * // Context-aware validation rule
-   * const validatePermission = ({ value, ruleParams, context }) => {
-   *   const [requiredPermission] = ruleParams;
-   *   const userPermissions = context?.permissions || [];
-   *   return userPermissions.includes(requiredPermission) ||
-   *          `Requires ${requiredPermission} permission`;
-   * };
-   *
-   * const RequiresPermission = Validator.buildRuleDecorator(validatePermission);
-   *
-   * class AdminAction {
-   *   @RequiresPermission(['admin'])
-   *   action: string;
-   *
-   *   @RequiresPermission(['delete', 'modify'])
-   *   destructiveAction: string;
-   * }
-   * ```
-   *
-   * ### Async Rule Decorators
-   * ```typescript
-   * // Async validation rule
-   * const validateUniqueEmail = async ({ value, context }) => {
-   *   const exists = await database.user.findByEmail(value);
-   *   return !exists || 'Email is already registered';
-   * };
-   *
-   * const IsUniqueEmail = Validator.buildRuleDecorator(validateUniqueEmail);
-   *
-   * class Registration {
-   *   @IsRequired
-   *   @IsEmail
-   *   @IsUniqueEmail([])
-   *   email: string;
-   * }
-   * ```
-   *
-   * @template TRuleParams - Array type defining parameter structure for the rule
-   * @template Context - Type of the validation context object
-   *
-   * @param ruleFunction - Validation function that will be wrapped in a decorator
-   *
-   * @returns Decorator factory function that accepts parameters and returns a property decorator
-   *
-   *
-   * @see {@link buildPropertyDecorator} - Lower-level decorator creation
-   * @see {@link registerRule} - Alternative way to create reusable rules
-   * @public
-   */
   /**
    * ## Helper: Normalize Rule Parameters
    * Ensures rule parameters are always in array format for consistent processing
@@ -3146,15 +3039,553 @@ export class Validator {
     return (Array.isArray(params) ? params : [params]) as TRuleParams;
   }
 
+  /**
+   * ## Build Rule Decorator Factory
+   *
+   * **Core Method**: Creates parameterized decorator factories for validation rules.
+   *
+   * This is the primary factory method for building reusable validation decorators
+   * that can accept configuration parameters. It transforms simple validation functions
+   * into TypeScript decorators with full type safety, parameter validation, and
+   * metadata management.
+   *
+   * ### Architecture Overview
+   *
+   * The decorator factory pattern implemented here enables clean, type-safe validation
+   * decorators while maintaining runtime flexibility. The method creates a three-level
+   * function chain:
+   *
+   * 1. **Factory Function** (`buildRuleDecorator(ruleFunction)`)
+   *    - Takes a validation rule function
+   *    - Returns a parameter-accepting function
+   *
+   * 2. **Parameter Function** (`factory(ruleParameters)`)
+   *    - Accepts rule parameters (conditionally optional)
+   *    - Returns a property decorator
+   *
+   * 3. **Property Decorator** (`@Decorator(parameters)`)
+   *    - Attaches validation metadata to class properties
+   *    - Executed at class definition time
+   *
+   * ### Type System Deep Dive
+   *
+   * #### Conditional Parameter Optionality
+   * ```typescript
+   * ValidatorTupleAllowsEmpty<TRuleParams> extends true
+   *   ? (ruleParameters?: TRuleParams) => PropertyDecorator
+   *   : (ruleParameters: TRuleParams) => PropertyDecorator
+   * ```
+   *
+   * The `ValidatorTupleAllowsEmpty` conditional type determines if parameters can be
+   * omitted based on the rule function's parameter structure. Rules that accept empty
+   * arrays (like `IsRequired`) make parameters optional, while rules requiring specific
+   * parameters (like `MinLength`) enforce parameter presence.
+   *
+   * #### Parameter Normalization
+   * All parameters are normalized to array format using `normalizeRuleParams()` to
+   * ensure consistent interfaces for rule functions, regardless of how parameters
+   * were passed to the decorator.
+   *
+   * ### Implementation Flow
+   *
+   * #### Phase 1: Parameter Processing
+   * ```typescript
+   * const finalRuleParameters = ruleParameters ?? ([] as unknown as TRuleParams);
+   * ```
+   * - Handles undefined parameters by defaulting to empty array
+   * - Type assertion ensures type compatibility
+   *
+   * #### Phase 2: Function Enhancement
+   * ```typescript
+   * const enhancedValidatorFunction = function(validationOptions) {
+   *   const enhancedOptions = Object.assign({}, validationOptions);
+   *   enhancedOptions.ruleParams = Validator.normalizeRuleParams(finalRuleParameters);
+   *   return ruleFunction(enhancedOptions);
+   * };
+   * ```
+   * - Creates wrapper function that injects normalized parameters
+   * - Preserves original validation options structure
+   * - Maintains function identity for debugging
+   *
+   * #### Phase 3: Symbol Marker Preservation
+   * ```typescript
+   * if (hasRuleMarker(ruleFunction, VALIDATOR_NESTED_RULE_MARKER)) {
+   *   (enhancedValidatorFunction as any)[VALIDATOR_NESTED_RULE_MARKER] = true;
+   *   (enhancedValidatorFunction as any)[VALIDATOR_NESTED_RULE_PARAMS] = normalizedParams;
+   * }
+   * ```
+   * - Preserves special markers for nested validation rules
+   * - Stores parameters for inspection by advanced validation features
+   * - Essential for `ValidateNested` and similar target-based rules
+   *
+   * #### Phase 4: Decorator Creation
+   * ```typescript
+   * return Validator.buildPropertyDecorator<TRuleParams, Context>(enhancedValidatorFunction);
+   * ```
+   * - Delegates to lower-level decorator creation
+   * - Attaches validation metadata to class properties
+   * - Enables rule accumulation and execution
+   *
+   * ### Rule Function Interface
+   *
+   * Rule functions receive a comprehensive validation context:
+   *
+   * ```typescript
+   * interface ValidationOptions<TRuleParams, Context> {
+   *   value: any;                          // The property value being validated
+   *   ruleParams: TRuleParams;             // Normalized parameter array
+   *   context?: Context;                   // Optional validation context
+   *   fieldName: string;                   // Raw property name
+   *   translatedPropertyName: string;      // Localized property name
+   *   i18n?: II18nService;                 // Internationalization service
+   *   // ... additional validation metadata
+   * }
+   * ```
+   *
+   * **Return Values:**
+   * - `string | false | undefined`: Validation error message or falsy for success
+   * - `Promise<string | false | undefined>`: For async validation rules
+   * - `ValidationResult`: Structured validation result object
+   *
+   * ### Usage Patterns
+   *
+   * #### Basic Parameterized Rules
+   * ```typescript
+   * // Rule function with single parameter
+   * const minLengthRule = ({ value, ruleParams }: ValidationOptions) => {
+   *   const [minLength] = ruleParams;
+   *   return value.length >= minLength || `Must be at least ${minLength} characters`;
+   * };
+   *
+   * // Create decorator factory
+   * const MinLength = Validator.buildRuleDecorator(minLengthRule);
+   *
+   * // Usage with different parameters
+   * class User {
+   *   @MinLength([3])      // Requires 3+ characters
+   *   username: string;
+   *
+   *   @MinLength([8])      // Requires 8+ characters
+   *   password: string;
+   * }
+   * ```
+   *
+   * #### Multi-Parameter Rules
+   * ```typescript
+   * const rangeRule = ({ value, ruleParams }) => {
+   *   const [min, max] = ruleParams;
+   *   if (typeof value !== 'number') return 'Must be a number';
+   *   return (value >= min && value <= max) || `Must be between ${min} and ${max}`;
+   * };
+   *
+   * const InRange = Validator.buildRuleDecorator(rangeRule);
+   *
+   * class Product {
+   *   @InRange([0, 100])     // Percentage: 0-100
+   *   discount: number;
+   *
+   *   @InRange([-90, 90])    // Latitude: -90 to 90
+   *   latitude: number;
+   * }
+   * ```
+   *
+   * #### Context-Aware Rules
+   * ```typescript
+   * interface SecurityContext {
+   *   userRole: 'admin' | 'user' | 'guest';
+   *   permissions: string[];
+   *   organizationId: string;
+   * }
+   *
+   * const requiresPermissionRule = ({ value, ruleParams, context }) => {
+   *   const [requiredPermission] = ruleParams;
+   *   const securityContext = context as SecurityContext;
+   *
+   *   if (!securityContext) return 'Security context required';
+   *   return securityContext.permissions.includes(requiredPermission) ||
+   *          `Requires '${requiredPermission}' permission`;
+   * };
+   *
+   * const RequiresPermission = Validator.buildRuleDecorator<SecurityContext>(requiresPermissionRule);
+   *
+   * class SecureResource {
+   *   @RequiresPermission(['read'])
+   *   publicData: string;
+   *
+   *   @RequiresPermission(['admin'])
+   *   adminData: string;
+   * }
+   * ```
+   *
+   * #### Optional Parameter Rules
+   * ```typescript
+   * // Rule that works with or without parameters
+   * const patternRule = ({ value, ruleParams }) => {
+   *   const [regex, flags] = ruleParams;
+   *
+   *   // Default email pattern if no parameters provided
+   *   const defaultRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   *   const pattern = regex || defaultRegex;
+   *   const regexFlags = flags || 'i';
+   *
+   *   const testRegex = new RegExp(pattern, regexFlags);
+   *   return testRegex.test(value) || 'Invalid format';
+   * };
+   *
+   * const MatchesPattern = Validator.buildRuleDecorator(patternRule);
+   *
+   * class Data {
+   *   @MatchesPattern()                    // Uses default email pattern
+   *   email: string;
+   *
+   *   @MatchesPattern([/^\d{3}-\d{2}-\d{4}$/])  // SSN pattern
+   *   ssn: string;
+   * }
+   * ```
+   *
+   * #### Async Validation Rules
+   * ```typescript
+   * const uniqueEmailRule = async ({ value, context }) => {
+   *   if (!value) return true; // Skip if empty
+   *
+   *   const db = context?.database;
+   *   if (!db) return 'Database context required for uniqueness validation';
+   *
+   *   try {
+   *     const existing = await db.query(
+   *       `SELECT 1 FROM users WHERE email = $1 LIMIT 1`,
+   *       [value]
+   *     );
+   *
+   *     return !existing.rows.length || 'Email address already registered';
+   *   } catch (error) {
+   *     return 'Unable to validate email uniqueness';
+   *   }
+   * };
+   *
+   * const IsUniqueEmail = Validator.buildRuleDecorator(uniqueEmailRule);
+   *
+   * class Registration {
+   *   @IsRequired
+   *   @IsEmail()
+   *   @IsUniqueEmail([])  // Empty array since no parameters needed
+   *   email: string;
+   * }
+   * ```
+   *
+   * ### Advanced Features
+   *
+   * #### Custom Validation Results
+   * ```typescript
+   * const complexRule = ({ value, ruleParams, fieldName }) => {
+   *   const [config] = ruleParams;
+   *
+   *   // Return structured validation result
+   *   return {
+   *     success: false,
+   *     error: {
+   *       message: `Custom validation failed for ${fieldName}`,
+   *       code: 'CUSTOM_VALIDATION_ERROR',
+   *       details: { config, value }
+   *     }
+   *   };
+   * };
+   * ```
+   *
+   * #### Rule Composition
+   * ```typescript
+   * const notEmptyRule = ({ value }) =>
+   *   value != null && value !== '' || 'Field cannot be empty';
+   *
+   * const emailRule = ({ value }) =>
+   *   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || 'Invalid email format';
+   *
+   * // Combine rules in a single decorator
+   * const IsRequiredEmail = Validator.buildRuleDecorator(({ value }) => {
+   *   const notEmpty = notEmptyRule({ value });
+   *   if (notEmpty !== true) return notEmpty;
+   *
+   *   return emailRule({ value });
+   * });
+   *
+   * class Contact {
+   *   @IsRequiredEmail([])  // Combines required + email validation
+   *   primaryEmail: string;
+   * }
+   * ```
+   *
+   * ### Performance Considerations
+   *
+   * #### Memory Efficiency
+   * - Factory functions are created once per rule type, not per usage
+   * - Parameter normalization happens at decoration time, not validation time
+   * - Rule functions are reused across multiple property applications
+   *
+   * #### Runtime Performance
+   * - Validation execution is deferred until `validateTarget()` is called
+   * - Parameter binding happens during decoration, not validation
+   * - No reflection overhead during actual validation
+   *
+   * #### Bundle Size Impact
+   * - Rule functions are tree-shakeable when not used
+   * - Decorator factories have minimal runtime footprint
+   * - Type-only parameters don't affect bundle size
+   *
+   * ### Error Handling & Debugging
+   *
+   * #### Common Issues
+   * ```typescript
+   * // ❌ Wrong: Single value instead of array
+   * @MinLength(5)  // TypeScript error: expected array
+   *
+   * // ✅ Correct: Array parameter
+   * @MinLength([5])
+   * ```
+   *
+   * ```typescript
+   * // ❌ Wrong: Missing parameters for required rule
+   * const RequiredRule = ({ value }) => !!value || 'Required';
+   * const IsRequired = Validator.buildRuleDecorator(RequiredRule);
+   * @IsRequired()  // Runtime error: undefined parameters
+   *
+   * // ✅ Correct: Use buildRuleDecoratorOptional or provide empty array
+   * @IsRequired([])
+   * ```
+   *
+   * #### Debugging Tips
+   * - Use `console.log(ruleParams)` in rule functions to inspect parameters
+   * - Check `hasRuleMarker()` for nested rule identification
+   * - Validate parameter types at rule function entry
+   * - Use meaningful error messages for easier debugging
+   *
+   * ### Integration with Validation System
+   *
+   * #### Rule Accumulation
+   * Multiple decorators on the same property are accumulated:
+   * ```typescript
+   * class RobustField {
+   *   @IsRequired([])      // Rule 1: Required check
+   *   @MinLength([3])      // Rule 2: Length check
+   *   @IsAlphanumeric([])  // Rule 3: Content check
+   *   username: string;
+   * }
+   * ```
+   *
+   * #### Validation Execution Order
+   * - Rules execute in decoration order (top to bottom)
+   * - First failing rule stops validation (unless configured otherwise)
+   * - All rules receive the same validation context
+   *
+   * #### Context Propagation
+   * ```typescript
+   * const result = await Validator.validateTarget(UserClass, {
+   *   data: userData,
+   *   context: { userId: 123, permissions: ['read'] },
+   *   errorMessageBuilder: (field, error) => `${field}: ${error}`
+   * });
+   * ```
+   *
+   * ### Migration Guide
+   *
+   * #### From Manual Decorators
+   * ```typescript
+   * // Before: Manual decorator creation
+   * function MinLength(minLength: number) {
+   *   return function(target: any, propertyKey: string) {
+   *     // Manual metadata attachment...
+   *   };
+   * }
+   *
+   * // After: Using buildRuleDecorator
+   * const minLengthRule = ({ value, ruleParams }) => {
+   *   const [min] = ruleParams;
+   *   return value.length >= min || `Too short`;
+   * };
+   * const MinLength = Validator.buildRuleDecorator(minLengthRule);
+   * ```
+   *
+   * #### From Class-Based Validators
+   * ```typescript
+   * // Before: Class-based approach
+   * class MinLengthValidator {
+   *   constructor(private minLength: number) {}
+   *   validate(value: any): string | null {
+   *     return value.length >= this.minLength ? null : 'Too short';
+   *   }
+   * }
+   *
+   * // After: Function-based with buildRuleDecorator
+   * const MinLength = Validator.buildRuleDecorator(
+   *   ({ value, ruleParams }) => {
+   *     const [min] = ruleParams;
+   *     return value.length >= min || 'Too short';
+   *   }
+   * );
+   * ```
+   *
+   * ### Best Practices
+   *
+   * #### Rule Function Design
+   * - Keep rule functions pure and testable
+   * - Use descriptive error messages
+   * - Handle edge cases (null, undefined, empty strings)
+   * - Validate parameter types at function entry
+   * - Return consistent result types
+   *
+   * #### Parameter Design
+   * - Use array parameters for consistency
+   * - Provide sensible defaults for optional parameters
+   * - Document parameter order and types
+   * - Consider parameter validation in rule functions
+   *
+   * #### Performance Optimization
+   * - Avoid expensive operations in frequently-used rules
+   * - Use async rules only when necessary
+   * - Cache expensive computations when possible
+   * - Profile validation performance in production
+   *
+   * #### Type Safety
+   * - Leverage TypeScript's type system fully
+   * - Use strict null checks in rule functions
+   * - Provide accurate type annotations
+   * - Test with strict TypeScript settings
+   *
+   * ### Troubleshooting
+   *
+   * #### "Property 'ruleParams' does not exist"
+   * - Ensure rule function accepts `ValidationOptions` parameter
+   * - Check that parameters are destructured correctly
+   *
+   * #### "Cannot read property '0' of undefined"
+   * - Rule expects parameters but none provided
+   * - Use `buildRuleDecoratorOptional` for optional parameters
+   * - Provide empty array `[]` for no-parameter rules
+   *
+   * #### "Type 'string' is not assignable to type 'TRuleParams'"
+   * - Parameters must be arrays, not single values
+   * - Wrap single parameters: `[value]` instead of `value`
+   *
+   * #### Async rule not working
+   * - Ensure `validateTarget()` is called with `await`
+   * - Check that validation context includes required services
+   * - Verify async rule returns Promise<string | false | undefined>
+   *
+   * ### Related Methods
+   *
+   * - {@link buildRuleDecoratorOptional} - Same as this method but parameters always optional
+   * - {@link buildTargetRuleDecorator} - Specialized for nested class validation
+   * - {@link buildPropertyDecorator} - Low-level decorator creation
+   * - {@link buildMultiRuleDecorator} - For rules with multiple validation functions
+   *
+   * ### See Also
+   *
+   * - {@link ValidatorTupleAllowsEmpty} - Type for conditional parameter optionality
+   * - {@link ValidatorRuleFunction} - Rule function interface
+   * - {@link validateTarget} - Main validation execution method
+   * - {@link ValidationOptions} - Complete validation context interface
+   *
+   * @template TRuleParams - Tuple type defining the exact parameter structure for the rule.
+   *   Must extend `ValidatorRuleParams` (array of unknown). Examples:
+   *   - `[min: number]` - Single numeric parameter
+   *   - `[min: number, max: number]` - Two numeric parameters
+   *   - `[pattern: RegExp, flags?: string]` - Regex with optional flags
+   *   - `[]` - No parameters required
+   *
+   * @template Context - Type of the validation context object passed through the validation chain.
+   *   Defaults to `unknown` if not specified. Common patterns:
+   *   - `SecurityContext` - User permissions and roles
+   *   - `DatabaseContext` - Database connections and transactions
+   *   - `LocalizationContext` - I18n and locale information
+   *   - `{ userId: string; permissions: string[] }` - Inline context type
+   *
+   * @param ruleFunction - The validation rule function to be wrapped in a decorator factory.
+   * @param ruleName - Optional rule name for automatic registration with `Validator.registerRule()`.
+   *   **Only available for rules where parameters are fully optional** (i.e., rules that can be called without arguments).
+   *   This parameter is typed as `ValidatorOptionalOrEmptyRuleNames`, which is a union of rule names
+   *   where `ValidatorTupleAllowsEmpty<TRuleParams>` extends `true`. This includes rules like:
+   *   - `"Required"` - No parameters needed
+   *   - `"Email"` - No parameters needed
+   *   - `"PhoneNumber"` - Optional country code parameter
+   *   - `"Nullable"`, `"Optional"`, `"Empty"` - No parameters needed
+   *
+   *   When provided, the rule function will be automatically registered under this name,
+   *   enabling programmatic rule discovery and string-based rule references in validation configurations.
+   *   This is particularly useful for built-in validation rules that need to be accessible by name
+   *   without requiring function references. Rules with required parameters cannot be registered
+   *   this way since they must always be called with arguments (e.g., `MinLength[5]`, `MaxLength[10]`).
+   *   This function receives normalized validation options and returns validation results.
+   *   Function signature: `(options: ValidationOptions<TRuleParams, Context>) => ValidationResult`
+   *
+   * @returns A decorator factory function that accepts rule parameters and returns a property decorator.
+   *   The factory function signature varies based on `ValidatorTupleAllowsEmpty`:
+   *   - When parameters are required: `(ruleParameters: TRuleParams) => PropertyDecorator`
+   *   - When parameters are optional: `(ruleParameters?: TRuleParams) => PropertyDecorator`
+   *
+   * @example
+   * ```typescript
+   * // Basic usage with required parameters
+   * const minLengthRule = ({ value, ruleParams }) => {
+   *   const [minLength] = ruleParams;
+   *   return value.length >= minLength || `Minimum ${minLength} characters required`;
+   * };
+   *
+   * const MinLength = Validator.buildRuleDecorator(minLengthRule);
+   *
+   * class User {
+   *   @MinLength([8])
+   *   password: string;
+   * }
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Advanced usage with context and custom types
+   * interface DatabaseContext {
+   *   db: DatabaseConnection;
+   *   transaction: Transaction;
+   * }
+   *
+   * const uniqueRule = async ({ value, ruleParams, context }) => {
+   *   const [table, column] = ruleParams;
+   *   const db = (context as DatabaseContext).db;
+   *
+   *   const exists = await db.query(
+   *     `SELECT 1 FROM ${table} WHERE ${column} = $1 LIMIT 1`,
+   *     [value]
+   *   );
+   *
+   *   return !exists.rows.length || `${column} must be unique`;
+   * };
+   *
+   * const IsUnique = Validator.buildRuleDecorator<DatabaseContext>(uniqueRule);
+   *
+   * class User {
+   *   @IsUnique(['users', 'email'])
+   *   email: string;
+   * }
+   * ```
+   *
+   * @since 1.0.0
+   * @public
+   * @category Decorator Factories
+   * @see {@link buildRuleDecoratorOptional}
+   * @see {@link buildTargetRuleDecorator}
+   * @see {@link ValidatorRuleFunction}
+   * @see {@link ValidatorTupleAllowsEmpty}
+   */
   static buildRuleDecorator<
     TRuleParams extends ValidatorRuleParams = ValidatorRuleParams,
     Context = unknown,
-  >(ruleFunction: ValidatorRuleFunction<TRuleParams, Context>) {
-    return function (
-      ruleParameters: ValidatorTupleAllowsEmpty<TRuleParams> extends true
-        ? TRuleParams
-        : TRuleParams
-    ) {
+  >(
+    ruleFunction: ValidatorRuleFunction<TRuleParams, Context>,
+    ruleName?: ValidatorOptionalOrEmptyRuleNames
+  ): ValidatorTupleAllowsEmpty<TRuleParams> extends true
+    ? (ruleParameters?: TRuleParams) => PropertyDecorator
+    : (ruleParameters: TRuleParams) => PropertyDecorator {
+    if (isNonNullString(ruleName)) {
+      Validator.registerRule(ruleName, ruleFunction);
+    }
+    return function (ruleParameters?: TRuleParams) {
       const finalRuleParameters =
         ruleParameters ?? ([] as unknown as TRuleParams);
       const enhancedValidatorFunction: ValidatorRuleFunction<
@@ -3306,7 +3737,7 @@ export class Validator {
    * **buildRuleDecorator (General Purpose):**
    * - Accepts any array type as ruleParams
    * - Used for property-level validation
-   * - Examples: @MinLength([5]), @IsEmail([]), @Pattern([/regex/])
+   * - Examples: @MinLength([5]), @IsEmail()([]), @Pattern([/regex/])
    * - Rule params can be any values
    *
    * **buildTargetRuleDecorator (Specialized):**
@@ -3547,7 +3978,7 @@ export class Validator {
  * })
  * class DetailedUser {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   @IsRequired
@@ -3574,7 +4005,7 @@ export class Validator {
  * })
  * class AdminUser {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   @CustomRule([
@@ -3607,7 +4038,7 @@ export class Validator {
  * })
  * class InternationalUser {
  *   @IsRequired
- *   @IsEmail
+ *   @IsEmail()
  *   email: string;
  *
  *   preferredLocale?: string;

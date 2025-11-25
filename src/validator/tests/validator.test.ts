@@ -522,7 +522,7 @@ describe('Validator', () => {
     it('should aggregate multiple field errors', async () => {
       // This test would need actual decorators on the class
       class User {
-        @IsEmail
+        @IsEmail()
         email: string = '';
         name: string = '';
       }
@@ -539,7 +539,7 @@ describe('Validator', () => {
 
     it('should include failure metadata', async () => {
       class User {
-        @IsEmail
+        @IsEmail()
         email: string = '';
       }
 

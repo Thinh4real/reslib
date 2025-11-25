@@ -1001,7 +1001,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
       }
 
       class User {
-        @IsEmail
+        @IsEmail()
         email: string = '';
 
         @ValidateNested([Address])
