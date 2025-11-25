@@ -11,6 +11,7 @@ import * as defaultTranslations from '@/translations';
 import { Logger } from '@logger';
 import { Session as session } from '@session/index';
 import { defaultStr } from '@utils/defaultStr';
+import { interpolate } from '@utils/interpolate';
 import { isNonNullString } from '@utils/isNonNullString';
 import { isNullable } from '@utils/isNullable';
 import { isPrimitive } from '@utils/isPrimitive';
@@ -71,7 +72,7 @@ export function Translate(key: string): PropertyDecorator & MethodDecorator {
  * const i18nInstance = I18n.getInstance();
  * i18nInstance.registerTranslations({
  *   en: {
- *     greeting: "Hello, {name}!",
+ *     greeting: "Hello, %{name}!",
  *     farewell: "Goodbye!",
  *   },
  * });
@@ -536,7 +537,7 @@ export class I18n extends I18nJs implements Observable<I18nEvent> {
       if (typeof i18nInterpolate == 'function') {
         return i18nInterpolate(i18n, str, params);
       }
-      return str;
+      return interpolate(str, params);
     };
     return i18n;
   }

@@ -11,11 +11,15 @@
  * console.log(isNativePromise({})); // Output: false
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isNativePromise(p: any): boolean {
-  /**
-   * If the value is a boolean or falsy, it's not a Promise.
-   */
-  if (typeof p === "boolean" || !p || typeof p === "number" || typeof p === "string" || typeof p == "symbol") {
+  if (
+    typeof p === 'boolean' ||
+    !p ||
+    typeof p === 'number' ||
+    typeof p === 'string' ||
+    typeof p == 'symbol'
+  ) {
     return false;
   }
 
@@ -29,7 +33,10 @@ function isNativePromise(p: any): boolean {
   /**
    * If the value's constructor is named 'Promise' or 'AsyncFunction', it's a Promise.
    */
-  if (p.constructor && (p.constructor.name === "Promise" || p.constructor.name === "AsyncFunction")) {
+  if (
+    p.constructor &&
+    (p.constructor.name === 'Promise' || p.constructor.name === 'AsyncFunction')
+  ) {
     return true;
   }
 
@@ -39,7 +46,11 @@ function isNativePromise(p: any): boolean {
   if (p instanceof Promise) {
     return true;
   }
-  if (typeof p?.then == "function" && typeof p?.catch === "function" && typeof p?.finally === "function") {
+  if (
+    typeof p?.then == 'function' &&
+    typeof p?.catch === 'function' &&
+    typeof p?.finally === 'function'
+  ) {
     return true;
   }
 
@@ -48,12 +59,12 @@ function isNativePromise(p: any): boolean {
    */
   return (
     p &&
-    typeof p.constructor === "function" &&
-    Function.prototype.toString.call(p.constructor).replace(/\(.*\)/, "()") ===
+    typeof p.constructor === 'function' &&
+    Function.prototype.toString.call(p.constructor).replace(/\(.*\)/, '()') ===
       Function.prototype.toString
         .call(Function)
-        .replace("Function", "Promise") // replacing Identifier
-        .replace(/\(.*\)/, "()")
+        .replace('Function', 'Promise') // replacing Identifier
+        .replace(/\(.*\)/, '()')
   ); // removing possible FormalParameterList
 }
 
@@ -70,9 +81,12 @@ function isNativePromise(p: any): boolean {
  * console.log(isPromise({})); // Output: false
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isPromise(value: any): boolean {
   /**
    * Check if the value is a native Promise.
    */
-  return value && Object.prototype.toString.call(value) === "[object Promise]" ? true : isNativePromise(value);
+  return value && Object.prototype.toString.call(value) === '[object Promise]'
+    ? true
+    : isNativePromise(value);
 }

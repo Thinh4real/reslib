@@ -14,6 +14,7 @@ import { Primitive } from '../types';
  * isPrimitive({})          // returns false
  * isPrimitive([])          // returns false
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isPrimitive(value: any): value is Primitive {
   return (
     value === null ||

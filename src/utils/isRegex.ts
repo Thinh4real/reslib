@@ -12,6 +12,7 @@
  * console.log(isRegExp({})); // Output: false
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isRegExp(regExp: any): regExp is RegExp {
   /**
    * If the value is an instance of the RegExp constructor, it's a regular expression.
@@ -23,12 +24,17 @@ export function isRegExp(regExp: any): regExp is RegExp {
   /**
    * If the value is not an object or does not have a toString method that includes "RegExp", it's not a regular expression.
    */
-  if (!regExp || typeof regExp !== "object" || !Object.prototype.toString.call(regExp).includes("RegExp")) {
+  if (
+    !regExp ||
+    typeof regExp !== 'object' ||
+    !Object.prototype.toString.call(regExp).includes('RegExp')
+  ) {
     return false;
   }
   try {
     new RegExp(regExp);
     return true;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     return false;
   }

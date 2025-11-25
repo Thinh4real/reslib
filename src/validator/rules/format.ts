@@ -1,10 +1,14 @@
 import { InputFormatter } from '@/inputFormatter';
 import { CountryCode } from '@countries/types';
 import { defaultStr } from '@utils/defaultStr';
+import { isEmail } from '@utils/isEmail';
 import { isNonNullString } from '@utils/isNonNullString';
 import { isUrl } from '@utils/uri';
-import { isEmail } from '@utils/validators/isEmail';
-import { IValidatorResult, IValidatorValidateOptions } from '../types';
+import {
+  IValidatorResult,
+  IValidatorRuleParams,
+  IValidatorValidateOptions,
+} from '../types';
 import { Validator } from '../validator';
 
 /**
@@ -291,6 +295,7 @@ function _JSON({
     try {
       JSON.parse(value);
       resolve(true);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       const message = i18n.t('validator.json', {
         field: translatedPropertyName || fieldName,
@@ -556,8 +561,10 @@ function _IsIP({
           /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
         break;
       default: // 4/6
+        // eslint-disable-next-line no-case-declarations
         const ipv4Regex =
           /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        // eslint-disable-next-line no-case-declarations
         const ipv6Regex =
           /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
         ipRegex = new RegExp(`(?:${ipv4Regex.source})|(?:${ipv6Regex.source})`);
@@ -712,6 +719,7 @@ function _Matches({
   try {
     const regex = new RegExp(ruleParams[0]);
     return regex.test(value) ? true : message;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
   } catch (error) {}
   return message;
 }

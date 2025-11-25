@@ -43,8 +43,6 @@ export function isInteger(x: any): x is number {
 
 export * from './isNullable';
 
-export { isClass } from './isClass';
-
 export { areEquals } from './areEquals';
 export { isEmpty } from './isEmpty';
 

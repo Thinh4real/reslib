@@ -10,7 +10,7 @@ import { isObj } from './object';
 export interface InterpolateOptions {
   /**
    * Custom regex pattern to match placeholders.
-   * Defaults to `\{([^}]+)\}` for `{key}` format.
+   * Defaults to `\%\{([^}]+)\}` for `%{key}` format.
    * The regex should have a capturing group for the key.
    */
   tagRegex?: RegExp;
@@ -35,7 +35,7 @@ export interface InterpolateOptions {
  *
  * This function is particularly useful for internationalization (i18n) and dynamic string formatting,
  * where text templates contain placeholders that need to be replaced with actual values.
- * By default, placeholders are in the format `{key}`, where `key` can be a simple string or a dotted path.
+ * By default, placeholders are in the format `%{key}`, where `key` can be a simple string or a dotted path.
  *
  * If a placeholder's key is not found in the params object or the value is empty,
  * the placeholder is replaced with an empty string.
@@ -46,13 +46,13 @@ export interface InterpolateOptions {
  * @returns The interpolated string with placeholders replaced by their corresponding values.
  *
  * @example
- * // Basic interpolation with default {key} format
- * const result = interpolate("Hello, {name}!", { name: "World" });
+ * // Basic interpolation with default %{key} format
+ * const result = interpolate("Hello, %{name}!", { name: "World" });
  * // Result: "Hello, World!"
  *
  * @example
  * // Multiple placeholders
- * const result = interpolate("User {firstName} {lastName} is {age} years old.", {
+ * const result = interpolate("User %{firstName} %{lastName} is %{age} years old.", {
  *   firstName: "John",
  *   lastName: "Doe",
  *   age: 30
@@ -61,14 +61,14 @@ export interface InterpolateOptions {
  *
  * @example
  * // Missing or empty parameters - placeholders are removed
- * const result = interpolate("Welcome {user} to {location}.", {
+ * const result = interpolate("Welcome %{user} to %{location}.", {
  *   user: "Alice"
  * });
  * // Result: "Welcome Alice to ."
  *
  * @example
  * // Dotted keys (treated as flat keys)
- * const result = interpolate("Contact: {user.email}", {
+ * const result = interpolate("Contact: %{user.email}", {
  *   "user.email": "alice@example.com"
  * });
  * // Result: "Contact: alice@example.com"
@@ -80,21 +80,21 @@ export interface InterpolateOptions {
  *
  * @example
  * // Custom value formatter for uppercase strings
- * const result = interpolate("Hello {name}!", { name: "world" }, {
+ * const result = interpolate("Hello %{name}!", { name: "world" }, {
  *   valueFormatter: (value, tagName) => typeof value === 'string' ? value.toUpperCase() : String(value)
  * });
  * // Result: "Hello WORLD!"
  *
  * @example
  * // Custom value formatter for numbers with currency
- * const result = interpolate("Price: {amount}", { amount: 99.99 }, {
+ * const result = interpolate("Price: %{amount}", { amount: 99.99 }, {
  *   valueFormatter: (value, tagName) => typeof value === 'number' ? `$${value.toFixed(2)}` : String(value)
  * });
  * // Result: "Price: $99.99"
  *
  * @example
  * // Custom value formatter based on tag name
- * const result = interpolate("User: {name}, Age: {age}", { name: "John", age: 25 }, {
+ * const result = interpolate("User: %{name}, Age: %{age}", { name: "John", age: 25 }, {
  *   valueFormatter: (value, tagName) => {
  *     if (tagName === 'age') return `${value} years old`;
  *     return String(value);
@@ -186,8 +186,8 @@ export function interpolate(
   if (!isObj(params) || !params) {
     return processedContent;
   }
-  // Use custom tag regex or default to {key} format
-  const tagRegex = options?.tagRegex || /\{([^}]+)\}/g;
+  // Use custom tag regex or default to %{key} format
+  const tagRegex = options?.tagRegex || /%\{([^}]+)\}/g;
   const usedTags = new Set<string>();
   let match;
   const content = defaultStr(text);
@@ -200,7 +200,7 @@ export function interpolate(
   }
   usedTags.forEach((tagPath) => {
     // Reconstruct the full tag based on the regex pattern
-    // For default {key}, it's {tagPath}
+    // For default %{key}, it's %{tagPath}
     // For custom patterns, we need to build the replacement string
     let tag: string;
     if (options?.tagRegex) {
@@ -241,7 +241,7 @@ export function interpolate(
       });
       return; // Skip the default logic
     } else {
-      tag = `{${tagPath}}`;
+      tag = `%{${tagPath}}`;
     }
     // Look for the value in params using the exact path as key
     // params has keys like "user.firstName", "domain.field", etc.

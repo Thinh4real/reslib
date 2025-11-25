@@ -8,7 +8,7 @@ import {
   AbreviateNumberResult,
 } from '../utils/numbers';
 import { CurrencyUtils } from './index';
-import session from './session';
+import { session } from './session';
 import { Currency } from './types';
 
 describe('Currency Utils', () => {
