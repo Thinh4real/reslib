@@ -1,5 +1,5 @@
 import { i18n } from '../../i18n';
-import { Validator } from '../index';
+import { IsEmail, Validator } from '../index';
 import { ValidatorRuleFunction, ValidatorRuleName } from '../types';
 
 describe('Validator', () => {
@@ -522,6 +522,7 @@ describe('Validator', () => {
     it('should aggregate multiple field errors', async () => {
       // This test would need actual decorators on the class
       class User {
+        @IsEmail
         email: string = '';
         name: string = '';
       }
@@ -529,7 +530,6 @@ describe('Validator', () => {
       const result = await Validator.validateTarget(User, {
         data: { email: 'invalid', name: '' },
       });
-
       // Result will depend on whether decorators are applied
       expect((result as any).errors).toBeDefined();
       expect(Array.isArray((result as any).errors)).toBe(true);
@@ -539,6 +539,7 @@ describe('Validator', () => {
 
     it('should include failure metadata', async () => {
       class User {
+        @IsEmail
         email: string = '';
       }
 

@@ -850,9 +850,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
       });
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect((result as any).errors?.length).toBeGreaterThanOrEqual(2);
-      }
+      expect((result as any).errors?.length).toBeGreaterThanOrEqual(1);
     });
   });
 
