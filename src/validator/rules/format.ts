@@ -6,6 +6,8 @@ import { isNonNullString } from '@utils/isNonNullString';
 import { isUrl } from '@utils/uri';
 import { ValidatorResult, ValidatorValidateOptions } from '../types';
 import { Validator } from '../validator';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import type { ValidatorRuleParams } from '../types';
 
 /**
  * ### IsEmail Decorator
@@ -291,7 +293,6 @@ function _JSON({
     try {
       JSON.parse(value);
       resolve(true);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       const message = i18n.t('validator.json', {
         field: translatedPropertyName || fieldName,
@@ -715,7 +716,7 @@ function _Matches({
   try {
     const regex = new RegExp(ruleParams[0]);
     return regex.test(value) ? true : message;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
+    // eslint-disable-next-line no-empty
   } catch (error) {}
   return message;
 }

@@ -4,6 +4,8 @@ import { ValidatorResult, ValidatorValidateOptions } from '../types';
 import { Validator } from '../validator';
 import { toNumber } from './utils';
 
+import type { ValidatorRuleParams } from '../types';
+
 /**
  * @function compareNumer
  *
@@ -26,6 +28,7 @@ import { toNumber } from './utils';
  * ```
  */
 function compareNumer(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   compare: (value: any, toCompare: any) => boolean,
   translateKey: string,
   { value, ruleParams, i18n, ...rest }: ValidatorValidateOptions

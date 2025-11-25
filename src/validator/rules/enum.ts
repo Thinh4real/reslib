@@ -2,6 +2,8 @@ import { Primitive } from '@/types';
 import { ValidatorResult, ValidatorValidateOptions } from '../types';
 import { Validator } from '../validator';
 
+import type { ValidatorRuleParams } from '../types';
+
 function _IsEnum<T extends Primitive = Primitive>({
   value,
   ruleParams,
@@ -58,6 +60,7 @@ declare module '../types' {
  * @param ruleParams - Allowed parameter values
  * @returns true if ALL values are found in ruleParams, false otherwise
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const allInRules = (value: any, ruleParams: any[]): boolean => {
   // Normalize input to array for uniform processing
   const values = Array.isArray(value) ? value : [value];

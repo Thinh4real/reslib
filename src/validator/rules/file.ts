@@ -1,6 +1,7 @@
-import { ValidatorResult, ValidatorValidateOptions } from '../types';
+import type { ValidatorResult, ValidatorValidateOptions } from '../types';
 import { Validator } from '../validator';
 
+import type { ValidatorRuleParams } from '../types';
 // Type definitions for file objects
 interface FileLike {
   size?: number;
@@ -10,11 +11,13 @@ interface FileLike {
   originalname?: string; // Multer property
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isFileLike(value: any): value is FileLike {
   try {
     if (typeof File !== 'undefined' && File && value instanceof File) {
       return true;
     }
+    // eslint-disable-next-line no-empty
   } catch {}
   return (
     value &&

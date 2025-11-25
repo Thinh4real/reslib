@@ -137,11 +137,13 @@ import { Validator } from '../validator';
  * @public
  */
 // Create the base ValidateNested function
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const validateNestedFunction = function ValidateNested(options: any) {
   return Validator.validateNestedRule(options);
 };
 
 // Mark it with a symbol so it can be reliably identified even in minified code
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (validateNestedFunction as any)[Symbol.for('validatorNestedRuleMarker')] = true;
 
 // Create a wrapper decorator that captures the target class

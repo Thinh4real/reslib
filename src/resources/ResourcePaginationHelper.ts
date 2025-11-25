@@ -1,3 +1,4 @@
+import { Dictionary } from '@/types';
 import { defaultArray } from '@utils/defaultArray';
 import { isNonNullString } from '@utils/isNonNullString';
 import { isNumber } from '@utils/isNumber';
@@ -275,6 +276,7 @@ export class ResourcePaginationHelper {
     count: number,
     queryOptions?: ResourceQueryOptions<DataType>
   ): ResourcePaginationMeta {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { limit, page, skip } =
       ResourcePaginationHelper.normalizePagination(queryOptions);
     count = isNumber(count) ? count : 0;
@@ -485,10 +487,10 @@ export class ResourcePaginationHelper {
    * @template T - The resource data type for type-safe query options
    * @param {Object} req - The request object containing query data from multiple sources
    * @param {string} req.url - The request URL containing query parameters
-   * @param {Record<string, any>} req.headers - Request headers (may include 'x-filters')
-   * @param {Record<string, any>} [req.params] - Route parameters from URL path
-   * @param {Record<string, any>} [req.filters] - Custom filter object
-   * @returns {ResourceQueryOptions<T> & {queryParams: Record<string, any>}} Normalized query options with:
+   * @param {Dictionary} req.headers - Request headers (may include 'x-filters')
+   * @param {Dictionary} [req.params] - Route parameters from URL path
+   * @param {Dictionary} [req.filters] - Custom filter object
+   * @returns {ResourceQueryOptions<T> & {queryParams: Dictionary}} Normalized query options with:
    *   - All standard `ResourceQueryOptions<T>` properties
    *   - `queryParams`: Raw parsed query parameters for reference
    *
@@ -632,10 +634,10 @@ export class ResourcePaginationHelper {
    */
   static parseQueryOptions<T = unknown>(req: {
     url: string;
-    headers: Record<string, any>;
-    params?: Record<string, any>;
-    filters?: Record<string, any>;
-  }): ResourceQueryOptions<T> & { queryParams: Record<string, any> } {
+    headers: Dictionary;
+    params?: Dictionary;
+    filters?: Dictionary;
+  }): ResourceQueryOptions<T> & { queryParams: Dictionary } {
     const queryParams = extendObj({}, req?.params, getQueryParams(req?.url));
     const xFilters = extendObj(
       {},
@@ -661,11 +663,12 @@ export class ResourcePaginationHelper {
     const defaultOrderBy = xFilters.orderBy;
     const orderBy = ResourcePaginationHelper.normalizeOrderBy(defaultOrderBy);
     if (orderBy && Object.getSize(orderBy, true) > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (result as any).orderBy = orderBy;
     }
-    const include = defaultArray<any>(xFilters.include);
+    const include = defaultArray(xFilters.include);
     if (include.length) {
-      result.include = include as any;
+      result.include = include;
     }
     const cache = xFilters.cache;
     if (cache !== undefined) {
@@ -691,6 +694,7 @@ export class ResourcePaginationHelper {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const defaultArrayOrStringOrObject = (...args: any[]) => {
   for (const arg of args) {
     if (Array.isArray(arg) && arg.length) {
@@ -706,6 +710,7 @@ const defaultArrayOrStringOrObject = (...args: any[]) => {
   return undefined;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const parseNumber = (value: any) => {
   if (isStringNumber(value)) {
     return Number(value);

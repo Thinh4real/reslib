@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import type { ValidatorRuleParams } from '../types';
 import { ValidatorValidateOptions } from '../types';
 import { Validator } from '../validator';
 
@@ -771,6 +772,7 @@ declare module '../types' {
      *
      * @public
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ArrayContains: ValidatorRuleParams<any[]>;
 
     /**

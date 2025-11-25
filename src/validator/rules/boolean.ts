@@ -1,4 +1,5 @@
 import { defaultStr } from '@/utils';
+import type { ValidatorRuleParams } from '../types';
 import { ValidatorResult, ValidatorValidateOptions } from '../types';
 import { Validator } from '../validator';
 

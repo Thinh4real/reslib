@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { _abreviateNumber, AbreviateNumberResult } from '../numbers';
 
 describe('_abreviateNumber function', () => {

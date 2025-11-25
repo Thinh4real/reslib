@@ -2,6 +2,7 @@ import { defaultStr } from '@utils/defaultStr';
 import { isEmpty } from '@utils/isEmpty';
 import { isNonNullString } from '@utils/isNonNullString';
 import { isNumber } from '@utils/isNumber';
+import type { ValidatorRuleParams } from '../types';
 import { ValidatorResult, ValidatorValidateOptions } from '../types';
 import { Validator } from '../validator';
 import { toNumber } from './utils';
