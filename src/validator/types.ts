@@ -339,8 +339,7 @@ export type ValidatorRule<
  *     never leak alien keys should the utility mis-behave.
  */
 export type ValidatorOptionalOrEmptyRuleNames =
-  ExtractOptionalOrEmptyKeys<ValidatorRuleParamTypes> &
-    keyof ValidatorRuleParamTypes;
+  ExtractOptionalOrEmptyKeys<ValidatorRuleParamTypes>;
 
 /**
  * Helper that returns true when a tuple type allows an empty invocation.
