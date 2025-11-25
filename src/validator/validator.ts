@@ -18,10 +18,10 @@ import {
   ValidatorMultiRuleFunction,
   ValidatorMultiRuleNames,
   ValidatorNestedRuleFunctionOptions,
-  ValidatorRegisteredRules,
   ValidatorResult,
   ValidatorRule,
   ValidatorRuleFunction,
+  ValidatorRuleFunctionsMap,
   ValidatorRuleName,
   ValidatorRuleObject,
   ValidatorRuleParams,
@@ -324,11 +324,11 @@ export class Validator {
    * @see {@link findRegisteredRule} - Find a specific rule
    * @public
    */
-  static getRules<Context = unknown>(): ValidatorRegisteredRules<Context> {
+  static getRules<Context = unknown>(): ValidatorRuleFunctionsMap<Context> {
     const rules = Reflect.getMetadata(Validator.RULES_METADATA_KEY, Validator);
     return isObj(rules)
       ? { ...rules }
-      : ({} as ValidatorRegisteredRules<Context>);
+      : ({} as ValidatorRuleFunctionsMap<Context>);
   }
   /**
    * ## Get Registered Rule
@@ -774,7 +774,7 @@ export class Validator {
    */
   private static parseStringRule<Context = unknown>(
     ruleString: string,
-    registeredRules: ValidatorRegisteredRules<Context>
+    registeredRules: ValidatorRuleFunctionsMap<Context>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
     let ruleName = String(ruleString).trim();
@@ -805,7 +805,7 @@ export class Validator {
   }
   private static parseObjectRule<Context = unknown>(
     rulesObject: ValidatorRuleObject,
-    registeredRules: ValidatorRegisteredRules<Context>
+    registeredRules: ValidatorRuleFunctionsMap<Context>
   ): ValidatorSanitizedRuleObject<ValidatorDefaultArray, Context>[] {
     const result: ValidatorSanitizedRuleObject<
       ValidatorDefaultArray,

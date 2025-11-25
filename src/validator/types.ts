@@ -1043,7 +1043,7 @@ export type ValidatorRuleName = keyof ValidatorRuleParamTypes & string;
  * This interface is used throughout the validator to:
  * - Type-check rule parameters at compile time
  * - Generate {@link ValidatorRuleName} union type
- * - Create {@link ValidatorRegisteredRules} registry type
+ * - Create {@link ValidatorRuleFunctionsMap} registry type
  * - Validate rule definitions in rule implementation files
  *
  * ### Rule Categories
@@ -1113,7 +1113,7 @@ export type ValidatorRuleName = keyof ValidatorRuleParamTypes & string;
  * @public
  * @template Context - Type of the optional validation context
  * @see {@link ValidatorRuleName} - Union type derived from this interface's keys
- * @see {@link ValidatorRegisteredRules} - Registry type using this interface
+ * @see {@link ValidatorRuleFunctionsMap} - Registry type using this interface
  * @see {@link ValidatorRuleParams} - Base parameter type for all rules
  * @see {@link Validator} - Main validator class that uses these rules
  */
@@ -3091,7 +3091,7 @@ export type ValidatorValidateTargetResult<Context = unknown> =
  *
  * ### Example Structure
  * ```typescript
- * const rules: ValidatorRegisteredRules = {
+ * const rules: ValidatorRuleFunctionsMap = {
  *   Required: (params, context) => { /* validation logic *\/ },
  *   Email: (params, context) => { /* email validation *\/ },
  *   MinLength: ([minLen], context) => { /* length validation *\/ },
@@ -3128,7 +3128,7 @@ export type ValidatorValidateTargetResult<Context = unknown> =
  * @see {@link Validator.getRules} - Method that returns this registry
  * @see {@link Validator.validateTarget} - Method that uses this registry
  */
-export type ValidatorRegisteredRules<Context = unknown> = {
+export type ValidatorRuleFunctionsMap<Context = unknown> = {
   [K in ValidatorRuleName]: ValidatorRuleFunction<
     ValidatorRuleParamTypes<Context>[K],
     Context
