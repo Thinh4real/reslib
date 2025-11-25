@@ -41,7 +41,7 @@ Validator.registerRule('Required', function Required(options) {
  * ```
  *
  * @decorator
- * @since 1.0.0
+ *
  * @see {@link IsOptional} - For optional fields
  * @public
  */
@@ -74,7 +74,7 @@ Validator.registerRule('Empty', function Empty() {
  * ```
  *
  * @decorator
- * @since 1.0.0
+ *
  * @public
  */
 export const IsEmpty = Validator.buildPropertyDecorator(['Empty']);
@@ -104,7 +104,7 @@ Validator.registerRule('Nullable', function Nullable() {
  * ```
  *
  * @decorator
- * @since 1.0.0
+ *
  * @public
  */
 export const IsNullable = Validator.buildPropertyDecorator(['Nullable']);
@@ -135,7 +135,7 @@ Validator.registerRule('Optional', function Optional() {
  * ```
  *
  * @decorator
- * @since 1.0.0
+ *
  * @public
  */
 export const IsOptional = Validator.buildPropertyDecorator(['Optional']);

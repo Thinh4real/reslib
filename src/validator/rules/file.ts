@@ -67,7 +67,7 @@ Validator.registerRule('File', _IsFile);
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsFile = Validator.buildPropertyDecorator(['File']);
@@ -140,7 +140,7 @@ Validator.registerRule('MaxFileSize', _MaxFileSize);
  * @param options.ruleParams - Array containing maximum file size in bytes
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const MaxFileSize =
@@ -220,7 +220,7 @@ Validator.registerRule('FileType', _IsFileType);
  * @param options.ruleParams - Array of allowed MIME types
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsFileType = Validator.buildRuleDecorator<string[]>(_IsFileType);
@@ -285,7 +285,7 @@ Validator.registerRule('Image', _Image);
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsImage = Validator.buildPropertyDecorator(['Image']);
@@ -362,7 +362,7 @@ Validator.registerRule('FileExtension', _IsFileExtension);
  * @param options.ruleParams - Array of allowed file extensions
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsFileExtension =
@@ -436,7 +436,7 @@ Validator.registerRule('MinFileSize', _MinFileSize);
  * @param options.ruleParams - Array containing minimum file size in bytes
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const MinFileSize =
@@ -479,7 +479,7 @@ declare module '../types' {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     File: IValidatorRuleParams<[], Context>;
@@ -522,7 +522,7 @@ declare module '../types' {
      * @param options.ruleParams - Array containing maximum file size in bytes
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     MaxFileSize: IValidatorRuleParams<[size: number], Context>;
@@ -565,7 +565,7 @@ declare module '../types' {
      * @param options.ruleParams - Array of allowed MIME types
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     FileType: IValidatorRuleParams<string[], Context>;
@@ -609,7 +609,7 @@ declare module '../types' {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     Image: IValidatorRuleParams<[], Context>;
@@ -652,7 +652,7 @@ declare module '../types' {
      * @param options.ruleParams - Array of allowed file extensions
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     FileExtension: IValidatorRuleParams<string[], Context>;
@@ -695,7 +695,7 @@ declare module '../types' {
      * @param options.ruleParams - Array containing minimum file size in bytes
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     MinFileSize: IValidatorRuleParams<[minSize: number], Context>;

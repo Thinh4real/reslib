@@ -276,7 +276,7 @@ export interface FieldBase<
  *
  * @interface FieldMap
  * @public
- * @since 1.0.0
+ *
  * @see {@link FieldBase} - The base interface that field definitions must extend
  * @see {@link Field} - How field configurations are created from this map
  * @see {@link FieldType} - The union type of all defined field types
@@ -472,7 +472,7 @@ export interface FieldMap {}
  *
  * @interface FieldActionsMap
  * @public
- * @since 1.0.0
+ *
  * @see {@link Field} - How action contexts are used in field definitions
  * @see {@link FieldMap} - The base field configurations that can be overridden
  * @see {@link UppercaseFirst} - Utility for transforming action names
@@ -764,7 +764,7 @@ export interface FieldActionsMap {
  * @template T - The field type (must be a key of FieldMap)
  * @default FieldType
  * @public
- * @since 1.0.0
+ *
  * @see {@link FieldMap} - The interface defining field type configurations
  * @see {@link FieldActionsMap} - The interface defining action contexts
  * @see {@link FieldBase} - The base properties shared by all field types
@@ -1288,7 +1288,7 @@ export type FieldType = keyof FieldMap;
  *
  * @interface Resources
  * @public
- * @since 1.0.0
+ *
  * @see {@link ResourceBase} - The base interface that resource definitions must implement
  * @see {@link ResourceConfig} - How to access individual resource configurations
  * @see {@link ResourceName} - The union type of all defined resource names
@@ -1594,7 +1594,7 @@ type ValidateResource<T> = T extends ResourceBase ? T : never;
  *
  * @type ResourceName
  * @public
- * @since 1.0.0
+ *
  * @see {@link Resources} - The global interface defining all resource configurations
  * @see {@link ResourceConfig} - How to access individual resource configurations
  * @see {@link ResourceActionName} - Action names for specific resources
@@ -1924,7 +1924,7 @@ export type ResourceName = keyof ValidatedResources;
  * @type ResourceConfig
  * @template TResourceName - The name of the resource (must be a key of Resources)
  * @public
- * @since 1.0.0
+ *
  * @see {@link Resources} - The global interface defining all resource configurations
  * @see {@link ResourceName} - Union type of all defined resource names
  * @see {@link ResourceActions} - How to access resource actions with type safety
@@ -2658,7 +2658,7 @@ type GetResourceActionNames<
  *
  * @interface ResourceDefaultActions
  * @public
- * @since 1.0.0
+ *
  * @see {@link ResourceActions} - How these actions are used in resource configurations
  * @see {@link ResourceAction} - The structure of individual actions
  * @see {@link ResourceBase} - How resources define their available actions
@@ -2949,7 +2949,7 @@ export interface ResourceDefaultActions {
  * @template TResourceName - The specific resource name type
  * @template Actions - The record of actions for this resource
  * @public
- * @since 1.0.0
+ *
  * @see {@link Resources} - Global interface for resource definitions
  * @see {@link ResourceName} - Union of all valid resource names
  * @see {@link ResourceConfig} - Type-safe resource configuration access

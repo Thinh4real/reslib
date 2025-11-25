@@ -44,7 +44,6 @@ declare module '../types' {
      * @param options.ruleParams - Array containing enum values
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.25.13
      * @public
      */
     Enum: IValidatorRuleParams<Array<Primitive>, Context>;

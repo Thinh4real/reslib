@@ -41,7 +41,7 @@ Validator.registerRule('Array', _Array);
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsArray = Validator.buildPropertyDecorator(['Array']);
@@ -110,7 +110,7 @@ Validator.registerRule('ArrayMinLength', _ArrayMinLength);
  * @param options.ruleParams - Array containing minimum length
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const ArrayMinLength =
@@ -180,7 +180,7 @@ Validator.registerRule('ArrayMaxLength', _ArrayMaxLength);
  * @param options.ruleParams - Array containing maximum length
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const ArrayMaxLength =
@@ -250,7 +250,7 @@ Validator.registerRule('ArrayLength', _ArrayLength);
  * @param options.ruleParams - Array containing exact length
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const ArrayLength = Validator.buildRuleDecorator<[number]>(_ArrayLength);
@@ -328,7 +328,7 @@ Validator.registerRule('ArrayContains', _ArrayContains);
  * @param options.ruleParams - Array of values that must be contained
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const ArrayContains =
@@ -400,7 +400,7 @@ Validator.registerRule('ArrayUnique', _ArrayUnique);
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const ArrayUnique = Validator.buildPropertyDecorator(['ArrayUnique']);
@@ -488,7 +488,7 @@ Validator.registerRule('ArrayAllNumbers', _ArrayAllNumbers);
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const ArrayAllStrings = Validator.buildPropertyDecorator([
@@ -519,7 +519,7 @@ export const ArrayAllStrings = Validator.buildPropertyDecorator([
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const ArrayAllNumbers = Validator.buildPropertyDecorator([
@@ -568,7 +568,7 @@ declare module '../types' {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     Array: IValidatorRuleParams<[], Context>;
@@ -616,7 +616,7 @@ declare module '../types' {
      * @param options.ruleParams - Array containing minimum length
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     ArrayMinLength: IValidatorRuleParams<[minLength: number], Context>;
@@ -664,7 +664,7 @@ declare module '../types' {
      * @param options.ruleParams - Array containing maximum length
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     ArrayMaxLength: IValidatorRuleParams<[maxLength: number], Context>;
@@ -717,7 +717,7 @@ declare module '../types' {
      * @param options.ruleParams - Array containing exact length
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     ArrayLength: IValidatorRuleParams<[length: number], Context>;
@@ -765,7 +765,7 @@ declare module '../types' {
      * @param options.ruleParams - Array of values that must be contained
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     ArrayContains: IValidatorRuleParams<any[], Context>;
@@ -814,7 +814,7 @@ declare module '../types' {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     ArrayUnique: IValidatorRuleParams<[], Context>;
@@ -839,7 +839,7 @@ declare module '../types' {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     ArrayAllStrings: IValidatorRuleParams<[], Context>;
@@ -865,7 +865,7 @@ declare module '../types' {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     ArrayAllNumbers: IValidatorRuleParams<[], Context>;

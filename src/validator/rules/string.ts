@@ -42,7 +42,7 @@ import { toNumber } from './utils';
  * ```
  *
  * @decorator
- * @since 1.0.0
+ *
  * @see {@link IsRequired} - Less strict alternative
  * @public
  */
@@ -282,7 +282,7 @@ Validator.registerRule('EndsWithOneOf', _EndsWith);
  * @param options.ruleParams - Array of valid ending values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const EndsWithOneOf = Validator.buildRuleDecorator<string[]>(_EndsWith);
@@ -376,7 +376,7 @@ Validator.registerRule('String', _String);
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsString = Validator.buildPropertyDecorator<[]>(['String']);
@@ -433,7 +433,7 @@ declare module '../types' {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     String: IValidatorRuleParams<[], Context>;
@@ -479,7 +479,7 @@ declare module '../types' {
      * @param options.ruleParams - Array of valid starting values
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     StartsWithOneOf: IValidatorRuleParams<string[], Context>;
@@ -525,7 +525,7 @@ declare module '../types' {
      * @param options.ruleParams - Array of valid ending values
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     EndsWithOneOf: IValidatorRuleParams<string[], Context>;

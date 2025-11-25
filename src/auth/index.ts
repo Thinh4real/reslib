@@ -426,7 +426,7 @@ export class Auth {
    * @see {@link Session.getToken} - Utility to get user's authentication token
    * @see {@link checkUserPermission} - Check specific user permissions
    *
-   * @since 1.0.0
+   *
    * @public
    *
    * @remarks
@@ -588,7 +588,7 @@ export class Auth {
    * @see {@link Auth.events} - Authentication event system for state change notifications
    * @see {@link AuthEvent} - Available authentication event types and payloads
    *
-   * @since 1.0.0
+   *
    * @public
    * @async
    *
@@ -800,7 +800,7 @@ export class Auth {
    * @see {@link Auth.events} - Authentication event system for state notifications
    * @see {@link isAllowed} - Check user permissions for access control
    *
-   * @since 1.0.0
+   *
    * @public
    * @async
    *
@@ -1019,7 +1019,7 @@ export class Auth {
    * @see {@link AuthEvent} - Authentication event types including 'SIGN_OUT'
    * @see {@link USER_SESSION_KEY} - Storage key used for session data
    *
-   * @since 1.0.0
+   *
    * @public
    * @async
    *
@@ -1178,7 +1178,7 @@ export class Auth {
    * @see {@link checkUserPermission} - Low-level permission checking
    * @see {@link isMasterAdmin} - Master admin detection function
    *
-   * @since 1.0.0
+   *
    * @public
    */
   static isAllowed<TResourceName extends ResourceName = ResourceName>(
@@ -1457,7 +1457,7 @@ export class Auth {
    * @see {@link AuthPerms} - Permission object structure and format
    * @see {@link AuthRole} - Role object structure with embedded permissions
    *
-   * @since 1.0.0
+   *
    * @public
    *
    * @remarks
@@ -1758,7 +1758,7 @@ export class Auth {
    * @see {@link isAllowed} - Comprehensive permission evaluation with multiple formats
    * @see {@link isAllowedForAction} - Action-specific permission matching utility
    *
-   * @since 1.0.0
+   *
    * @public
    *
    * @remarks
@@ -2028,7 +2028,7 @@ export class Auth {
    * @see {@link checkUserPermission} - User-specific permission validation
    * @see {@link isAllowed} - Comprehensive permission evaluation system
    *
-   * @since 1.0.0
+   *
    * @public
    *
    * @remarks
@@ -2269,7 +2269,7 @@ export class Auth {
    * @see {@link getSignedUser} - Method that uses Session for retrieving encrypted user data
    * @see {@link AuthUser} - User interface that may be stored in session
    *
-   * @since 1.0.0
+   *
    * @public
    * @readonly
    *

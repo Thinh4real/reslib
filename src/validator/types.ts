@@ -131,7 +131,7 @@ import { CountryCode } from '@countries/types';
  * ```
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorRuleFunction} - Functions that return this type
  * @see {@link IValidatorValidateResult} - Higher-level validation results
  * @see {@link Validator.validate} - Main validation method
@@ -298,7 +298,7 @@ export type IValidatorResult = boolean | string | Promise<boolean | string>;
  * });
  * ```
  *
- * @since 1.0.0
+ *
  * @see {@link IValidatorRuleFunction} - Function-based rules
  * @see {@link IValidatorRuleName} - Built-in rule names
  * @see {@link IValidatorRuleObject} - Object-based rules
@@ -480,7 +480,7 @@ type ExtractOptionalOrEmptyKeys<T> = {
  * });
  * ```
  *
- * @since 1.0.0
+ *
  * @see {@link IValidatorRule} - Union type that includes this
  * @see {@link IValidatorRuleName} - Valid rule names
  * @see {@link IValidatorRulesMap} - Parameter type definitions
@@ -522,7 +522,7 @@ export type IValidatorRuleObject<Context = unknown> = Partial<{
  * ```
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorRule} - Individual rule type
  * @see {@link IValidatorValidateOptions} - Options interface that uses this type
  * @see {@link Validator.validate} - Validation method that accepts these rules
@@ -607,7 +607,7 @@ export type IValidatorSanitizedRule<
  * @template Context - The type of the optional validation context
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorSanitizedRule} - Union type that includes this interface
  * @see {@link IValidatorRuleFunction} - The validation function type
  * @see {@link IValidatorRuleName} - Rule name type
@@ -812,7 +812,7 @@ export type IValidatorRuleFunction<
  * @template Context - Optional context type for validation (defaults to unknown)
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorRulesMap} - Uses this type for rule parameter definitions
  * @see {@link IValidatorRuleFunction} - Validation function that receives these parameters
  * @see {@link IValidatorRule} - Complete rule definition including this parameter type
@@ -958,7 +958,7 @@ export type IValidatorRuleParams<
  * @template Context - Optional context type for validation (defaults to unknown)
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorValidateTargetOptions} - Base target validation options
  * @see {@link IValidatorValidateOptions} - Single-value validation options
  * @see {@link Validator.validateNestedRule} - Method that uses this interface
@@ -1135,7 +1135,7 @@ export type IValidatorRuleName = keyof IValidatorRulesMap & string;
  * @template Context - Type of the optional validation context (defaults to unknown)
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorRuleName} - Union type derived from this interface's keys
  * @see {@link IValidatorRegisteredRules} - Registry type using this interface
  * @see {@link IValidatorRuleParams} - Base parameter type for all rules
@@ -1614,7 +1614,6 @@ export interface IValidatorValidateOptions<
  * @template Context - Type of the optional validation context object
  *
  * @public
- * @since 1.35.0
  * @see {@link Validator.validateOneOfRule} - Method that uses this interface
  * @see {@link IValidatorValidateOptions} - Base options interface being extended
  * @see {@link IValidatorRuleFunction} - Type of functions in ruleParams array
@@ -1834,7 +1833,7 @@ export type IValidatorValidateTargetData<
  * @template ParamsTypes - Parameter types for validation rules (defaults to IValidatorRuleParams)
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorValidateOptions} - Base options interface being extended
  * @see {@link IValidatorValidateTargetData} - Target data type
  * @see {@link Validator.validateTarget} - Method that uses this interface
@@ -1984,7 +1983,7 @@ export type IValidatorMultiRuleNames = 'OneOf' | 'AllOf';
  * ```
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorValidateFailure} - Single validation failure result
  * @see {@link IValidatorValidateTargetFailure} - Target validation failure result
  * @see {@link Validator.validate} - Method that creates these errors
@@ -2077,7 +2076,7 @@ export interface IValidatorValidationError {
  * @template Context - Type of the optional validation context
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorValidateResult}
  * @see {@link IValidatorValidateFailure}
  * @see {@link Validator.validate}
@@ -2149,7 +2148,7 @@ export interface IValidatorValidateSuccess<Context = unknown>
  * @template Context - Type parameter for optional typed context object
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorValidateOptions} - Options passed to validation
  * @see {@link IValidatorValidateSuccess} - Success result type
  * @see {@link IValidatorValidateFailure} - Failure result type
@@ -2303,7 +2302,7 @@ interface BaseData<Context = unknown> {
  * @template Context - Type of the optional validation context
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorValidateResult}
  * @see {@link IValidatorValidateSuccess}
  * @see {@link IValidatorValidationError}
@@ -2416,7 +2415,7 @@ export interface IValidatorValidateFailure<Context = unknown>
  * ```
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorValidateSuccess} - Success variant
  * @see {@link IValidatorValidateFailure} - Failure variant
  * @see {@link Validator.validate} - Main validation method
@@ -2515,7 +2514,7 @@ export type IValidatorValidateResult<Context = unknown> =
  * @template Context - Type of the optional validation context
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorValidateTargetResult}
  * @see {@link IValidatorValidationError}
  * @see {@link Validator.validateTarget}
@@ -2678,7 +2677,7 @@ export interface IValidatorValidateTargetFailure<Context = unknown>
  * @template Context - Type of the optional validation context
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorValidateTargetResult}
  * @see {@link IValidatorValidateSuccess} - Single-value equivalent
  * @see {@link Validator.validateTarget}
@@ -2819,7 +2818,7 @@ export interface IValidatorValidateTargetSuccess<Context = unknown>
  * @template Context - Type of the optional validation context
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorValidateTargetSuccess} - Success variant
  * @see {@link IValidatorValidateTargetFailure} - Failure variant
  * @see {@link Validator.validateTarget} - Main target validation method
@@ -2892,7 +2891,7 @@ export type IValidatorValidateTargetResult<Context = unknown> =
  * @template Context - Type of the optional validation context object
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link IValidatorRuleName} - Valid rule names (keys of this registry)
  * @see {@link IValidatorRulesMap} - Rule parameter definitions
  * @see {@link IValidatorRuleFunction} - Validation function signature

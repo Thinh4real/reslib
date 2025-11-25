@@ -53,7 +53,7 @@ Validator.registerRule('Date', _Date);
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsDate = Validator.buildPropertyDecorator(['Date']);
@@ -151,7 +151,7 @@ Validator.registerRule('DateAfter', _DateAfter);
  * @param options.ruleParams - Array containing the date to compare against
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsDateAfter =
@@ -250,7 +250,7 @@ Validator.registerRule('DateBefore', _DateBefore);
  * @param options.ruleParams - Array containing the date to compare against
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsDateBefore =
@@ -358,7 +358,7 @@ Validator.registerRule('DateBetween', _DateBetween);
  * @param options.ruleParams - Array containing start date and end date
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsDateBetween =
@@ -471,7 +471,7 @@ Validator.registerRule('SameDate', _IsSameDate);
  * @param options.ruleParams - Array containing the date to compare against
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsSameDate =
@@ -541,7 +541,7 @@ Validator.registerRule('FutureDate', _IsFutureDate);
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsFutureDate = Validator.buildPropertyDecorator<[]>([
@@ -612,7 +612,7 @@ Validator.registerRule('PastDate', _IsPassDate);
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsPastDate = Validator.buildPropertyDecorator<[]>(['PastDate']);
@@ -664,7 +664,7 @@ declare module '../types' {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     Date: IValidatorRuleParams<[], Context>;
@@ -712,7 +712,7 @@ declare module '../types' {
      * @param options.ruleParams - Array containing the date to compare against
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     DateAfter: IValidatorRuleParams<[date: string | Date], Context>;
@@ -760,7 +760,7 @@ declare module '../types' {
      * @param options.ruleParams - Array containing the date to compare against
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     DateBefore: IValidatorRuleParams<[date: string | Date], Context>;
@@ -809,7 +809,7 @@ declare module '../types' {
      * @param options.ruleParams - Array containing start date and end date
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     DateBetween: IValidatorRuleParams<
@@ -860,7 +860,7 @@ declare module '../types' {
      * @param options.ruleParams - Array containing the date to compare against
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     SameDate: IValidatorRuleParams<[date: string | Date], Context>;
@@ -904,7 +904,7 @@ declare module '../types' {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     FutureDate: IValidatorRuleParams<[], Context>;
@@ -948,7 +948,7 @@ declare module '../types' {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     PastDate: IValidatorRuleParams<[], Context>;

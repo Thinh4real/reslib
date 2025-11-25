@@ -60,7 +60,7 @@ function _Boolean({
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsBoolean = Validator.buildPropertyDecorator(['Boolean']);
@@ -110,7 +110,7 @@ declare module '../types' {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     Boolean: IValidatorRuleParams<[], Context>;

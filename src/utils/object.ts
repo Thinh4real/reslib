@@ -106,19 +106,23 @@ import { isRegExp } from './isRegex';
  * 5. **Prototype chain validation**: Ensures the prototype chain is standard
  * 6. **Cross-frame compatibility**: Handles objects from different execution contexts
  *
- * @since 1.0.0
+ *
  * @category Type Guards
  * @see {@link cloneObject} - For cloning plain objects
  * @see {@link extendObj} - For merging plain objects
  * @see {@link defaultObj} - For providing default plain objects
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isObj<T = any>(
   obj: T
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): obj is T extends Record<any, any> | object
   ? T
-  : T extends string | undefined | null | boolean | Array<any>
+  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    T extends string | undefined | null | boolean | Array<any>
     ? never
-    : any {
+    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      any {
   // Early rejection for null, non-objects, and known non-plain object types
   if (
     obj === null ||
@@ -166,7 +170,7 @@ export function isObj<T = any>(
   // where the Object constructor might be different but the object is still plain
   return (
     typeof proto.hasOwnProperty === 'function' &&
-    proto.hasOwnProperty('isPrototypeOf') &&
+    Object.prototype.hasOwnProperty.call(proto, 'isPrototypeOf') &&
     typeof proto.isPrototypeOf === 'function'
   );
 }
@@ -210,6 +214,7 @@ export function isObj<T = any>(
  * console.log(clonedComplex); // Outputs: { a: 1, b: [2, { c: 3 }] }
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function cloneObject<T = any>(source: T): T {
   if (Array.isArray(source)) {
     const clone = [];
@@ -220,6 +225,7 @@ export function cloneObject<T = any>(source: T): T {
   } else if (isObj(source) && source) {
     const clone: Dictionary = {};
     for (var prop in source) {
+      // eslint-disable-next-line no-prototype-builtins
       if (source.hasOwnProperty(prop)) {
         clone[prop] = cloneObject(source[prop]);
       }
@@ -270,6 +276,7 @@ export function cloneObject<T = any>(source: T): T {
  * console.log(nonObjectSize); // Outputs: 0
  */
 export const objectSize = (Object.getSize = function (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   obj: any,
   breakOnFirstElementFound: boolean = false
 ): number {
@@ -299,7 +306,7 @@ export const objectSize = (Object.getSize = function (
     /**
      * If the property is the object's own property, increment the size.
      */
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       size++;
       /**
        * If breakOnFirstElementFound is true, return the size immediately.
@@ -349,6 +356,7 @@ export const objectSize = (Object.getSize = function (
  * console.log(result5); // Outputs: {}
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function defaultObj<T extends object = any>(...args: any[]): T {
   /**
    * If there is only one argument, return it if it's an object, or an empty object if it's not.
@@ -419,6 +427,7 @@ declare global {
      * @param {T} obj - The object to clone.
      * @returns {T} A clone of the object.
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     clone: <T = any>(obj: T) => T;
 
     /**
@@ -449,6 +458,7 @@ declare global {
      * console.log(emptyObjSize); // Outputs: 0
      * ```
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getSize: (obj: any, breakOnFirstElementFound?: boolean) => number;
 
     /**
@@ -513,8 +523,9 @@ declare global {
      * @throws {Error} Will not throw errors, but silently skips non-primitive values
      *
      * @category Utilities
-     * @since 1.0.0
+     *
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     flatten(obj: any): Record<string, Primitive>;
 
     /**
@@ -546,8 +557,9 @@ declare global {
      * - Works best with objects declared with 'as const' for literal type inference
      * - Particularly useful for objects with mixed string and numeric keys
      *
-     * @since 1.0.0
+     *
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     typedEntries<T extends Record<any, unknown> = any>(
       obj: T
     ): Array<{ [K in keyof T]: [K, T[K]] }[keyof T]>;
@@ -589,8 +601,11 @@ declare global {
  * For arrays, The function replaces the contents of the arrays, preserving the original order of the elements.
  * Empty values like null, undefined, and empty strings are ignored.
  */
-export function extendObj<T extends Record<string, any> = any>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function extendObj<T extends Record<any, any> = any>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   target: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ...sources: any[]
 ): T {
   const isTargetArray = Array.isArray(target);
@@ -627,6 +642,7 @@ export function extendObj<T extends Record<string, any> = any>(
     //We are sure that target is a plain object and source is a plain object
     // Extend the target with source properties
     for (let j in source) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const srcValue = (source as any)[j];
 
       // Skip undefined values
@@ -634,9 +650,11 @@ export function extendObj<T extends Record<string, any> = any>(
         continue;
       }
       if (srcValue === source) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (target as any)[j] = target; // Point to the target itself
         continue;
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const targetValue = (target as any)[j];
       const isTargetValueArr = Array.isArray(targetValue);
       const isSrcArr = Array.isArray(srcValue);
@@ -644,25 +662,30 @@ export function extendObj<T extends Record<string, any> = any>(
         if (isSrcArr) {
           mergeTwoArray(target[j], srcValue);
         } else {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (target as any)[j] = srcValue;
         }
         continue;
       } else if (!isObj(targetValue)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (target as any)[j] = srcValue;
         continue;
       }
       //here targetValue is a plain object
       if (isSrcArr || !isObj(srcValue)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (target as any)[j] = srcValue;
         continue;
       }
       //here targetValue is a plain object and srcValue is an object, recursively extend them
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (target as any)[j] = extendObj({}, targetValue, srcValue);
     }
   }
   return target as T;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mergeTwoArray = (target: any[], source: any[]) => {
   const sourceLength = source.length;
   let indexCounter = 0;
@@ -758,17 +781,21 @@ const mergeTwoArray = (target: any[], source: any[]) => {
  * @throws {Error} Will not throw errors, but silently skips non-primitive values
  *
  * @category Utilities
- * @since 1.0.0
+ *
  */
 export function flattenObject(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   obj: any,
   options?: FlattenObjectOptions
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Record<string, any> {
   return _flattenObject(obj, '', {}, options);
 }
 function _flattenObject(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   obj: any,
   prefix: string = '',
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   flattened: Record<string, any> = {},
   options?: FlattenObjectOptions
 ): Record<string, Primitive> {
@@ -796,6 +823,7 @@ function _flattenObject(
 
   // Handle Map and WeakMap
   if (obj instanceof Map || obj instanceof WeakMap) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Array.from((obj as Map<any, any>).entries()).forEach(([mapKey, value]) => {
       const newKey = prefix ? `${prefix}[${String(mapKey)}]` : String(mapKey);
       _flattenObject(value, newKey, flattened, options);
@@ -805,6 +833,7 @@ function _flattenObject(
 
   // Handle Array, Set, and WeakSet
   if (Array.isArray(obj) || obj instanceof Set || obj instanceof WeakSet) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const array = Array.isArray(obj) ? obj : Array.from(obj as any);
     array.forEach((value, index) => {
       const newKey = prefix ? `${prefix}[${index}]` : String(index);
@@ -841,6 +870,7 @@ function _flattenObject(
  * isIterableStructure(new Map())           // returns true
  * isIterableStructure({})                  // returns false
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isIterableStructure(value: any): boolean {
   return (
     Array.isArray(value) ||
@@ -880,8 +910,9 @@ export function isIterableStructure(value: any): boolean {
  * - Works best with objects declared with 'as const' for literal type inference
  * - Particularly useful for objects with mixed string and numeric keys
  *
- * @since 1.0.0
+ *
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function typedEntries<T extends Record<any, unknown> = any>(
   obj: T
 ): Array<{ [K in keyof T]: [K, T[K]] }[keyof T]> {
@@ -923,7 +954,7 @@ export interface FlattenObjectOptions {
    * // Result: { 'name': 'John', 'tags': ['developer', 'typescript'], 'scores': [85, 92, 78] }
    * ```
    *
-   * @since 1.0.0
+   *
    */
   skipArrays?: boolean;
 }

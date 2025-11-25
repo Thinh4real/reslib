@@ -1,7 +1,7 @@
-import { defaultBool } from "./defaultBool";
-import { isEmpty } from "./isEmpty";
-import { isNonNullString } from "./isNonNullString";
-import { isNumber } from "./isNumber";
+import { defaultBool } from './defaultBool';
+import { isEmpty } from './isEmpty';
+import { isNonNullString } from './isNonNullString';
+import { isNumber } from './isNumber';
 /**
  * A highly optimized sorting function capable of efficiently handling billions of array elements
  * with support for complex objects and various data types.
@@ -49,7 +49,8 @@ import { isNumber } from "./isNumber";
  * // numbers is still [5, 2, 9, 1, 5, 6]
  * // sortedNumbers is [1, 2, 5, 5, 6, 9]
  */
-export function sortBy<T, V = any>(
+
+export function sortBy<T, V = unknown>(
   data: T[],
   getItemValue: (item: T) => V,
   options: {
@@ -68,9 +69,9 @@ export function sortBy<T, V = any>(
   options = Object.assign({}, options);
   options.direction =
     isNonNullString(options.direction) &&
-    ["asc", "desc"].includes(options.direction)
+    ['asc', 'desc'].includes(options.direction)
       ? options.direction
-      : "asc";
+      : 'asc';
   options.chunkSize =
     isNumber(options.chunkSize) && options.chunkSize > 0
       ? options.chunkSize
@@ -117,7 +118,7 @@ function chunkingMergeSort<T, V>(
   );
 }
 
-function compare<V = any>(
+function compare<V = unknown>(
   valueA: V,
   valueB: V,
   direction: SortOrder,
@@ -126,14 +127,14 @@ function compare<V = any>(
   // Inside our compare function:
   // Special handling for null and undefined
   if (isEmpty(valueA) && isEmpty(valueB)) return 0;
-  if (isEmpty(valueA) && !isEmpty(valueB)) return direction === "asc" ? -1 : 1;
-  if (isEmpty(valueB) && !isEmpty(valueA)) return direction === "asc" ? 1 : -1;
-  if (typeof valueA === "number" && typeof valueB === "number") {
-    return direction === "asc" ? valueA - valueB : valueB - valueA;
+  if (isEmpty(valueA) && !isEmpty(valueB)) return direction === 'asc' ? -1 : 1;
+  if (isEmpty(valueB) && !isEmpty(valueA)) return direction === 'asc' ? 1 : -1;
+  if (typeof valueA === 'number' && typeof valueB === 'number') {
+    return direction === 'asc' ? valueA - valueB : valueB - valueA;
   }
   // Handle different types appropriately
   if (valueA instanceof Date && valueB instanceof Date) {
-    return direction === "asc"
+    return direction === 'asc'
       ? valueA.getTime() - valueB.getTime()
       : valueB.getTime() - valueA.getTime();
   }
@@ -141,10 +142,12 @@ function compare<V = any>(
     valueA = valueA.toString() as V;
     valueB = valueB.toString() as V;
   }
-  if (["boolean", "number", "string"].includes(typeof valueA)) {
+  if (['boolean', 'number', 'string'].includes(typeof valueA)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     valueA = String(valueA) as any;
   }
-  if (["boolean", "number", "string"].includes(typeof valueB)) {
+  if (['boolean', 'number', 'string'].includes(typeof valueB)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     valueB = String(valueB) as any;
   }
   // Convert to strings for general comparison
@@ -154,6 +157,7 @@ function compare<V = any>(
     stringA = stringA.toLowerCase();
     stringB = stringB.toLowerCase();
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return compareStrings(stringA, stringB, direction as any);
 }
 
@@ -167,8 +171,8 @@ function compare<V = any>(
  */
 function compareStrings(a: string, b: string, dir: SortOrder): -1 | 0 | 1 {
   // For empty string checks
-  if (!a && b) return dir === "asc" ? -1 : 1;
-  if (a && !b) return dir === "asc" ? 1 : -1;
+  if (!a && b) return dir === 'asc' ? -1 : 1;
+  if (a && !b) return dir === 'asc' ? 1 : -1;
   if (!a && !b) return 0;
 
   // For non-empty strings
@@ -177,7 +181,7 @@ function compareStrings(a: string, b: string, dir: SortOrder): -1 | 0 | 1 {
   // Normalize to exactly -1, 0, or 1
   const normalizedComparison = comparison < 0 ? -1 : comparison > 0 ? 1 : 0;
   // Apply direction
-  return (dir === "asc" ? normalizedComparison : -normalizedComparison) as
+  return (dir === 'asc' ? normalizedComparison : -normalizedComparison) as
     | -1
     | 0
     | 1;
@@ -217,4 +221,4 @@ function merge<T, V>(
   return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
 }
 
-type SortOrder = "asc" | "desc";
+type SortOrder = 'asc' | 'desc';

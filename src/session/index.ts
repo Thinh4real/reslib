@@ -177,7 +177,7 @@ class Manager {
    * @see {@link Platform.isClientSide} - Platform detection utility
    * @see {@link JsonHelper} - JSON serialization utilities used by storage
    *
-   * @since 1.0.0
+   *
    * @public
    *
    * @remarks
@@ -368,7 +368,7 @@ class Manager {
    * @see {@link Session.set} - Session storage method that uses namespaced keys
    * @see {@link Session.get} - Session retrieval method that uses namespaced keys
    *
-   * @since 1.0.0
+   *
    * @public
    *
    * @remarks
@@ -574,7 +574,7 @@ class Manager {
    * @see {@link isNonNullString} - Validation function used for input checking
    * @see {@link Session} - Session utilities that use the namespaced keys
    *
-   * @since 1.0.0
+   *
    * @public
    *
    * @remarks
@@ -785,7 +785,7 @@ class Manager {
    * @see {@link Session.get} - Method that uses sanitized keys for retrieval
    * @see {@link sanitizeKey} - Standalone function wrapper for this method
    *
-   * @since 1.0.0
+   *
    * @public
    *
    * @remarks
@@ -1074,7 +1074,7 @@ const handleSetValue = (value: any, decycle?: boolean) => {
  * @see {@link SessionStorage} - Interface defining storage contract
  * @see {@link Session.get} - Main session retrieval method that uses this function
  *
- * @since 1.0.0
+ *
  * @internal
  *
  * @remarks
@@ -1312,7 +1312,7 @@ const isValidStorage = (storage?: SessionStorage): boolean => {
  * - **Error Resilience**: Graceful handling of storage failures and edge cases
  *
  * @namespace Session
- * @since 1.0.0
+ *
  * @public
  */
 export const Session = {
@@ -1683,7 +1683,7 @@ export const Session = {
    * @see {@link Manager} - Global session manager configuration
    * @see {@link SessionStorage} - Storage backend interface
    *
-   * @since 1.0.0
+   *
    * @public
    *
    * @remarks
@@ -1935,7 +1935,7 @@ export const Session = {
  * @see {@link Session} - The exported session utilities that use the attached storage
  * @see {@link isValidStorage} - Function used to validate storage implementations
  *
- * @since 1.0.0
+ *
  * @public
  *
  * @remarks

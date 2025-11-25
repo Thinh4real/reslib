@@ -141,7 +141,7 @@ export interface ClassConstructor<T = unknown, D extends any[] = any[]>
  * - Maintaining type relationships and inference
  *
  * @public
- * @since 1.0.0
+ *
  * @see {@link Partial} - Makes all properties optional
  * @see {@link Required} - Makes all properties required
  * @see {@link Pick} - Selects specific properties

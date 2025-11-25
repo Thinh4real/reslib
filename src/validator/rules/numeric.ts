@@ -319,7 +319,7 @@ export const IsNumberDifferentFrom = Validator.buildRuleDecorator<
  * ```
  *
  * @decorator
- * @since 1.0.0
+ *
  * @see {@link IsRequired} - Often used together
  * @public
  */
@@ -413,7 +413,7 @@ function NumberBetween({
  * @param options.ruleParams - Array containing [min, max] values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsNumberBetween =
@@ -521,7 +521,7 @@ Validator.registerRule('DecimalPlaces', DecimalPlaces);
  * @param options.ruleParams - Array with decimal places specification
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const HasDecimalPlaces =
@@ -576,7 +576,7 @@ function _Integer({
  *
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsInteger = Validator.buildPropertyDecorator(['Integer']);
@@ -612,7 +612,7 @@ Validator.registerRule('Integer', _Integer);
  * @returns Promise resolving to `true` when value is an even integer,
  *          rejecting with a localized error message otherwise
  *
- * @since 1.0.0
+ *
  * @public
  */
 function EvenNumber({
@@ -699,7 +699,7 @@ export const IsEvenNumber = Validator.buildPropertyDecorator(['EvenNumber']);
  * @returns Promise resolving to `true` when value is an odd integer,
  *          rejecting with a localized error message otherwise
  *
- * @since 1.0.0
+ *
  * @public
  */
 function OddNumber({
@@ -845,7 +845,7 @@ function MultipleOf({
  * @param options.ruleParams - Array containing the multiple value
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.0.0
+ *
  * @public
  */
 export const IsMultipleOf =
@@ -894,7 +894,7 @@ declare module '../types' {
      * @param options.ruleParams - Array containing [min, max] values
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     NumberBetween: IValidatorRuleParams<[min: number, max: number], Context>;
@@ -944,7 +944,7 @@ declare module '../types' {
      * @param options.ruleParams - Array with decimal places specification
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     DecimalPlaces: IValidatorRuleParams<
@@ -991,7 +991,7 @@ declare module '../types' {
      *
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     Integer: IValidatorRuleParams<[], Context>;
@@ -1016,7 +1016,7 @@ declare module '../types' {
      * ```
      *
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
-     * @since 1.0.0
+     *
      * @public
      */
     EvenNumber: IValidatorRuleParams<[], Context>;
@@ -1072,7 +1072,7 @@ declare module '../types' {
      * @param options.ruleParams - Array containing the multiple value
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.0.0
+     *
      * @public
      */
     MultipleOf: IValidatorRuleParams<[number], Context>;
@@ -1097,7 +1097,7 @@ declare module '../types' {
      * ```
      *
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
-     * @since 1.0.0
+     *
      * @public
      */
     OddNumber: IValidatorRuleParams<[], Context>;

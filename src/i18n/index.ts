@@ -247,7 +247,6 @@ export class I18n extends I18nJs implements Observable<I18nEvent> {
    * @see {@link translateTarget} for translating class properties decorated with @Translate
    * @see {@link t} for translating individual keys with interpolation support
    *
-   * @since 1.20.3
    */
   translateObject<T extends Record<string, string>>(
     object: T,

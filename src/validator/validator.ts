@@ -177,7 +177,7 @@ function markRuleWithSymbol(ruleFunc: any, marker: symbol): void {
  * ```
  *
  * @author Resk Framework Team
- * @since 1.0.0
+ *
  * @version 2.1.0
  * @see {@link https://docs.resk.dev/validation | Validation Documentation}
  * @public
@@ -191,7 +191,7 @@ export class Validator {
    *
    * @private
    * @readonly
-   * @since 1.0.0
+   *
    */
   private static readonly RULES_METADATA_KEY = Symbol('validationRules');
 
@@ -277,7 +277,7 @@ export class Validator {
    * @throws {Error} When ruleName is not a non-empty string
    * @throws {Error} When ruleHandler is not a function
    *
-   * @since 1.0.0
+   *
    * @see {@link findRegisteredRule} - Find a registered rule
    * @see {@link getRules} - Get all registered rules
    * @public
@@ -334,7 +334,7 @@ export class Validator {
    *
    * @returns An immutable copy of all registered validation rules
    *
-   * @since 1.0.0
+   *
    * @see {@link registerRule} - Register a new rule
    * @see {@link findRegisteredRule} - Find a specific rule
    * @public
@@ -397,7 +397,7 @@ export class Validator {
    *
    * @returns The validation rule function if found, undefined otherwise
    *
-   * @since 1.0.0
+   * 
    * @see {@link registerRule} - Register a new validation rule
    * @see {@link getRules} - Get all registered rules
    * @see {@link hasRule} - Check if a rule exists (type guard)
@@ -462,7 +462,7 @@ export class Validator {
    *
    * @returns `true` if the rule exists and ruleName is a valid IValidatorRuleName, `false` otherwise
    *
-   * @since 1.0.0
+   * 
    * @see {@link getRule} - Get the actual rule function
    * @see {@link getRules} - Get all registered rules
    * @see {@link registerRule} - Register a new validation rule
@@ -521,7 +521,7 @@ export class Validator {
    * @returns returns.multiple - Separator for joining multiple error messages
    * @returns returns.single - Separator for single error message formatting
    *
-   * @since 1.0.0
+   *
    * @see {@link validate} - Uses these separators for error formatting
    * @see {@link validateTarget} - Also uses these separators
    * @public
@@ -600,7 +600,7 @@ export class Validator {
    *
    * @returns The validation rule function if found, undefined otherwise
    *
-   * @since 1.0.0
+   *
    * @see {@link registerRule} - Register a new rule
    * @see {@link getRules} - Get all rules
    * @public
@@ -687,7 +687,7 @@ export class Validator {
    * @returns returns.sanitizedRules - Array of standardized, executable rule objects
    * @returns returns.invalidRules - Array of rules that couldn't be processed (unregistered)
    *
-   * @since 1.0.0
+   *
    * @see {@link parseStringRule} - Internal string rule parser
    * @see {@link parseObjectRule} - Internal object rule parser
    * @see {@link validate} - Uses this method for rule processing
@@ -773,7 +773,7 @@ export class Validator {
    * @returns returns.ruleFunction - The actual validation function
    * @returns returns.rawRuleName - The original unparsed rule string
    *
-   * @since 1.0.0
+   *
    * @see {@link parseAndValidateRules} - Public method that uses this parser
    * @private
    */
@@ -1007,7 +1007,7 @@ export class Validator {
    *
    * @throws {Never} This method never throws. All errors are returned in the result object.
    *
-   * @since 1.0.0
+   * 
    * @see {@link validateTarget} - For class-based validation using decorators
    * @see {@link registerRule} - To register custom validation rules
    * @see {@link IValidatorValidateResult} - Result type documentation
@@ -1255,7 +1255,7 @@ export class Validator {
    *
    * @returns `true` if validation should be skipped due to nullable conditions, `false` otherwise
    *
-   * @since 1.0.0
+   *
    * @see {@link validate} - Uses this method to conditionally skip validation
    * @see {@link validateTarget} - Also uses this method for class-based validation
    * @public
@@ -1317,7 +1317,7 @@ export class Validator {
    *   ruleParams: ["Email", "PhoneNumber"],
    * });
    * // res === true when any sub-rule succeeds
-   * @since 1.0.0
+   *
    * @see {@link validateMultiRule}
    */
   static validateOneOfRule<
@@ -1348,7 +1348,7 @@ export class Validator {
    *   ruleParams: ["String", { MinLength: [5] }],
    * });
    * // res === true only if all sub-rules succeed
-   * @since 1.0.0
+   *
    * @see {@link validateMultiRule}
    */
   static validateAllOfRule<
@@ -1383,7 +1383,7 @@ export class Validator {
    *   ruleParams: ["Email"],
    * });
    * // res === true when every item is a valid email
-   * @since 1.0.0
+   *
    */
   static async validateArrayOfRule<
     Context = unknown,
@@ -1573,7 +1573,7 @@ export class Validator {
    * - Performance: Delegates to validateTarget which validates fields in parallel
    * - Error aggregation uses nested field paths for hierarchical clarity
    *
-   * @since 1.0.0
+   *
    * @see {@link validateNested} - Factory function that creates rule functions using this method
    * @see {@link validateTarget} - The underlying class-based validation method (accepts options with data)
    * @see {@link ValidateNested} - Decorator that uses this method via the factory
@@ -1703,7 +1703,7 @@ export class Validator {
    * });
    * // resultAllOf === true
    *
-   * @since 1.0.0
+   *
    * @see {@link validateOneOfRule} - Convenience wrapper applying `OneOf` logic
    * @see {@link validateAllOfRule} - Convenience wrapper applying `AllOf` logic
    * @see {@link oneOf} - Factory to build a reusable `OneOf` rule function
@@ -1919,7 +1919,7 @@ export class Validator {
    * - Supports both built-in rules and custom validation functions
    * - Context is passed through to all sub-rule validations
    *
-   * @since 1.0.0
+   *
    * @see {@link validateOneOfRule} - The underlying validation method
    * @see {@link buildMultiRuleDecorator} - Creates decorators using this method
    * @see {@link registerRule} - Register the returned function as a named rule
@@ -1957,7 +1957,7 @@ export class Validator {
    * const strongStringRule = Validator.allOf(["String", { MinLength: [5] }]);
    * const res = await strongStringRule({ value: "hello" });
    * // res === true
-   * @since 1.0.0
+   *
    * @see {@link validateAllOfRule}
    * @see {@link buildMultiRuleDecorator}
    * @see {@link registerRule}
@@ -1993,7 +1993,7 @@ export class Validator {
    * @example
    * const emails = Validator.arrayOf(["Email"]);
    * const res = await emails({ value: ["a@b.com", "c@d.com"] }); // true
-   * @since 1.0.0
+   *
    */
   static arrayOf<
     Context = unknown,
@@ -2226,7 +2226,7 @@ export class Validator {
    * }
    * ```
    *
-   * @since 1.0.0
+   *
    * @see {@link validateNestedRule} - The underlying validation executor that delegates to validateTarget
    * @see {@link ValidateNested} - Decorator using this factory
    * @see {@link validateTarget} - Multi-field class validation (signature: validateTarget<T, Context>(target, options))
@@ -2528,7 +2528,7 @@ export class Validator {
    * - Error messages use default format: \"[translatedPropertyName] : error\" unless custom builder provided
    * - Integrates with the multi-rule system (OneOf, AllOf, ArrayOf) for field validation
    *
-   * @since 1.0.0
+   *
    * @see {@link validate} - For single-value validation without class schema
    * @see {@link validateNestedRule} - Internal rule handler that delegates to validateTarget
    * @see {@link validateNested} - Factory creating nested validation rule functions
@@ -2740,7 +2740,7 @@ export class Validator {
    *
    * @returns Record mapping property names to their validation rules
    *
-   * @since 1.0.0
+   *
    * @see {@link validateTarget} - Uses this method to get validation rules
    * @see {@link buildPropertyDecorator} - How rules are attached to properties
    * @public
@@ -2810,7 +2810,7 @@ export class Validator {
    *
    * @returns `true` if the property has a ValidateNested rule applied, `false` otherwise
    *
-   * @since 1.0.0
+   *
    * @see {@link getTargetRules} - Get all rules for a target class
    * @see {@link validateNestedRule} - The underlying nested validation method
    * @see {@link ValidateNested} - The decorator that applies nested validation
@@ -2893,7 +2893,7 @@ export class Validator {
    *
    * @returns The nested class constructor if found, undefined otherwise
    *
-   * @since 1.0.0
+   *
    * @see {@link hasValidateNestedRule} - Check if property has ValidateNested rule
    * @see {@link getTargetRules} - Get all rules for a class
    * @public
@@ -2977,7 +2977,7 @@ export class Validator {
    *
    * @returns Validation options object, or empty object if none configured
    *
-   * @since 1.0.0
+   *
    * @see {@link validateTarget} - Uses these options during validation
    * @see {@link ValidationTargetOptions} - Decorator to set these options
    * @public
@@ -3093,7 +3093,7 @@ export class Validator {
    *
    * @returns Decorator factory function that accepts parameters and returns a property decorator
    *
-   * @since 1.0.0
+   *
    * @see {@link buildPropertyDecorator} - Lower-level decorator creation
    * @see {@link registerRule} - Alternative way to create reusable rules
    * @public
@@ -3310,7 +3310,7 @@ export class Validator {
    *   - Attaches target-based validation to class properties
    *   - Works with class validation via validateTarget()
    *
-   * @since 1.0.0
+   *
    * @see {@link buildRuleDecorator} - General-purpose decorator factory
    * @see {@link buildPropertyDecorator} - Low-level decorator creation
    * @see {@link ValidateNested} - Example target rule decorator
@@ -3341,7 +3341,7 @@ export class Validator {
    * @param ruleFunction  The validation rule to wrap
    * @returns A decorator factory that can be invoked **with or without** parameters
    *
-   * @since 1.0.0
+   *
    * @see {@link buildRuleDecorator}
    * @public
    */
@@ -3410,7 +3410,7 @@ export class Validator {
    *
    * @returns Property decorator function that can be applied to class properties
    *
-   * @since 1.0.0
+   *
    * @see {@link buildRuleDecorator} - Higher-level decorator creation
    * @internal
    */
@@ -3565,7 +3565,7 @@ export class Validator {
  *
  * @returns Class decorator function that applies the validation configuration
  *
- * @since 1.0.0
+ *
  * @see {@link validateTarget} - Method that uses these options
  * @see {@link getValidateTargetOptions} - Retrieves configured options
  * @decorator

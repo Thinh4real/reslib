@@ -172,7 +172,7 @@ import { Validator } from '../validator';
  * @throws {string} When all sub-rules fail, throws aggregated error messages joined with semicolons
  * @throws {string} When no sub-rules are provided, throws "invalidRule" error
  *
- * @since 1.0.0
+ *
  * @see {@link Validator.validateOneOfRule} - The underlying validation method
  * @see {@link Validator.buildMultiRuleDecorator} - Factory method that creates this decorator
  * @see {@link Validator.validateTarget} - For class-based validation using decorators
