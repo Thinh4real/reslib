@@ -3061,49 +3061,55 @@ export type ValidatorValidateTargetResult<Context = unknown> =
   | ValidatorValidateTargetFailure<Context>;
 
 /**
- * ## Registered Validation Rules Registry
+ * ## Validator Rule Functions Map
  *
- * A type-safe registry mapping validation rule names to their corresponding validation functions.
- * This mapped type provides compile-time guarantees that only valid rule names can be used
- * to access their associated validation functions.
+ * A type-safe mapped type that creates a lookup table of validation rule names to their corresponding validation functions.
+ * This mapped type provides compile-time guarantees that only valid rule names can be used as keys
+ * to access their associated validation functions, preventing runtime errors from invalid rule lookups.
  *
  * ### Purpose
- * Serves as the central registry for all built-in validation rules in the validator system.
+ * Serves as the central type definition for the validation rule function lookup table in the validator system.
  * Enables type-safe retrieval and execution of validation functions by their string names,
- * preventing runtime errors from invalid rule name lookups.
+ * ensuring that each validation rule has a properly typed function with correct parameters and context.
  *
  * ### Type Structure
  * - **Key**: `ValidatorRuleName` - Valid rule names from {@link ValidatorRuleParamTypes}
- * - **Value**: `ValidatorRuleFunction<Params, Context>` - Corresponding validation function
- * - **Mapped Type**: `[K in ValidatorRuleName]` ensures all rule names have functions
+ * - **Value**: `ValidatorRuleFunction<Params, Context>` - Corresponding validation function with proper typing
+ * - **Mapped Type**: `[K in ValidatorRuleName]` ensures every rule name maps to its function
  *
  * ### Type Safety Benefits
  * - **Compile-time Validation**: Only valid rule names can be used as keys
- * - **Parameter Type Safety**: Each rule function has correctly typed parameters
- * - **Context Propagation**: Context types are properly maintained throughout
- * - **Rule Function Signature**: Ensures consistent function signatures across all rules
+ * - **Parameter Type Safety**: Each rule function has correctly typed parameters based on the rule
+ * - **Context Propagation**: Context types are properly maintained throughout the validation pipeline
+ * - **Function Signature Consistency**: Ensures all rule functions follow the same signature pattern
  *
  * ### Usage in Validator Class
  * This type is primarily used internally by the {@link Validator} class:
- * - {@link Validator.getRules} returns an instance of this type
+ * - {@link Validator.getRules} returns an instance of this mapped type
  * - {@link Validator.validateTarget} uses it to retrieve rule functions by name
- * - Rule execution methods access functions through this registry
+ * - Rule execution methods access functions through this type-safe lookup table
  *
  * ### Example Structure
  * ```typescript
  * const rules: ValidatorRuleFunctionsMap = {
- *   Required: (params, context) => { /* validation logic *\/ },
- *   Email: (params, context) => { /* email validation *\/ },
- *   MinLength: ([minLen], context) => { /* length validation *\/ },
+ *   Required: (params, context) => {
+ *     // validation logic here
+ *   },
+ *   Email: (params, context) => {
+ *     // email validation logic
+ *   },
+ *   MinLength: ([minLen], context) => {
+ *     // length validation logic
+ *   },
  *   // ... all other built-in rules
  * };
  * ```
  *
  * ### Relationship to Other Types
  * - **Source of Keys**: Keys come from {@link ValidatorRuleName} (derived from {@link ValidatorRuleParamTypes})
- * - **Function Signatures**: Values are {@link ValidatorRuleFunction} instances
- * - **Parameter Types**: Parameters typed via {@link ValidatorRuleParamTypes} lookups
- * - **Context**: Context type propagated from generic parameter
+ * - **Function Signatures**: Values are {@link ValidatorRuleFunction} instances with proper generic parameters
+ * - **Parameter Types**: Parameters typed via {@link ValidatorRuleParamTypes} lookups for each specific rule
+ * - **Context**: Context type propagated from generic parameter throughout the validation system
  *
  * ### Runtime Usage
  * ```typescript
@@ -3122,11 +3128,11 @@ export type ValidatorValidateTargetResult<Context = unknown> =
  *
  * @public
  *
- * @see {@link ValidatorRuleName} - Valid rule names (keys of this registry)
+ * @see {@link ValidatorRuleName} - Valid rule names (keys of this map)
  * @see {@link ValidatorRuleParamTypes} - Rule parameter definitions
  * @see {@link ValidatorRuleFunction} - Validation function signature
- * @see {@link Validator.getRules} - Method that returns this registry
- * @see {@link Validator.validateTarget} - Method that uses this registry
+ * @see {@link Validator.getRules} - Method that returns this map
+ * @see {@link Validator.validateTarget} - Method that uses this map
  */
 export type ValidatorRuleFunctionsMap<Context = unknown> = {
   [K in ValidatorRuleName]: ValidatorRuleFunction<
