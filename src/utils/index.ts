@@ -23,10 +23,10 @@ export { uniqid } from './uniqid';
 export * from './uri';
 
 export * from './global';
+export * from './isEmail';
 export { isPrimitive } from './isPrimitive';
 export * from './string';
 export * from './uri';
-export * from './validators';
 
 /**
  * Checks if a value is an integer.
@@ -36,6 +36,7 @@ export * from './validators';
  * @param x The value to check.
  * @returns True if the value is an integer, false otherwise.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isInteger(x: any): x is number {
   return isNumber(x) && isFinite(x) && Math.floor(x) === x;
 }

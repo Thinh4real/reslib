@@ -1,4 +1,4 @@
-export default {
+export const countries = {
   AF: {
     code: 'AF',
     dialCode: '93',

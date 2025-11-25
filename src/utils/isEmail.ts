@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { isNonNullString } from '../isNonNullString';
+import { isNonNullString } from './isNonNullString';
 
 /**
  * Validates whether a given string is a valid email address.
@@ -32,7 +32,10 @@ export function isEmail(email: string): boolean {
   // Trim whitespace
   email = email.trim();
 
-  // Length constraints (RFC 5321)
+  /**
+   * Length constraints (RFC 5321)
+   *https://www.rfc-editor.org/rfc/rfc3696
+   */
   if (email.length > 320) {
     return false;
   }

@@ -1,37 +1,43 @@
-var hasElementType = typeof Element !== "undefined";
-var hasMap = typeof Map === "function";
-var hasSet = typeof Set === "function";
-var hasArrayBuffer = typeof ArrayBuffer === "function" && !!ArrayBuffer.isView;
+let hasElementType = typeof Element !== 'undefined';
+let hasMap = typeof Map === 'function';
+let hasSet = typeof Set === 'function';
+let hasArrayBuffer = typeof ArrayBuffer === 'function' && !!ArrayBuffer.isView;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function equals(a: any, b: any) {
   if (a === b) return true;
-  if (hasArrayBuffer && (ArrayBuffer.isView(a) || a instanceof ArrayBuffer) && (ArrayBuffer.isView(b) || b instanceof ArrayBuffer)) {
-    length = a.byteLength;
+  if (
+    hasArrayBuffer &&
+    (ArrayBuffer.isView(a) || a instanceof ArrayBuffer) &&
+    (ArrayBuffer.isView(b) || b instanceof ArrayBuffer)
+  ) {
+    let length = a.byteLength;
     if (length != b.byteLength) return false;
     // Create typed array views of the ArrayBuffer objects
     const view1 = new Int32Array(a as ArrayBuffer);
     const view2 = new Int32Array(b as ArrayBuffer);
-    for (i = length; i-- !== 0; ) {
+    for (let i = length; i-- !== 0; ) {
       if (view1[i] !== view2[i]) return false;
     }
     return true;
   }
-  if (a && b && typeof a == "object" && typeof b == "object") {
+  if (a && b && typeof a == 'object' && typeof b == 'object') {
     if (a.constructor !== b.constructor) return false;
-    var length, i, keys;
+    let length, i, keys;
     if (Array.isArray(a)) {
       length = a.length;
       if (length != b.length) return false;
       for (i = length; i-- !== 0; ) if (!equals(a[i], b[i])) return false;
       return true;
     }
-    var it;
+    let it;
     if (hasMap && a instanceof Map && b instanceof Map) {
       if (a.size !== b.size) return false;
       it = a.entries();
       while (!(i = it.next()).done) if (!b.has(i.value[0])) return false;
       it = a.entries();
-      while (!(i = it.next()).done) if (!equals(i.value[1], b.get(i.value[0]))) return false;
+      while (!(i = it.next()).done)
+        if (!equals(i.value[1], b.get(i.value[0]))) return false;
       return true;
     }
 
@@ -42,20 +48,35 @@ function equals(a: any, b: any) {
       return true;
     }
 
-    if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
-    if (a.valueOf !== Object.prototype.valueOf && typeof a.valueOf === "function" && typeof b.valueOf === "function") return a.valueOf() === b.valueOf();
-    if (a.toString !== Object.prototype.toString && typeof a.toString === "function" && typeof b.toString === "function") return a.toString() === b.toString();
+    if (a.constructor === RegExp)
+      return a.source === b.source && a.flags === b.flags;
+    if (
+      a.valueOf !== Object.prototype.valueOf &&
+      typeof a.valueOf === 'function' &&
+      typeof b.valueOf === 'function'
+    )
+      return a.valueOf() === b.valueOf();
+    if (
+      a.toString !== Object.prototype.toString &&
+      typeof a.toString === 'function' &&
+      typeof b.toString === 'function'
+    )
+      return a.toString() === b.toString();
 
     keys = Object.keys(a);
     length = keys.length;
     if (length !== Object.keys(b).length) return false;
 
-    for (i = length; i-- !== 0; ) if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+    for (i = length; i-- !== 0; )
+      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
 
     if (hasElementType && a instanceof Element) return false;
 
     for (i = length; i-- !== 0; ) {
-      if ((keys[i] === "_owner" || keys[i] === "__v" || keys[i] === "__o") && a.$$typeof) {
+      if (
+        (keys[i] === '_owner' || keys[i] === '__v' || keys[i] === '__o') &&
+        a.$$typeof
+      ) {
         continue;
       }
       if (!equals(a[keys[i]], b[keys[i]])) return false;
@@ -83,9 +104,11 @@ function equals(a: any, b: any) {
  * areEquals([1, 2], [1, 2]); // true
  * areEquals([1, 2], [1, 3]); // false
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function areEquals(a: any, b: any) {
   try {
     return equals(a, b);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
   } catch (e) {}
   return false;
 }

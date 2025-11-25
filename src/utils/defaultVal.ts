@@ -15,6 +15,7 @@
  * console.log(defaultVal(undefined, undefined)); // Output: undefined
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function defaultVal(...args: any[]) {
   let nullV = undefined;
   for (let i in args) {

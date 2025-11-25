@@ -4,7 +4,7 @@ import { defaultStr } from '@utils/defaultStr';
 import { isNonNullString } from '@utils/isNonNullString';
 import { extendObj, isObj } from '@utils/object';
 import 'reflect-metadata';
-import countries from './countries';
+import { countries } from './countries';
 import { Country, CountryCode } from './types';
 const countriesByDialCodes = {};
 Object.keys(countries).map((countryCode) => {

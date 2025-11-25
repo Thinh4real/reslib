@@ -1,4 +1,4 @@
-import { isNonNullString } from "./isNonNullString";
+import { isNonNullString } from './isNonNullString';
 
 /**
  * Returns the first non-null string value among the provided arguments.
@@ -16,25 +16,14 @@ import { isNonNullString } from "./isNonNullString";
  * console.log(defaultStr(null, null, null)); // Output: ""
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function defaultStr(...args: any[]): string {
-  /**
-   * Iterate over the provided arguments.
-   */
   for (var i in args) {
     const v = args[i];
 
-    /**
-     * Check if the current argument is a non-null string.
-     */
-    if (typeof v === "string" && isNonNullString(v)) {
-      /**
-       * If a non-null string is found, return it immediately.
-       */
+    if (isNonNullString(v)) {
       return v;
     }
   }
-  /**
-   * If no non-null string is found, return an empty string.
-   */
-  return "";
+  return '';
 }

@@ -1,6 +1,6 @@
 import { Currency } from '@/currency/types';
 import { Dictionary } from '@/types';
-import countries from './countries';
+import { countries } from './countries';
 /****
  * @typedef CountryCode
  * The type of the country code.

@@ -200,7 +200,7 @@ const getCurrency: () => Currency = (): Currency => {
   } as Currency;
 };
 
-export default {
+export const session = {
   getFormat: getCurrencyFormat,
   setFormat: setCurrencyFormat,
   setCurrency: setCurrency,

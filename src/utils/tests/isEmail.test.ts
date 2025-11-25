@@ -1,4 +1,4 @@
-import { isEmail } from './isEmail';
+import { isEmail } from '../isEmail';
 
 describe('isEmail', () => {
   describe('Valid email addresses', () => {
@@ -222,6 +222,27 @@ describe('isEmail', () => {
 
     test('should accept @ in quoted local part', () => {
       expect(isEmail('"user@name"@example.com')).toBe(true);
+    });
+  });
+  describe('isEmail', () => {
+    it('should return true for valid email addresses', () => {
+      expect(isEmail('test.name@example.com')).toBe(true);
+      expect(isEmail('test+name@example.co.uk')).toBe(true);
+      expect(isEmail('test_name@sub.example.com')).toBe(true);
+    });
+
+    it('should return false for invalid email addresses', () => {
+      expect(isEmail('test@.com')).toBe(false);
+      expect(isEmail('@example.com')).toBe(false);
+      expect(isEmail('test@example')).toBe(false);
+      expect(isEmail('test@.')).toBe(false);
+    });
+
+    it('should return false for non-string inputs', () => {
+      expect(isEmail(null as any)).toBe(false);
+      expect(isEmail(undefined as any)).toBe(false);
+      expect(isEmail(123 as any)).toBe(false);
+      expect(isEmail({} as any)).toBe(false);
     });
   });
 });

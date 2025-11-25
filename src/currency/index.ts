@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import { defaultStr } from '../utils/defaultStr';
 import { isNonNullString } from '../utils/isNonNullString';
 import { currencies } from './currencies';
-import session from './session';
+import { session } from './session';
 import { Currency, CurrencySymbol } from './types';
 import { isCurrency } from './utils';
 
