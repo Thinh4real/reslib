@@ -2,7 +2,7 @@ import {
   buildPropertyDecorator,
   getDecoratedProperties,
 } from '@/resources/decorators';
-import { ClassConstructor, Dictionary, MakeOptional } from '@/types';
+import { ClassConstructor, Dictionary, MakeOptional, Primitive } from '@/types';
 import {
   defaultStr,
   isEmpty,
@@ -53,32 +53,13 @@ const VALIDATOR_ONEOF_RULE_MARKER = Symbol.for('validatorOneOfRuleMarker');
 const VALIDATOR_ALLOF_RULE_MARKER = Symbol.for('validatorAllOfRuleMarker');
 const VALIDATOR_ARRAYOF_RULE_MARKER = Symbol.for('validatorArrayOfRuleMarker');
 
-/** Array of all multi-rule markers for easy iteration and checking */
-const VALIDATOR_MULTI_RULE_MARKERS = [
-  VALIDATOR_ONEOF_RULE_MARKER,
-  VALIDATOR_ALLOF_RULE_MARKER,
-  VALIDATOR_ARRAYOF_RULE_MARKER,
-];
-
-/**
- * Checks if a rule function has any of the multi-rule markers.
- * Used to reliably detect OneOf, AllOf, or ArrayOf rules even in minified code.
- * @param ruleFunc - The rule function to check
- * @returns true if the function has any multi-rule marker
- */
-function hasMultiRuleMarker(ruleFunc: any): boolean {
-  if (typeof ruleFunc !== 'function') return false;
-  return VALIDATOR_MULTI_RULE_MARKERS.some(
-    (marker) => ruleFunc[marker] === true
-  );
-}
-
 /**
  * Checks if a rule function has a specific marker.
  * @param ruleFunc - The rule function to check
  * @param marker - The marker symbol to check for
  * @returns true if the function has the specified marker
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function hasRuleMarker(ruleFunc: any, marker: symbol): boolean {
   return typeof ruleFunc === 'function' && ruleFunc[marker] === true;
 }
@@ -89,6 +70,7 @@ function hasRuleMarker(ruleFunc: any, marker: symbol): boolean {
  * @returns "oneof" | "allof" | "arrayof" | undefined
  */
 function getMultiRuleType(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ruleFunc: any
 ): 'oneof' | 'allof' | 'arrayof' | undefined {
   if (hasRuleMarker(ruleFunc, VALIDATOR_ONEOF_RULE_MARKER)) return 'oneof';
@@ -208,6 +190,7 @@ export class Validator {
    * @param marker - The marker symbol to apply
    * @internal
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static markRuleWithSymbol(ruleFunc: any, marker: symbol): void {
     markRuleWithSymbol(ruleFunc, marker);
   }
@@ -285,8 +268,7 @@ export class Validator {
    * @public
    */
   static registerRule<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    TParams extends Array<any> = Array<any>,
+    TParams extends ValidatorDefaultArray = ValidatorDefaultArray,
     Context = unknown,
   >(
     ruleName: ValidatorRuleName,
@@ -610,14 +592,16 @@ export class Validator {
    * @public
    */
   static findRegisteredRule<
-    TParams extends Array<any> = Array<any>,
+    TParams extends ValidatorDefaultArray = ValidatorDefaultArray,
     Context = unknown,
   >(
     ruleName: ValidatorRuleName
   ): ValidatorRuleFunction<TParams, Context> | undefined {
     if (!isNonNullString(ruleName)) return undefined;
     const rules = Validator.getRules();
-    return rules[ruleName] as any | undefined;
+    return rules[ruleName] as
+      | ValidatorRuleFunction<TParams, Context>
+      | undefined;
   }
 
   /**
@@ -698,8 +682,10 @@ export class Validator {
    * @public
    */
   static parseAndValidateRules<Context = unknown>(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    inputRules?: ValidatorValidateOptions<Array<any>, Context>['rules']
+    inputRules?: ValidatorValidateOptions<
+      ValidatorDefaultArray,
+      Context
+    >['rules']
   ): {
     sanitizedRules: ValidatorSanitizedRules<Context>;
     invalidRules: ValidatorRules<Context>[];
@@ -712,8 +698,9 @@ export class Validator {
 
     for (const rule of rulesToProcess) {
       if (typeof rule === 'function') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        parsedRules.push(rule as ValidatorRuleFunction<Array<any>, Context>);
+        parsedRules.push(
+          rule as ValidatorRuleFunction<ValidatorDefaultArray, Context>
+        );
       } else if (isNonNullString(rule)) {
         const parsedRule = this.parseStringRule<Context>(rule, registeredRules);
         if (parsedRule) {
@@ -788,6 +775,7 @@ export class Validator {
   private static parseStringRule<Context = unknown>(
     ruleString: string,
     registeredRules: ValidatorRegisteredRules<Context>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): any {
     let ruleName = String(ruleString).trim();
     const ruleParameters: string[] = [];
@@ -818,10 +806,11 @@ export class Validator {
   private static parseObjectRule<Context = unknown>(
     rulesObject: ValidatorRuleObject,
     registeredRules: ValidatorRegisteredRules<Context>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): ValidatorSanitizedRuleObject<Array<any>, Context>[] {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result: ValidatorSanitizedRuleObject<Array<any>, Context>[] = [];
+  ): ValidatorSanitizedRuleObject<ValidatorDefaultArray, Context>[] {
+    const result: ValidatorSanitizedRuleObject<
+      ValidatorDefaultArray,
+      Context
+    >[] = [];
     if (!isObj(rulesObject) || typeof rulesObject !== 'object') {
       return result;
     }
@@ -839,7 +828,7 @@ export class Validator {
             ruleName,
 
             ruleFunction: ruleFunction as ValidatorRuleFunction<
-              Array<any>,
+              ValidatorDefaultArray,
               Context
             >,
             params: ruleParameters,
@@ -1004,7 +993,7 @@ export class Validator {
    * @template Context - Optional type for the validation context object
    *
    * @param options - Validation options (MakeOptional<
-    ValidatorValidateOptions<Array<any>, Context>,
+    ValidatorValidateOptions<ValidatorDefaultArray, Context>,
     "i18n"
   >)
    * @param options.value - The value to validate (required)
@@ -1035,7 +1024,7 @@ export class Validator {
     rules,
     ...extra
   }: MakeOptional<
-    ValidatorValidateOptions<Array<any>, Context>,
+    ValidatorValidateOptions<ValidatorDefaultArray, Context>,
     'i18n'
   >): Promise<ValidatorValidateResult<Context>> {
     const i18n = this.getI18n(extra);
@@ -1076,7 +1065,8 @@ export class Validator {
       return createSuccessResult<Context>(successOrErrorData, startTime);
     }
 
-    if (this.shouldSkipValidation({ value, rules: sanitizedRules })) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (this.shouldSkipValidation({ value, rules: sanitizedRules as any })) {
       // Value meets nullable conditions - validation succeeds
       return createSuccessResult<Context>(successOrErrorData, startTime);
     }
@@ -1088,6 +1078,7 @@ export class Validator {
     return new Promise((resolve) => {
       let index = -1;
       const rulesLength = sanitizedRules.length;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const next = async function (): Promise<any> {
         index++;
         if (index >= rulesLength) {
@@ -1096,16 +1087,18 @@ export class Validator {
         const rule = sanitizedRules[index];
         let ruleName = undefined;
         let rawRuleName: ValidatorRuleName | string | undefined = undefined;
-        let ruleParams: any[] = [];
-        let ruleFunc: ValidatorRuleFunction<Array<any>, Context> | undefined =
-          typeof rule === 'function' ? rule : undefined;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let ruleParams: ValidatorRuleParams<Array<any>, Context>[] = [];
+        let ruleFunc:
+          | ValidatorRuleFunction<ValidatorDefaultArray, Context>
+          | undefined = typeof rule === 'function' ? rule : undefined;
         if (typeof rule === 'object' && isObj(rule)) {
           ruleFunc = rule.ruleFunction;
           ruleParams = Array.isArray(rule.params) ? rule.params : [];
           ruleName = rule.ruleName;
           rawRuleName = rule.rawRuleName;
         } else if (typeof rule == 'function') {
-          ruleName = rule.name as any;
+          ruleName = rule.name as ValidatorRuleName;
           rawRuleName = ruleName;
         }
 
@@ -1131,6 +1124,7 @@ export class Validator {
           value,
           i18n,
         };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleResult = (result: any) => {
           result =
             typeof result === 'string'
@@ -1163,6 +1157,7 @@ export class Validator {
             return resolve(
               createFailureResult(error, successOrErrorData, startTime)
             );
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } else if ((result as any) instanceof Error) {
             const error = createValidationError(stringify(result), {
               value,
@@ -1186,6 +1181,7 @@ export class Validator {
           const arrayOfResult = await Validator.validateArrayOfRule<Context>({
             ...validateOptions,
             startTime,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any);
           return handleResult(arrayOfResult);
         } else if (markerType === 'oneof' || markerType === 'allof') {
@@ -1194,7 +1190,8 @@ export class Validator {
             {
               ...validateOptions,
               startTime,
-            }
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } as any
           );
           return handleResult(oneOrAllResult);
         } else if (
@@ -1208,6 +1205,7 @@ export class Validator {
             ...validateOptions,
             data,
             startTime,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ruleParams: ruleParams as any,
           });
           return handleResult(nestedResult);
@@ -1230,13 +1228,15 @@ export class Validator {
         }
 
         try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const result = await ruleFunc(validateOptions as any);
           return handleResult(result);
         } catch (e) {
           return handleResult(
             typeof e === 'string'
               ? e
-              : (e as any)?.message || e?.toString() || stringify(e)
+              : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (e as any)?.message || e?.toString() || stringify(e)
           );
         }
       };
@@ -1279,15 +1279,16 @@ export class Validator {
     value,
     rules,
   }: {
-    rules: Array<ValidatorRuleName> | ValidatorSanitizedRules<any>;
+    rules: Array<ValidatorRuleName> | ValidatorSanitizedRules;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: any;
   }) {
     // Check for nullable rules - if value meets nullable conditions, skip validation
     if (isEmpty(value) && Array.isArray(rules)) {
       const nullableConditions = {
-        Empty: (value: any) => value === '',
-        Nullable: (value: any) => value === null || value === undefined,
-        Optional: (value: any) => value === undefined,
+        Empty: (value: Primitive) => value === '',
+        Nullable: (value: Primitive) => value === null || value === undefined,
+        Optional: (value: Primitive) => value === undefined,
       };
       for (const rule of rules) {
         if (typeof rule == 'function') {
@@ -1298,9 +1299,9 @@ export class Validator {
           !isNonNullString(ruleName) &&
           typeof rule === 'object' &&
           rule &&
-          isNonNullString((rule as any).ruleName)
+          isNonNullString(rule.ruleName)
         ) {
-          ruleName = (rule as any).ruleName;
+          ruleName = rule.ruleName;
         }
         if (
           ruleName &&
@@ -1455,25 +1456,26 @@ export class Validator {
     });
     return `${header}${single}${failures.join(multiple)}`;
   }
-  static getI18nTranslateOptions({
+  static getI18nTranslateOptions<Context = unknown>({
     fieldName,
     propertyName,
     fieldLabel,
     translatedPropertyName,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context,
-    data,
     ...rest
-  }: Partial<ValidatorValidateOptions<Array<any>, any>>) {
+  }: Partial<ValidatorValidateOptions<ValidatorDefaultArray, Context>>) {
     fieldName = defaultStr(fieldName, propertyName);
     fieldLabel = defaultStr(fieldLabel, translatedPropertyName, fieldName);
-    const r: Partial<ValidatorValidateOptions<Array<any>, any>> = {
-      fieldLabel,
-      translatedPropertyName: defaultStr(translatedPropertyName, fieldLabel),
-      propertyName: defaultStr(propertyName, fieldName),
-      fieldName,
-    };
+    const r: Partial<ValidatorValidateOptions<ValidatorDefaultArray, Context>> =
+      {
+        fieldLabel,
+        translatedPropertyName: defaultStr(translatedPropertyName, fieldLabel),
+        propertyName: defaultStr(propertyName, fieldName),
+        fieldName,
+      };
     if ('data' in rest && rest.data !== undefined) {
-      (r as any).data = rest.data;
+      r.data = rest.data;
     }
     if ('value' in rest) {
       r.value = rest.value;
@@ -1614,6 +1616,7 @@ export class Validator {
     const translateProperties = {
       rule: 'ValidateNested',
       ...this.getI18nTranslateOptions(extra),
+      startTime,
       value,
     };
     // Validate that a nested class was provided
@@ -1639,6 +1642,7 @@ export class Validator {
       ...options,
       data: value,
       parentData: extra.data,
+      startTime,
     });
 
     // If validation succeeded, return true
@@ -1647,9 +1651,11 @@ export class Validator {
     }
 
     // Aggregate nested errors with field path information
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const nestedErrors = (nestedResult as any).errors || [];
     const errorMessages = nestedErrors
       .map(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (err: any) =>
           `[${err.translatedPropertyName ?? err.propertyName}]: ${err.message}`
       )
@@ -1740,6 +1746,7 @@ export class Validator {
       ...extra
     }: ValidatorValidateMultiRuleOptions<Context, RulesFunctions>
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     startTime = isNumber(startTime) ? startTime : Date.now();
     // Special handling for OneOf: validate against each sub-rule in parallel
     const subRules = (
@@ -1760,6 +1767,7 @@ export class Validator {
         ...extra,
         rules: [subRule],
         i18n,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
       //console.log(res, " is rest about validating ", value, "and rule name ", subRule);
       if (res.success) {
@@ -1777,6 +1785,7 @@ export class Validator {
     }
     if (allErrors.length === 0) return true;
     return i18n.t(`validator.${lowerFirst(ruleName)}`, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...this.getI18nTranslateOptions(extra as any),
       value,
       ruleName,
@@ -2276,6 +2285,7 @@ export class Validator {
   }
 
   static isFailure<Context = unknown>(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     result: any
   ): result is ValidatorValidateFailure<Context> {
     return (
@@ -2568,7 +2578,7 @@ export class Validator {
     const targetRules = Validator.getTargetRules<Target>(target);
     const { context, errorMessageBuilder, ...restOptions } = Object.assign(
       {},
-      Validator.getValidateTargetOptions(target) as any,
+      Validator.getValidateTargetOptions(target),
       options
     );
     const data = Object.assign({}, options.data);
@@ -2585,6 +2595,7 @@ export class Validator {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let validatedFieldCount = 0;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const translatedPropertyNames = i18n.translateTarget(target as any, {
       data,
     });
@@ -2597,7 +2608,7 @@ export class Validator {
         continue;
       }
       const translatedPropertyName: string = defaultStr(
-        (translatedPropertyNames as any)[propertyKey],
+        translatedPropertyNames[propertyKey],
         propertyKey
       );
       validationPromises.push(
@@ -2650,16 +2661,19 @@ export class Validator {
       return Promise.all(validationPromises).then(() => {
         const isValidationSuccessful = !validationErrors.length;
         if (isValidationSuccessful) {
-          resolve(
-            createSuccessResult<Context>(
+          resolve({
+            ...createSuccessResult<Context>(
               {
                 data,
                 value: undefined,
                 context,
               },
               startTime
-            ) as any
-          );
+            ),
+            status: 'success',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            data: data as any,
+          });
         } else {
           const message = i18n.translate('validator.failedForNFields', {
             count: validationErrors.length,
@@ -2760,7 +2774,7 @@ export class Validator {
    * @see {@link buildPropertyDecorator} - How rules are attached to properties
    * @public
    */
-  static getTargetRules<T extends ClassConstructor = any>(
+  static getTargetRules<T extends ClassConstructor>(
     target: T
   ): Record<keyof InstanceType<T>, ValidatorRule[]> {
     return getDecoratedProperties(
@@ -2831,7 +2845,7 @@ export class Validator {
    * @see {@link ValidateNested} - The decorator that applies nested validation
    * @public
    */
-  static hasValidateNestedRule<T extends ClassConstructor = any>(
+  static hasValidateNestedRule<T extends ClassConstructor>(
     target: T,
     propertyKey: keyof InstanceType<T>
   ): boolean {
@@ -2847,8 +2861,10 @@ export class Validator {
       if (typeof rule === 'function') {
         return hasRuleMarker(rule, VALIDATOR_NESTED_RULE_MARKER);
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (isObj(rule) && typeof (rule as any).ruleFunction === 'function') {
         return hasRuleMarker(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (rule as any).ruleFunction,
           VALIDATOR_NESTED_RULE_MARKER
         );
@@ -2913,7 +2929,7 @@ export class Validator {
    * @see {@link getTargetRules} - Get all rules for a class
    * @public
    */
-  static getValidateNestedTarget<T extends ClassConstructor = any>(
+  static getValidateNestedTarget<T extends ClassConstructor>(
     target: T,
     propertyKey: keyof InstanceType<T>
   ): ClassConstructor | undefined {
@@ -2931,16 +2947,20 @@ export class Validator {
         hasRuleMarker(rule, VALIDATOR_NESTED_RULE_MARKER)
       ) {
         // Try to get params from the stored params symbol
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const params = (rule as any)[VALIDATOR_NESTED_RULE_PARAMS];
         if (Array.isArray(params) && params.length > 0) {
           return params[0];
         }
       } else if (
         isObj(rule) &&
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         typeof (rule as any).ruleFunction === 'function' &&
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         hasRuleMarker((rule as any).ruleFunction, VALIDATOR_NESTED_RULE_MARKER)
       ) {
         // For object rules, try to get from params
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const ruleParams = (rule as any).params;
         if (Array.isArray(ruleParams) && ruleParams.length > 0) {
           return ruleParams[0];
@@ -2999,6 +3019,7 @@ export class Validator {
    */
   public static getValidateTargetOptions<T extends ClassConstructor>(
     target: T
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): ValidatorValidateTargetOptions<T, any> {
     return Object.assign(
       {},
@@ -3589,8 +3610,10 @@ export class Validator {
  * @public
  */
 export function ValidationTargetOptions(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   validationOptions: ValidatorValidateTargetOptions<any, any>
 ): ClassDecorator {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   return function (targetClass: Function) {
     Reflect.defineMetadata(
       VALIDATOR_TARGET_OPTIONS_METADATA_KEY,
@@ -3603,12 +3626,14 @@ export function ValidationTargetOptions(
 function createValidationError(
   message: string,
   params: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value?: any;
     fieldName?: string;
     propertyName?: string;
     translatedPropertyName?: string;
     ruleName?: ValidatorRuleName;
     rawRuleName?: ValidatorRuleName | string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ruleParams: any[];
   }
 ): ValidatorValidationError {
@@ -3629,8 +3654,9 @@ function createValidationError(
 function createSuccessResult<Context = unknown>(
   options: {
     context?: Context;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: any;
-    data?: Record<string, any>;
+    data?: Dictionary;
   },
   startTime: number
 ): ValidatorValidateSuccess<Context> {
@@ -3663,3 +3689,6 @@ function createFailureResult<Context = unknown>(
     duration: Date.now() - startTime,
   };
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ValidatorDefaultArray = Array<any>;

@@ -1600,12 +1600,113 @@ export interface ValidatorValidateMultiRuleOptions<
 > extends ValidatorValidateOptions<RulesFunctions, Context> {
   startTime?: number;
 }
+/**
+ * ## Default Multi-Rule Type
+ *
+ * A generic type alias representing an array of validation rules with configurable parameter types.
+ * This type serves as the default constraint for multi-rule validation functions that accept
+ * arrays of rules with varying parameter signatures.
+ *
+ * ### Purpose
+ * Provides a flexible type for representing collections of validation rules where each rule
+ * can have different parameter types. Used as a constraint for {@link ValidatorMultiRuleFunction}
+ * and {@link ValidatorValidateMultiRuleOptions} to ensure type safety in multi-rule scenarios.
+ *
+ * ### Type Parameters
+ * - **Context**: Optional context type for validation (defaults to `unknown`)
+ * - **ParamsTypes**: Parameter types for the rules (defaults to `any` for maximum flexibility)
+ *
+ * ### Usage in Multi-Rule Validation
+ * This type is used internally by the validator for operations that process multiple rules
+ * simultaneously, such as "OneOf" and "AllOf" validation patterns.
+ *
+ * ### Example
+ * ```typescript
+ * // Array of rules with different parameter types
+ * const rules: ValidatorDefaultMultiRule = [
+ *   { ruleName: "Required" },                    // No params
+ *   { ruleName: "MinLength", params: [5] },      // Number param
+ *   { ruleName: "Email" },                       // No params
+ * ];
+ * ```
+ *
+ * ### Relationship to Validation System
+ * - **Used by**: {@link ValidatorValidateMultiRuleOptions} as constraint
+ * - **Constrains**: {@link ValidatorMultiRuleFunction} parameter types
+ * - **Enables**: Type-safe multi-rule validation operations
+ *
+ * @template Context - Type of the optional validation context
+ * @template ParamsTypes - Type of rule parameters (defaults to any for flexibility)
+ *
+ * @public
+ *
+ * @see {@link ValidatorValidateMultiRuleOptions} - Uses this as constraint
+ * @see {@link ValidatorMultiRuleFunction} - Function type that accepts this
+ * @see {@link ValidatorRule} - Individual rule type
+ */
 export type ValidatorDefaultMultiRule<
   Context = unknown,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ParamsTypes extends ValidatorRuleParams = any,
 > = Array<ValidatorRule<ParamsTypes, Context>>;
 
+/**
+ * ## Multi-Rule Validation Function Type
+ *
+ * A specialized validation function type for operations that process multiple validation rules
+ * simultaneously. This type is used for complex validation patterns like "OneOf" and "AllOf"
+ * where multiple rules need to be evaluated together.
+ *
+ * ### Purpose
+ * Defines the signature for validation functions that accept arrays of rules as parameters,
+ * enabling advanced validation logic that depends on multiple rule outcomes. Used by
+ * {@link Validator.validateOneOfRule} and {@link Validator.validateAllOfRule} methods.
+ *
+ * ### Type Parameters
+ * - **Context**: Optional context type for validation (defaults to `unknown`)
+ * - **RulesFunctions**: Array type of rules accepted as parameters (constrained by {@link ValidatorDefaultMultiRule})
+ *
+ * ### Function Signature
+ * ```typescript
+ * (options: ValidatorValidateOptions<RulesFunctions, Context>) => ValidatorResult
+ * ```
+ *
+ * ### Usage in Validation System
+ * This type enables the creation of higher-order validation rules that combine multiple
+ * simpler rules with logical operators (AND, OR, etc.).
+ *
+ * ### Example
+ * ```typescript
+ * // OneOf validation function
+ * const validateOneOf: ValidatorMultiRuleFunction = async (options) => {
+ *   const { ruleParams, value } = options;
+ *
+ *   // ruleParams is an array of validation functions
+ *   for (const ruleFunc of ruleParams) {
+ *     const result = await ruleFunc({ ...options, rule: undefined });
+ *     if (result === true) return true; // At least one rule passed
+ *   }
+ *
+ *   return "None of the rules passed validation";
+ * };
+ * ```
+ *
+ * ### Relationship to Validation System
+ * - **Used by**: Multi-rule validation methods in {@link Validator}
+ * - **Constrained by**: {@link ValidatorDefaultMultiRule} for parameter types
+ * - **Returns**: Standard {@link ValidatorResult} for consistency
+ * - **Enables**: Complex validation logic with multiple rules
+ *
+ * @template Context - Type of the optional validation context
+ * @template RulesFunctions - Type of the rules array parameter
+ *
+ * @public
+ *
+ * @see {@link ValidatorDefaultMultiRule} - Constrains the RulesFunctions parameter
+ * @see {@link Validator.validateOneOfRule} - Uses this function type
+ * @see {@link Validator.validateAllOfRule} - Uses this function type
+ * @see {@link ValidatorResult} - Return type
+ */
 export type ValidatorMultiRuleFunction<
   Context = unknown,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1615,6 +1716,86 @@ export type ValidatorMultiRuleFunction<
   >,
 > = ValidatorRuleFunction<RulesFunctions, Context>;
 
+/**
+ * ## Target Validation Data Type
+ *
+ * A mapped type representing the data structure expected for class-based validation using
+ * {@link Validator.validateTarget}. This type creates a partial record mapping class properties
+ * to their values, enabling type-safe validation of entire class instances.
+ *
+ * ### Purpose
+ * Provides compile-time type safety for data passed to {@link Validator.validateTarget} method.
+ * Ensures that the data object matches the structure of the target class constructor, allowing
+ * validation decorators to be applied to class properties with full type checking.
+ *
+ * ### Type Construction
+ * ```typescript
+ * Partial<Record<keyof InstanceType<Target>, any>>
+ * ```
+ * - **Target**: Class constructor type (must extend `ClassConstructor`)
+ * - **InstanceType<Target>**: Properties of the class instance
+ * - **Partial**: All properties are optional (validation fills in defaults)
+ * - **Record<..., any>**: Values can be any type (validation will check)
+ *
+ * ### Usage in Target Validation
+ * ```typescript
+ * class UserForm {
+ *   @IsRequired
+ *   @IsEmail
+ *   email: string;
+ *
+ *   @IsRequired
+ *   @MinLength([3])
+ *   name: string;
+ *
+ *   @IsOptional
+ *   age?: number;
+ * }
+ *
+ * // Type-safe data object
+ * const data: ValidatorValidateTargetData<UserForm> = {
+ *   email: "user@example.com",  // ✓ Matches UserForm.email
+ *   name: "John",               // ✓ Matches UserForm.name
+ *   age: 25,                    // ✓ Matches UserForm.age
+ * };
+ *
+ * const result = await Validator.validateTarget(UserForm, data);
+ * ```
+ *
+ * ### Key Features
+ * - **Partial Mapping**: Not all class properties need to be provided
+ * - **Type Safety**: Property names and types are checked at compile time
+ * - **Decorator Integration**: Works with validation decorators on class properties
+ * - **Flexible Values**: Accepts any value type (validation rules determine validity)
+ *
+ * ### Comparison with Single-Value Validation
+ * | Aspect | Target Data | Single Value |
+ * |--------|-------------|--------------|
+ * | Structure | Object with multiple properties | Single value |
+ * | Validation | Multiple fields simultaneously | One value at a time |
+ * | Type Safety | Class property mapping | Any value type |
+ * | Use Case | Form validation | Field validation |
+ *
+ * ### Runtime Behavior
+ * - **Missing Properties**: Validation decorators determine if properties are required
+ * - **Extra Properties**: Ignored (only decorated properties are validated)
+ * - **Type Coercion**: Values are validated according to decorator rules, not TypeScript types
+ *
+ * ### Relationship to Validation System
+ * - **Used by**: {@link Validator.validateTarget} as input data type
+ * - **Mapped from**: Class constructor type via `InstanceType<Target>`
+ * - **Validated by**: Decorator-based rules on class properties
+ * - **Returns**: {@link ValidatorValidateTargetResult} with validated instance
+ *
+ * @template Target - The class constructor type being validated
+ *
+ * @public
+ *
+ * @see {@link Validator.validateTarget} - Method that accepts this data type
+ * @see {@link ValidatorValidateTargetOptions} - Options type that includes this
+ * @see {@link ValidatorValidateTargetResult} - Result type returned after validation
+ * @see {@link ClassConstructor} - Base constructor type constraint
+ */
 export type ValidatorValidateTargetData<
   Target extends ClassConstructor = ClassConstructor,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1851,6 +2032,73 @@ export interface ValidatorValidateTargetOptions<
   ) => string;
 }
 
+/**
+ * ## Multi-Rule Names Union
+ *
+ * A union type defining the names of validation rules that operate on multiple sub-rules.
+ * These rules combine the results of several validation rules using logical operations.
+ *
+ * ### Purpose
+ * Defines the specific rule names that support multi-rule validation patterns.
+ * These rules allow combining multiple validation conditions with logical operators
+ * like "one of" or "all of", enabling complex validation scenarios.
+ *
+ * ### Supported Multi-Rules
+ * - **'OneOf'**: Passes if at least one of the sub-rules passes (logical OR)
+ * - **'AllOf'**: Passes only if all sub-rules pass (logical AND)
+ *
+ * ### Type Structure
+ * Simple string literal union with two possible values:
+ * ```typescript
+ * 'OneOf' | 'AllOf'
+ * ```
+ *
+ * ### Usage in Validation
+ * Multi-rule names are used in {@link ValidatorMultiRuleFunction} to specify
+ * which logical operation to apply to a collection of validation rules.
+ *
+ * ```typescript
+ * // Example: Email must be valid OR be empty (optional email field)
+ * const rule: ValidatorMultiRuleFunction = (rules, context) => {
+ *   return rules.OneOf([
+ *     rules.Email([], context),
+ *     rules.IsEmpty([], context)
+ *   ]);
+ * };
+ * ```
+ *
+ * ### Relationship to Validation System
+ * - **Used by**: {@link ValidatorMultiRuleFunction} as operation selector
+ * - **Implemented in**: Rule registry as special multi-rule handlers
+ * - **Combines with**: Regular validation rules via logical operations
+ * - **Returns**: Single validation result from multiple rule evaluations
+ *
+ * ### Key Characteristics
+ * - **Logical Operations**: Supports OR ('OneOf') and AND ('AllOf') combinations
+ * - **Rule Composition**: Enables building complex validation logic from simple rules
+ * - **Type Safety**: Compile-time guarantees for valid multi-rule names
+ * - **Extensible**: New logical operations can be added by extending this union
+ *
+ * ### Comparison with Single Rules
+ * | Aspect | Single Rule | Multi-Rule |
+ * |--------|-------------|------------|
+ * | Operation | One condition | Multiple conditions |
+ * | Logic | Direct validation | Logical combination |
+ * | Use Case | Basic validation | Complex conditional validation |
+ * | Example | "IsEmail" | "OneOf(IsEmail, IsEmpty)" |
+ *
+ * ### Runtime Behavior
+ * - **OneOf**: Returns success if any sub-rule passes, failure if all fail
+ * - **AllOf**: Returns success only if all sub-rules pass, failure if any fails
+ * - **Short-circuiting**: May stop evaluation early based on logical operation
+ * - **Error Aggregation**: Collects errors from all evaluated rules
+ *
+ * @public
+ *
+ * @see {@link ValidatorMultiRuleFunction} - Function type that uses these names
+ * @see {@link ValidatorDefaultMultiRule} - Default multi-rule configuration
+ * @see {@link ValidatorRuleName} - General rule names (includes these)
+ */
 export type ValidatorMultiRuleNames = 'OneOf' | 'AllOf';
 /**
  * ## Validation Result Types (Either Pattern)

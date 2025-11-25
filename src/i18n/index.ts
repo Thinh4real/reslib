@@ -27,7 +27,7 @@ import {
 import moment, { LocaleSpecification } from 'moment';
 import 'reflect-metadata';
 import { I18nEvent, I18nTranslation } from '../types/i18n';
-import { Dictionary } from '../types/index';
+import { ClassConstructor, Dictionary } from '../types/index';
 /**
  * A key to store metadata for translations.
  */
@@ -159,8 +159,8 @@ export class I18n extends I18nJs implements Observable<I18nEvent> {
    * @param options The translation options.
    * @returns The translated keys.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type
-  translateTarget<T extends { new (...args: any[]): {} } = any>(
+
+  translateTarget<T extends ClassConstructor>(
     target: T,
     options?: TranslateOptions
   ): Record<keyof T, string> {
@@ -268,8 +268,8 @@ export class I18n extends I18nJs implements Observable<I18nEvent> {
    * @param target the target class
    * @returns the translation keys for the target class
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type
-  static getTargetTanslationKeys<T extends { new (...args: any[]): {} } = any>(
+
+  static getTargetTanslationKeys<T extends ClassConstructor>(
     target: T
   ): Record<keyof T, string> {
     return getDecoratedProperties(target, TRANSLATION_KEY);
