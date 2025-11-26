@@ -116,38 +116,70 @@ describe('Validator Rules', () => {
     });
 
     it('rejects odd integers', async () => {
-      const r = await Validator.getRules().EvenNumber({ value: 7, i18n });
+      const r = await Validator.getRules().EvenNumber({
+        value: 7,
+        i18n,
+        ruleParams: [],
+      });
       expect(r).toBe(i18n.t('validator.evenNumber'));
     });
 
     it('rejects non-integer numeric values with integer message', async () => {
-      const r = await Validator.getRules().EvenNumber({ value: 2.5, i18n });
+      const r = await Validator.getRules().EvenNumber({
+        value: 2.5,
+        i18n,
+        ruleParams: [],
+      });
       expect(r).toBe(i18n.t('validator.integer'));
     });
 
     it('rejects non-numeric inputs with number message', async () => {
-      const r = await Validator.getRules().EvenNumber({ value: 'abc', i18n });
+      const r = await Validator.getRules().EvenNumber({
+        value: 'abc',
+        i18n,
+        ruleParams: [],
+      });
       expect(r).toBe(i18n.t('validator.number'));
     });
   });
 
   describe('OddNumber', () => {
     it('validates odd integers', async () => {
-      const r1 = await Validator.getRules().OddNumber({ value: 1, i18n });
-      const r2 = await Validator.getRules().OddNumber({ value: '7', i18n });
-      const r3 = await Validator.getRules().OddNumber({ value: -5, i18n });
+      const r1 = await Validator.getRules().OddNumber({
+        value: 1,
+        i18n,
+        ruleParams: [],
+      });
+      const r2 = await Validator.getRules().OddNumber({
+        value: '7',
+        i18n,
+        ruleParams: [],
+      });
+      const r3 = await Validator.getRules().OddNumber({
+        value: -5,
+        i18n,
+        ruleParams: [],
+      });
       expect(r1).toBe(true);
       expect(r2).toBe(true);
       expect(r3).toBe(true);
     });
 
     it('rejects even integers', async () => {
-      const r = await Validator.getRules().OddNumber({ value: 10, i18n });
+      const r = await Validator.getRules().OddNumber({
+        value: 10,
+        i18n,
+        ruleParams: [],
+      });
       expect(r).toBe(i18n.t('validator.oddNumber'));
     });
 
     it('rejects non-integer numeric values with integer message', async () => {
-      const r = await Validator.getRules().OddNumber({ value: 3.14, i18n });
+      const r = await Validator.getRules().OddNumber({
+        value: 3.14,
+        i18n,
+        ruleParams: [],
+      });
       expect(r).toBe(i18n.t('validator.integer'));
     });
 
@@ -155,6 +187,7 @@ describe('Validator Rules', () => {
       const r = await Validator.getRules().OddNumber({
         value: null as any,
         i18n,
+        ruleParams: [],
       });
       expect(r).toBe(i18n.t('validator.number'));
     });
@@ -162,12 +195,20 @@ describe('Validator Rules', () => {
 
   describe('required', () => {
     it('should validate if the value is present', () => {
-      const result = Validator.getRules().Required({ value: 'Hello', i18n });
+      const result = Validator.getRules().Required({
+        value: 'Hello',
+        i18n,
+        ruleParams: [],
+      });
       expect(result).toBe(true);
     });
 
     it('should return an error message if the value is not present', () => {
-      const result = Validator.getRules().Required({ value: '', i18n });
+      const result = Validator.getRules().Required({
+        value: '',
+        i18n,
+        ruleParams: [],
+      });
       expect(result).toBe(i18n.t('validator.required'));
     });
   });
@@ -197,6 +238,7 @@ describe('Validator Rules', () => {
       const result = Validator.getRules().Email({
         value: 'test@example.com',
         i18n,
+        ruleParams: [],
       });
       expect(result).toBe(true);
     });
@@ -205,6 +247,7 @@ describe('Validator Rules', () => {
       const result = Validator.getRules().Email({
         value: 'invalid-email',
         i18n,
+        ruleParams: [],
       });
       expect(result).not.toBe(true);
     });
@@ -215,12 +258,17 @@ describe('Validator Rules', () => {
       const result = Validator.getRules().Url({
         value: 'https://example.com',
         i18n,
+        ruleParams: [],
       });
       expect(result).toBe(true);
     });
 
     it('should return an error message if the value is not a valid URL', () => {
-      const result = Validator.getRules().Url({ value: 'invalid-url', i18n });
+      const result = Validator.getRules().Url({
+        value: 'invalid-url',
+        i18n,
+        ruleParams: [],
+      });
       expect(result).not.toBe(true);
     });
   });
@@ -270,6 +318,7 @@ describe('Validator Rules', () => {
       const result = Validator.getRules().FileName({
         value: 'validFileName.txt',
         i18n,
+        ruleParams: [],
       });
       expect(result).toBe(true);
     });
@@ -278,6 +327,7 @@ describe('Validator Rules', () => {
       const result = Validator.getRules().FileName({
         value: 'invalid/file:name.txt',
         i18n,
+        ruleParams: [],
       });
       expect(result).not.toBe(true);
     });
@@ -318,14 +368,14 @@ describe('Validator Rules', () => {
 
       @IsRequired()
       @IsNumberLT(10)
-      @IsNumberGT([5])
+      @IsNumberGT(5)
       @Translate('validator.tests.entity.note')
       note?: number;
 
       @Translate('validator.tests.entity.aString')
       @IsRequired()
       @Length(10)
-      @Length([5, 20])
+      @Length(5, 20)
       aString?: string;
     }
 
@@ -367,17 +417,31 @@ describe('Validator Rules', () => {
     describe('Empty Rule', () => {
       describe('Rule Function', () => {
         it('should always return true (Empty rule always passes)', () => {
-          expect(Validator.getRules().Empty({ value: '', i18n })).toBe(true);
-          expect(Validator.getRules().Empty({ value: null, i18n })).toBe(true);
-          expect(Validator.getRules().Empty({ value: undefined, i18n })).toBe(
-            true
-          );
-          expect(Validator.getRules().Empty({ value: 'test', i18n })).toBe(
-            true
-          );
-          expect(Validator.getRules().Empty({ value: 123, i18n })).toBe(true);
-          expect(Validator.getRules().Empty({ value: [], i18n })).toBe(true);
-          expect(Validator.getRules().Empty({ value: {}, i18n })).toBe(true);
+          expect(
+            Validator.getRules().Empty({ value: '', i18n, ruleParams: [] })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Empty({ value: null, i18n, ruleParams: [] })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Empty({
+              value: undefined,
+              i18n,
+              ruleParams: [],
+            })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Empty({ value: 'test', i18n, ruleParams: [] })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Empty({ value: 123, i18n, ruleParams: [] })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Empty({ value: [], i18n, ruleParams: [] })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Empty({ value: {}, i18n, ruleParams: [] })
+          ).toBe(true);
         });
       });
 
@@ -460,21 +524,35 @@ describe('Validator Rules', () => {
     describe('Nullable Rule', () => {
       describe('Rule Function', () => {
         it('should always return true (Nullable rule always passes)', () => {
-          expect(Validator.getRules().Nullable({ value: null, i18n })).toBe(
-            true
-          );
           expect(
-            Validator.getRules().Nullable({ value: undefined, i18n })
+            Validator.getRules().Nullable({ value: null, i18n, ruleParams: [] })
           ).toBe(true);
-          expect(Validator.getRules().Nullable({ value: '', i18n })).toBe(true);
-          expect(Validator.getRules().Nullable({ value: 'test', i18n })).toBe(
-            true
-          );
-          expect(Validator.getRules().Nullable({ value: 123, i18n })).toBe(
-            true
-          );
-          expect(Validator.getRules().Nullable({ value: [], i18n })).toBe(true);
-          expect(Validator.getRules().Nullable({ value: {}, i18n })).toBe(true);
+          expect(
+            Validator.getRules().Nullable({
+              value: undefined,
+              i18n,
+              ruleParams: [],
+            })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Nullable({ value: '', i18n, ruleParams: [] })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Nullable({
+              value: 'test',
+              i18n,
+              ruleParams: [],
+            })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Nullable({ value: 123, i18n, ruleParams: [] })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Nullable({ value: [], i18n, ruleParams: [] })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Nullable({ value: {}, i18n, ruleParams: [] })
+          ).toBe(true);
         });
       });
 
@@ -538,15 +616,15 @@ describe('Validator Rules', () => {
 
       describe('Decorator', () => {
         class TestEntity {
-          @IsNullable
+          @IsNullable()
           @IsRequired()
           nullableField?: string;
 
-          @IsNullable
+          @IsNullable()
           @IsEmail()
           optionalEmail?: string;
 
-          @IsNullable
+          @IsNullable()
           @IsNonNullString()
           strictString?: string;
         }
@@ -614,20 +692,34 @@ describe('Validator Rules', () => {
       describe('Rule Function', () => {
         it('should always return true (Optional rule always passes)', () => {
           expect(
-            Validator.getRules().Optional({ value: undefined, i18n })
+            Validator.getRules().Optional({
+              value: undefined,
+              i18n,
+              ruleParams: [],
+            })
           ).toBe(true);
-          expect(Validator.getRules().Optional({ value: null, i18n })).toBe(
-            true
-          );
-          expect(Validator.getRules().Optional({ value: '', i18n })).toBe(true);
-          expect(Validator.getRules().Optional({ value: 'test', i18n })).toBe(
-            true
-          );
-          expect(Validator.getRules().Optional({ value: 123, i18n })).toBe(
-            true
-          );
-          expect(Validator.getRules().Optional({ value: [], i18n })).toBe(true);
-          expect(Validator.getRules().Optional({ value: {}, i18n })).toBe(true);
+          expect(
+            Validator.getRules().Optional({ value: null, i18n, ruleParams: [] })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Optional({ value: '', i18n, ruleParams: [] })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Optional({
+              value: 'test',
+              i18n,
+              ruleParams: [],
+            })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Optional({ value: 123, i18n, ruleParams: [] })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Optional({ value: [], i18n, ruleParams: [] })
+          ).toBe(true);
+          expect(
+            Validator.getRules().Optional({ value: {}, i18n, ruleParams: [] })
+          ).toBe(true);
         });
       });
 
@@ -854,7 +946,7 @@ describe('Validator Rules', () => {
         @IsEmail()
         emptyEmail?: string;
 
-        @IsNullable
+        @IsNullable()
         @IsEmail()
         nullableEmail?: string;
 
@@ -866,7 +958,7 @@ describe('Validator Rules', () => {
         @IsRequired()
         emptyRequired?: string;
 
-        @IsNullable
+        @IsNullable()
         @IsRequired()
         nullableRequired?: string;
 
