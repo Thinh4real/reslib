@@ -589,31 +589,32 @@ export const IsPastDate = Validator.buildRuleDecorator<
 declare module '../types' {
   export interface ValidatorRuleParamTypes {
     /**
-     * ### Date Rule
-     *
-     * Validates that the field under validation is a valid date.
+     * @summary Validates that the field contains a valid date value.
+     * @description
+     * Ensures the input represents a valid date that can be parsed into a JavaScript Date object.
+     * Accepts Date instances, ISO date strings, and numeric timestamps.
      *
      * @example
      * ```typescript
-     * // Valid dates
+     * // Valid date inputs
      * await Validator.validate({
      *   value: new Date(),
      *   rules: ['Date']
      * }); // ✓ Valid
      *
      * await Validator.validate({
-     *   value: '2024-01-01',
+     *   value: '2024-01-01T10:30:00Z',
      *   rules: ['Date']
      * }); // ✓ Valid
      *
      * await Validator.validate({
-     *   value: 1640995200000,
+     *   value: 1640995200000, // Unix timestamp
      *   rules: ['Date']
      * }); // ✓ Valid
      *
-     * // Invalid examples
+     * // Invalid inputs
      * await Validator.validate({
-     *   value: 'invalid-date',
+     *   value: 'invalid-date-string',
      *   rules: ['Date']
      * }); // ✗ Invalid
      *
@@ -622,40 +623,44 @@ declare module '../types' {
      *   rules: ['Date']
      * }); // ✗ Invalid
      *
-     * // Class validation
+     * await Validator.validate({
+     *   value: {},
+     *   rules: ['Date']
+     * }); // ✗ Invalid
+     * ```
+     *
+     * @example
+     * ```typescript
+     * // Class validation usage
      * class Event {
-     *   @Required
+     *   @IsRequired()
      *   @IsDate()
      *   eventDate: Date;
      * }
      * ```
-     *
-     * @param options - Validation options containing value and context
-     * @returns Promise resolving to true if valid, rejecting with error message if invalid
-     *
      *
      * @public
      */
     Date: ValidatorRuleParams<[]>;
 
     /**
-     * ### DateAfter Rule
+     * @summary Validates that the date occurs after a specified reference date.
+     * @description
+     * Checks if the input date is strictly greater than the provided comparison date.
+     * Both dates are converted to Date objects for comparison.
      *
-     * Validates that the date is after the specified date.
-     *
-     * #### Parameters
-     * - Date to compare against (Date object, ISO string, or timestamp)
+     * @param date - The reference date to compare against. Accepts Date object, ISO string, or timestamp.
      *
      * @example
      * ```typescript
-     * // Valid examples
+     * // Valid examples (date must be after reference)
      * await Validator.validate({
      *   value: new Date('2024-01-02'),
      *   rules: ['DateAfter[2024-01-01]']
      * }); // ✓ Valid
      *
      * await Validator.validate({
-     *   value: '2024-06-15',
+     *   value: '2024-06-15T12:00:00Z',
      *   rules: ['DateAfter[2024-01-01]']
      * }); // ✓ Valid
      *
@@ -663,47 +668,50 @@ declare module '../types' {
      * await Validator.validate({
      *   value: new Date('2023-12-31'),
      *   rules: ['DateAfter[2024-01-01]']
-     * }); // ✗ Invalid
+     * }); // ✗ Invalid (before reference)
      *
      * await Validator.validate({
-     *   value: '2024-01-01',
+     *   value: '2024-01-01T23:59:59Z',
      *   rules: ['DateAfter[2024-01-01]']
-     * }); // ✗ Invalid (not strictly after)
+     * }); // ✗ Invalid (same date, not after)
      *
-     * // Class validation
+     * await Validator.validate({
+     *   value: 'invalid-date',
+     *   rules: ['DateAfter[2024-01-01]']
+     * }); // ✗ Invalid (invalid input date)
+     * ```
+     *
+     * @example
+     * ```typescript
+     * // Class validation with dynamic reference
      * class Event {
      *   @IsDateAfter(new Date('2024-01-01'))
      *   eventDate: Date;
      * }
      * ```
      *
-     * @param options - Validation options with rule parameters
-     * @param options.ruleParams - Array containing the date to compare against
-     * @returns Promise resolving to true if valid, rejecting with error message if invalid
-     *
-     *
      * @public
      */
     DateAfter: ValidatorRuleParams<[date: ValidatorDate]>;
 
     /**
-     * ### DateBefore Rule
+     * @summary Validates that the date occurs before a specified reference date.
+     * @description
+     * Checks if the input date is strictly less than the provided comparison date.
+     * Both dates are converted to Date objects for comparison.
      *
-     * Validates that the date is before the specified date.
-     *
-     * #### Parameters
-     * - Date to compare against (Date object, ISO string, or timestamp)
+     * @param date - The reference date to compare against. Accepts Date object, ISO string, or timestamp.
      *
      * @example
      * ```typescript
-     * // Valid examples
+     * // Valid examples (date must be before reference)
      * await Validator.validate({
      *   value: new Date('2023-12-31'),
      *   rules: ['DateBefore[2024-01-01]']
      * }); // ✓ Valid
      *
      * await Validator.validate({
-     *   value: '2023-06-15',
+     *   value: '2023-06-15T12:00:00Z',
      *   rules: ['DateBefore[2024-01-01]']
      * }); // ✓ Valid
      *
@@ -711,73 +719,84 @@ declare module '../types' {
      * await Validator.validate({
      *   value: new Date('2024-01-02'),
      *   rules: ['DateBefore[2024-01-01]']
-     * }); // ✗ Invalid
+     * }); // ✗ Invalid (after reference)
      *
      * await Validator.validate({
-     *   value: '2024-01-01',
+     *   value: '2024-01-01T00:00:01Z',
      *   rules: ['DateBefore[2024-01-01]']
-     * }); // ✗ Invalid (not strictly before)
+     * }); // ✗ Invalid (same date, not before)
      *
-     * // Class validation
+     * await Validator.validate({
+     *   value: 'invalid-date',
+     *   rules: ['DateBefore[2024-01-01]']
+     * }); // ✗ Invalid (invalid input date)
+     * ```
+     *
+     * @example
+     * ```typescript
+     * // Class validation with deadline
      * class Deadline {
      *   @IsDateBefore(new Date('2024-12-31'))
      *   submissionDate: Date;
      * }
      * ```
      *
-     * @param options - Validation options with rule parameters
-     * @param options.ruleParams - Array containing the date to compare against
-     * @returns Promise resolving to true if valid, rejecting with error message if invalid
-     *
-     *
      * @public
      */
     DateBefore: ValidatorRuleParams<[date: ValidatorDate]>;
 
     /**
-     * ### DateBetween Rule
+     * @summary Validates that the date falls within a specified date range (inclusive).
+     * @description
+     * Checks if the input date is greater than or equal to the start date and
+     * less than or equal to the end date. All dates are converted to Date objects.
      *
-     * Validates that the date is between the specified start and end dates (inclusive).
-     *
-     * #### Parameters
-     * - Start date (Date object, ISO string, or timestamp)
-     * - End date (Date object, ISO string, or timestamp)
+     * @param minDate - The minimum/earliest allowed date. Accepts Date object, ISO string, or timestamp.
+     * @param maxDate - The maximum/latest allowed date. Accepts Date object, ISO string, or timestamp.
      *
      * @example
      * ```typescript
-     * // Valid examples
+     * // Valid examples (within range inclusive)
      * await Validator.validate({
      *   value: new Date('2024-06-15'),
      *   rules: ['DateBetween[2024-01-01,2024-12-31]']
      * }); // ✓ Valid
      *
      * await Validator.validate({
-     *   value: '2024-01-01',
+     *   value: '2024-01-01T00:00:00Z', // Start boundary
      *   rules: ['DateBetween[2024-01-01,2024-12-31]']
-     * }); // ✓ Valid (inclusive)
+     * }); // ✓ Valid
+     *
+     * await Validator.validate({
+     *   value: '2024-12-31T23:59:59Z', // End boundary
+     *   rules: ['DateBetween[2024-01-01,2024-12-31]']
+     * }); // ✓ Valid
      *
      * // Invalid examples
      * await Validator.validate({
      *   value: new Date('2023-12-31'),
      *   rules: ['DateBetween[2024-01-01,2024-12-31]']
-     * }); // ✗ Invalid
+     * }); // ✗ Invalid (before range)
      *
      * await Validator.validate({
      *   value: '2025-01-01',
      *   rules: ['DateBetween[2024-01-01,2024-12-31]']
-     * }); // ✗ Invalid
+     * }); // ✗ Invalid (after range)
      *
-     * // Class validation
+     * await Validator.validate({
+     *   value: 'invalid-date',
+     *   rules: ['DateBetween[2024-01-01,2024-12-31]']
+     * }); // ✗ Invalid (invalid input date)
+     * ```
+     *
+     * @example
+     * ```typescript
+     * // Class validation for vacation period
      * class Vacation {
      *   @IsDateBetween(new Date('2024-01-01'), new Date('2024-12-31'))
      *   vacationDate: Date;
      * }
      * ```
-     *
-     * @param options - Validation options with rule parameters
-     * @param options.ruleParams - Array containing start date and end date
-     * @returns Promise resolving to true if valid, rejecting with error message if invalid
-     *
      *
      * @public
      */
@@ -786,68 +805,72 @@ declare module '../types' {
     >;
 
     /**
-     * ### SameDate Rule
+     * @summary Validates that the date matches a specific date (ignoring time components).
+     * @description
+     * Compares only the date parts (year, month, day) of the input and reference dates,
+     * ignoring hours, minutes, seconds, and milliseconds. Useful for date-only equality checks.
      *
-     * Validates that the date equals the specified date (compares date part only, ignores time).
-     *
-     * #### Parameters
-     * - Date to compare against (Date object, ISO string, or timestamp)
+     * @param date - The reference date to match against. Accepts Date object, ISO string, or timestamp.
      *
      * @example
      * ```typescript
-     * // Valid examples
+     * // Valid examples (same date regardless of time)
      * await Validator.validate({
-     *   value: new Date('2024-01-01T10:30:00'),
+     *   value: new Date('2024-01-01T10:30:45Z'),
      *   rules: ['SameDate[2024-01-01]']
      * }); // ✓ Valid (time ignored)
      *
      * await Validator.validate({
      *   value: '2024-01-01',
-     *   rules: ['SameDate[2024-01-01]']
-     * }); // ✓ Valid
+     *   rules: ['SameDate[2024-01-01T23:59:59Z]']
+     * }); // ✓ Valid (time ignored)
      *
      * // Invalid examples
      * await Validator.validate({
-     *   value: new Date('2024-01-02'),
+     *   value: new Date('2024-01-02T00:00:00Z'),
      *   rules: ['SameDate[2024-01-01]']
-     * }); // ✗ Invalid
+     * }); // ✗ Invalid (different date)
      *
      * await Validator.validate({
-     *   value: '2024-01-01T10:30:00',
+     *   value: '2024-01-01T10:30:00Z',
      *   rules: ['SameDate[2024-01-02]']
-     * }); // ✗ Invalid
+     * }); // ✗ Invalid (different date)
      *
-     * // Class validation
+     * await Validator.validate({
+     *   value: 'invalid-date',
+     *   rules: ['SameDate[2024-01-01]']
+     * }); // ✗ Invalid (invalid input date)
+     * ```
+     *
+     * @example
+     * ```typescript
+     * // Class validation for specific birthday
      * class Birthday {
      *   @IsSameDate(new Date('1990-01-01'))
      *   birthDate: Date;
      * }
      * ```
      *
-     * @param options - Validation options with rule parameters
-     * @param options.ruleParams - Array containing the date to compare against
-     * @returns Promise resolving to true if valid, rejecting with error message if invalid
-     *
-     *
      * @public
      */
     SameDate: ValidatorRuleParams<[date: ValidatorDate]>;
 
     /**
-     * ### FutureDate Rule
-     *
-     * Validates that the date is in the future.
+     * @summary Validates that the date is in the future relative to the current time.
+     * @description
+     * Checks if the input date occurs after the current moment (now).
+     * Useful for validating future events, deadlines, or appointments.
      *
      * @example
      * ```typescript
-     * // Valid examples
+     * // Valid examples (future dates)
      * await Validator.validate({
      *   value: new Date(Date.now() + 86400000), // Tomorrow
      *   rules: ['FutureDate']
      * }); // ✓ Valid
      *
      * await Validator.validate({
-     *   value: '2025-01-01',
+     *   value: '2025-01-01T00:00:00Z',
      *   rules: ['FutureDate']
      * }); // ✓ Valid
      *
@@ -855,43 +878,48 @@ declare module '../types' {
      * await Validator.validate({
      *   value: new Date(Date.now() - 86400000), // Yesterday
      *   rules: ['FutureDate']
-     * }); // ✗ Invalid
+     * }); // ✗ Invalid (past date)
      *
      * await Validator.validate({
-     *   value: new Date(), // Now
+     *   value: new Date(), // Current time
      *   rules: ['FutureDate']
-     * }); // ✗ Invalid
+     * }); // ✗ Invalid (not strictly future)
      *
-     * // Class validation
+     * await Validator.validate({
+     *   value: 'invalid-date',
+     *   rules: ['FutureDate']
+     * }); // ✗ Invalid (invalid input date)
+     * ```
+     *
+     * @example
+     * ```typescript
+     * // Class validation for future appointments
      * class Appointment {
-     *   @IsFutureDate
+     *   @IsFutureDate()
      *   appointmentDate: Date;
      * }
      * ```
-     *
-     * @param options - Validation options containing value and context
-     * @returns Promise resolving to true if valid, rejecting with error message if invalid
-     *
      *
      * @public
      */
     FutureDate: ValidatorRuleParams<[]>;
 
     /**
-     * ### PastDate Rule
-     *
-     * Validates that the date is in the past.
+     * @summary Validates that the date is in the past relative to the current time.
+     * @description
+     * Checks if the input date occurs before the current moment (now).
+     * Useful for validating historical events or past occurrences.
      *
      * @example
      * ```typescript
-     * // Valid examples
+     * // Valid examples (past dates)
      * await Validator.validate({
      *   value: new Date(Date.now() - 86400000), // Yesterday
      *   rules: ['PastDate']
      * }); // ✓ Valid
      *
      * await Validator.validate({
-     *   value: '2020-01-01',
+     *   value: '2020-01-01T00:00:00Z',
      *   rules: ['PastDate']
      * }); // ✓ Valid
      *
@@ -899,23 +927,27 @@ declare module '../types' {
      * await Validator.validate({
      *   value: new Date(Date.now() + 86400000), // Tomorrow
      *   rules: ['PastDate']
-     * }); // ✗ Invalid
+     * }); // ✗ Invalid (future date)
      *
      * await Validator.validate({
-     *   value: new Date(), // Now
+     *   value: new Date(), // Current time
      *   rules: ['PastDate']
-     * }); // ✗ Invalid
+     * }); // ✗ Invalid (not strictly past)
      *
-     * // Class validation
+     * await Validator.validate({
+     *   value: 'invalid-date',
+     *   rules: ['PastDate']
+     * }); // ✗ Invalid (invalid input date)
+     * ```
+     *
+     * @example
+     * ```typescript
+     * // Class validation for historical events
      * class HistoricalEvent {
-     *   @IsPastDate
+     *   @IsPastDate()
      *   eventDate: Date;
      * }
      * ```
-     *
-     * @param options - Validation options containing value and context
-     * @returns Promise resolving to true if valid, rejecting with error message if invalid
-     *
      *
      * @public
      */
