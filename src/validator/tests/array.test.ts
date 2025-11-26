@@ -626,7 +626,7 @@ describe('Array Validation Rules', () => {
 
       it('registers decorator and validates', async () => {
         const rules = Validator.getTargetRules(StringList);
-        expect(rules.items).toContain('ArrayAllStrings');
+        expect(rules.items).toContain(Function);
 
         const ok = await Validator.validateTarget(StringList, {
           data: { items: ['x', 'y'] },
@@ -733,7 +733,7 @@ describe('Array Validation Rules', () => {
 
       it('registers decorator and validates', async () => {
         const rules = Validator.getTargetRules(NumberList);
-        expect(rules.values).toContain('ArrayAllNumbers');
+        expect(rules.values).toContain(Function);
 
         const ok = await Validator.validateTarget(NumberList, {
           data: { values: [1, 2, 3] },

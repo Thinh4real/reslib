@@ -924,7 +924,7 @@ export type ValidatorRuleFunction<
  */
 export type ValidatorRuleParams<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TParams extends Array<any> = Array<any>,
+  TParams extends Array<any> | ReadonlyArray<any> = Array<any>,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Context = unknown,
 > = TParams extends [] ? [] : TParams;

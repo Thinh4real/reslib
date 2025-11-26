@@ -990,9 +990,10 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
           },
         },
       });
-
+      console.log(result1, ' is rrrrrrrrrrrrrrr1');
       expect(result1.success).toBe(true);
       expect(result2.success).toBe(true);
+      console.log(result2, ' is rrrrrrrrrrrrrrrr2');
     });
 
     it('should validate mixed nested and non-nested fields', async () => {
