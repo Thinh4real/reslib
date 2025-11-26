@@ -330,6 +330,156 @@ export const AllOf = Validator.buildMultiRuleDecorator(function AllOf(options) {
   return Validator.validateAllOfRule(options);
 }, Symbol.for('validatorAllOfRuleMarker'));
 
+/**
+ * ## ArrayOf Validation Decorator
+ *
+ * A powerful validation decorator that validates arrays where each element must satisfy
+ * ALL of the provided sub-rules. This decorator combines array validation with AllOf logic,
+ * ensuring that every item in an array meets multiple validation criteria simultaneously.
+ *
+ * ### ArrayOf Validation Concept
+ * ArrayOf first validates that the value is an array, then applies AllOf validation to each
+ * element. This means every single item in the array must pass ALL specified validation rules.
+ * It's perfect for validating collections where each item has multiple requirements.
+ *
+ * ### Key Features
+ * - **Array Validation**: Ensures the value is an array before validating elements
+ * - **Element-wise AllOf**: Each array element must satisfy ALL sub-rules
+ * - **Comprehensive Coverage**: Validates all elements against all rules
+ * - **Detailed Error Reporting**: Provides specific error messages for failed elements
+ * - **Type Safe**: Full TypeScript support with generic context typing
+ * - **Decorator Pattern**: Easy to apply to array properties using the `@ArrayOf()` syntax
+ *
+ * ### Common Use Cases
+ * - **Email Lists**: Array of strings where each must be valid email AND not empty
+ * - **Product IDs**: Array of codes where each must match format AND be correct length
+ * - **User Permissions**: Array of permission strings with specific format requirements
+ * - **Numeric Ranges**: Array of numbers within bounds AND meeting precision requirements
+ * - **File Lists**: Array of file paths that must exist AND have valid extensions
+ *
+ * ### Validation Behavior
+ * - **Array Check**: First validates that the value is actually an array
+ * - **Element Validation**: Each element is validated against ALL sub-rules
+ * - **All-or-Nothing**: Every element must pass all rules for overall validation to succeed
+ * - **Empty Arrays**: Empty arrays are considered valid (no elements to validate)
+ * - **Rule Processing**: Each sub-rule is applied to each element using `Validator.validate`
+ *
+ * ### Common Use Cases
+ * - **Email Lists**: Each email must be valid format AND not empty
+ * - **Product Codes**: Each code must match pattern AND be correct length
+ * - **User IDs**: Each ID must be valid format AND within length limits
+ * - **Numeric Arrays**: Each number must be within range AND meet precision rules
+ * - **Permission Lists**: Each permission must be valid format AND recognized
+ *
+ * ### Validation Behavior
+ * - **Array Validation**: First ensures the value is an array
+ * - **Element-wise Validation**: Each array element must pass ALL sub-rules
+ * - **Comprehensive Checking**: All elements are validated against all rules
+ * - **Empty Arrays**: Valid (no elements means no validation failures)
+ * - **Error Details**: Specific error messages indicate which element failed which rule
+ *
+ * @example
+ * ```typescript
+ * import { ArrayOf } from 'reslib/validator';
+ *
+ * class User {
+ *   // Each email in the list must be a valid email AND not empty
+ *   @ArrayOf("Email", "IsNonNullString")
+ *   emailAddresses: string[];
+ *
+ *   // Each permission must be a string AND match the permission format
+ *   @ArrayOf(
+ *     "IsString",
+ *     [{Matches: [/^perm\./, {message: 'Permission must start with perm.'}]}]
+ *   )
+ *   permissions: string[];
+ * }
+ *
+ * // Validation examples
+ * const user1 = new User();
+ * user1.emailAddresses = ["user@example.com", "admin@test.com"]; // ✅ Passes
+ *
+ * const user2 = new User();
+ * user2.emailAddresses = ["invalid-email", "user@example.com"]; // ❌ Fails
+ * // Error: "Invalid email format (at index 0)"
+ * ```
+ *
+ * @example
+ * ```typescript
+ * class Product {
+ *   // Each product code must be string, 10 chars, start with PROD, alphanumeric
+ *   @ArrayOf(
+ *     "IsString",
+ *     ["Length", 10, { message: 'Each product code must be exactly 10 characters' }],
+ *     [{Matches: [/^PROD/, { message: 'Each product code must start with PROD' }]}],
+ *     [{Matches: [/^[A-Z0-9]+$/, { message: 'Each product code must be alphanumeric' }]}]
+ *   )
+ *   productCodes: string[];
+ *
+ *   // Each price must be a positive number within reasonable range
+ *   @ArrayOf(
+ *     "IsNumber",
+ *     [{Min: [0.01, { message: 'Each price must be greater than 0' }]}],
+ *     [{Max: [999999.99, { message: 'Each price cannot exceed $999,999.99' }]}]
+ *   )
+ *   prices: number[];
+ * }
+ *
+ * // Validation examples
+ * const product1 = new Product();
+ * product1.productCodes = ["PROD123456", "PROD789012"]; // ✅ Passes
+ *
+ * const product2 = new Product();
+ * product2.productCodes = ["PROD123456", "INVALID123"]; // ❌ Fails
+ * // Error: "Each product code must start with PROD (at index 1)"
+ * ```
+ *
+ * @example
+ * ```typescript
+ * class Configuration {
+ *   // Each tag must be non-empty string AND within length limits AND valid format
+ *   @ArrayOf(
+ *     "IsString",
+ *     ["IsNotEmpty"],
+ *     [{MinLength: [2]}],
+ *     [{MaxLength: [50]}],
+ *     [{Matches: [/^[a-zA-Z0-9_-]+$/, { message: 'Tags can only contain letters, numbers, hyphens, and underscores' }]}]
+ *   )
+ *   tags: string[];
+ * }
+ *
+ * // Validation examples
+ * const config1 = new Configuration();
+ * config1.tags = ["important", "urgent", "review"]; // ✅ Passes
+ *
+ * const config2 = new Configuration();
+ * config2.tags = ["important", "", "review"]; // ❌ Fails
+ * // Error: "Tags cannot be empty (at index 1)"
+ *
+ * const config3 = new Configuration();
+ * config3.tags = ["important", "tag with spaces", "review"]; // ❌ Fails
+ * // Error: "Tags can only contain letters, numbers, hyphens, and underscores (at index 1)"
+ * ```
+ *
+ * @template Context - Optional type for the validation context object
+ *
+ * @param rules - Array of validation rules where ALL must pass for each array element
+ * @param rules - Each rule can be a string (rule name), object (rule with parameters), or function (custom validation)
+ *
+ * @returns Property decorator that applies ArrayOf validation logic to array properties
+ *
+ * @throws {string} When value is not an array, throws "Value must be an array" error
+ * @throws {string} When any array element fails any sub-rule, throws detailed error message
+ * @throws {string} When no sub-rules are provided, throws "invalidRule" error
+ *
+ * @see {@link Validator.validateArrayOfRule} - The underlying validation method
+ * @see {@link Validator.buildMultiRuleDecorator} - Factory method that creates this decorator
+ * @see {@link Validator.validateTarget} - For class-based validation using decorators
+ * @see {@link ValidatorValidateMultiRuleOptions} - Type definition for validation options
+ *
+ * @public
+ * @decorator
+ */
 export const ArrayOf = Validator.buildMultiRuleDecorator(function ArrayOf(
   options
 ) {

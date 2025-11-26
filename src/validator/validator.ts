@@ -3940,6 +3940,8 @@ export class Validator {
     }
     if (symbolMarker) {
       Validator.markRuleWithSymbol(ruleFunction, symbolMarker);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (ruleFunction as any)[symbolMarker] = true;
     }
     return function (...ruleParameters: TRuleParams) {
       const finalRuleParameters = ruleParameters;
