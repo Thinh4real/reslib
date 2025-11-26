@@ -165,7 +165,7 @@ export type ValidatorResult = boolean | string | Promise<boolean | string>;
  * #### 3. Parameterized Rules (Template Literal)
  * Built-in rules with parameters specified in string format. Readable and concise.
  * ```typescript
- * "MinLength[5]" | "MaxLength[100]" | "NumberBetween[0,100]"
+ * {MinLength:[5]}, {MaxLength:[100]} or {NumberBetween:[0,100]}
  * ```
  *
  * #### 4. Object Rules (`ValidatorRuleObject`)
@@ -194,7 +194,6 @@ export type ValidatorResult = boolean | string | Promise<boolean | string>;
  * ```typescript
  * // All these are valid ValidatorRule instances
  * const rule1: ValidatorRule = "Email";
- * const rule2: ValidatorRule = "MinLength[5]";
  * const rule3: ValidatorRule = { Required: [] };
  * const rule4: ValidatorRule = ({ value }) => typeof value === 'string';
  * ```
@@ -241,7 +240,7 @@ export type ValidatorResult = boolean | string | Promise<boolean | string>;
  * const simpleRules = ["Required", "Email"];
  *
  * // ✅ Use parameterized rules for single parameters
- * const lengthRules = ["MinLength[5]", "MaxLength[100]"];
+ * const lengthRules = [{ MinLength: [5] }, { MaxLength: [100] }];
  *
  * // ✅ Use object rules for complex parameters or type safety
  * const complexRules = [{ NumberBetween: [0, 100] }];
@@ -521,7 +520,6 @@ type ExtractOptionalOrEmptyKeys<T> = {
  * ```typescript
  * const rules: ValidatorRules = [
  *   "Required",                    // String rule
- *   "MinLength[5]",               // Parameterized string rule
  *   { MinLength: [5] },           // Object rule (this type)
  *   ({ value }) => value > 0,     // Function rule
  * ];
@@ -611,7 +609,7 @@ export type ValidatorRuleObject = Partial<{
  * const rules1: ValidatorRules = ["Required", "Email"];
  *
  * // Using parameterized rules
- * const rules2: ValidatorRules = ["Required", "MinLength[5]", "MaxLength[100]"];
+ * const rules2: ValidatorRules = ["Required", { MinLength: [5] }, { MaxLength: [100] }];
  *
  * // Using validation functions
  * const rules3: ValidatorRules = [
@@ -672,7 +670,7 @@ export type ValidatorSanitizedRule<
  * for executing a validation rule after it has been processed from its raw form.
  *
  * ### Purpose
- * After validation rules are parsed from strings like "MinLength[5]" or objects like
+ * After validation rules are parsed from objects like `{ MinLength: [5] }` or `{ ruleName: "Required" }`, they are converted into this standardized object format
  * `{ ruleName: "Required" }`, they are converted into this standardized object format
  * that contains all the information needed to execute the validation.
  *
@@ -680,7 +678,7 @@ export type ValidatorSanitizedRule<
  * - **ruleName**: The parsed rule identifier (e.g., "MinLength")
  * - **params**: Array of parameters extracted from the rule (e.g., `[5]`)
  * - **ruleFunction**: The actual validation function to execute
- * - **rawRuleName**: The original unparsed rule string (e.g., "MinLength[5]")
+ * - **rawRuleName**: The original unparsed rule string (e.g., {MinLength:[5]})
  *
  * ### Usage in Validation Pipeline
  * ```typescript
@@ -726,7 +724,7 @@ export interface ValidatorSanitizedRuleObject<
    * The parsed name of the validation rule
    *
    * This is the rule identifier extracted from the original rule specification.
-   * For example, if the raw rule was "MinLength[5]", this would be "MinLength".
+   * For example, if the raw rule was {MinLength:[5]}, this would be "MinLength".
    * Must be a valid rule name from {@link ValidatorRuleName}.
    *
    * @type {ValidatorRuleName}
@@ -747,8 +745,8 @@ export interface ValidatorSanitizedRuleObject<
    *
    * @type {TParams}
    * @example [] // For "Required" rule
-   * @example [5] // For "MinLength[5]" rule
-   * @example [0, 100] // For "NumberBetween[0,100]" rule
+   * @example [5] // For {MinLength:[5]} rule
+   * @example [0, 100] // For {NumberBetween:[0,100]} rule
    */
   params: TParams;
 
@@ -772,7 +770,7 @@ export interface ValidatorSanitizedRuleObject<
    * exactly what the user specified.
    *
    * @type {ValidatorRuleName | string}
-   * @example "MinLength[5]"
+   * @example {MinLength:[5]}
    * @example "Required"
    * @example "Email"
    */
@@ -1188,7 +1186,7 @@ export type ValidatorRuleName = keyof ValidatorRuleParamTypes & string;
  * Email: ValidatorRuleParams<[]>;              // "Email"
  *
  * // Rules with single parameters
- * MinLength: ValidatorRuleParams<[number]>;    // "MinLength[5]"
+ * MinLength: ValidatorRuleParams<[number]>;    // {MinLength:[5]}
  * NumberEQ: ValidatorRuleParams<[number]>;  // "NumberEQ[42]"
  *
  * // Rules with optional parameters
@@ -1291,7 +1289,7 @@ export interface ValidatorValidateOptions<
    *
    * Contains the parameters required by the current rule. For example, for a
    * MinLength rule, this would be `[5]` to require minimum 5 characters.
-   * These are typically extracted from raw rule names like "MinLength[5]".
+   * These are typically extracted from raw rule names like {MinLength:[5]}.
    *
    * @type {TParams}
    * @optional
@@ -1343,7 +1341,7 @@ export interface ValidatorValidateOptions<
    * The raw rule name as originally specified (before parsing)
    *
    * The unparsed rule name including any parameters in brackets.
-   * For example, "MinLength[5]" or "NumberGT[0]" before the name
+   * For example, {MinLength:[5]} or {NumberGT:[0]} before the name
    * and parameters are extracted into `ruleName` and `ruleParams`.
    *
    * @type {string}
@@ -1353,7 +1351,7 @@ export interface ValidatorValidateOptions<
    * ```typescript
    * const options: ValidatorValidateOptions = {
    *   value: "test",
-   *   rawRuleName: "MinLength[5]",        // Raw form
+   *   rawRuleName: { MinLength: [5] },      // Raw form
    *   ruleName: "MinLength",               // Parsed name
    *   ruleParams: [5],                     // Parsed params
    *   propertyName: "username"

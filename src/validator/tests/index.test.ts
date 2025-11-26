@@ -89,10 +89,26 @@ describe('Validator Rules', () => {
 
   describe('EvenNumber', () => {
     it('validates even integers', async () => {
-      const r1 = await Validator.getRules().EvenNumber({ value: 0, i18n });
-      const r2 = await Validator.getRules().EvenNumber({ value: 2, i18n });
-      const r3 = await Validator.getRules().EvenNumber({ value: '8', i18n });
-      const r4 = await Validator.getRules().EvenNumber({ value: -4, i18n });
+      const r1 = await Validator.getRules().EvenNumber({
+        value: 0,
+        i18n,
+        ruleParams: [],
+      });
+      const r2 = await Validator.getRules().EvenNumber({
+        value: 2,
+        i18n,
+        ruleParams: [],
+      });
+      const r3 = await Validator.getRules().EvenNumber({
+        value: '8',
+        i18n,
+        ruleParams: [],
+      });
+      const r4 = await Validator.getRules().EvenNumber({
+        value: -4,
+        i18n,
+        ruleParams: [],
+      });
       expect(r1).toBe(true);
       expect(r2).toBe(true);
       expect(r3).toBe(true);
@@ -283,7 +299,7 @@ describe('Validator Rules', () => {
       }
       @IsNumber()
       @Translate('validator.tests.entity.id')
-      @IsNumberNE([10])
+      @IsNumberNE(10)
       id?: number;
 
       @IsRequired()
@@ -301,14 +317,14 @@ describe('Validator Rules', () => {
       url?: string;
 
       @IsRequired()
-      @IsNumberLT([10])
+      @IsNumberLT(10)
       @IsNumberGT([5])
       @Translate('validator.tests.entity.note')
       note?: number;
 
       @Translate('validator.tests.entity.aString')
       @IsRequired()
-      @Length([10])
+      @Length(10)
       @Length([5, 20])
       aString?: string;
     }
