@@ -93,7 +93,7 @@ describe('Validator.validate() - Either Pattern Tests', () => {
 
     it('should pass custom rule function that returns true', async () => {
       const result = await Validator.validate({
-        rules: [({ value }) => value === 'valid' || false],
+        rules: [({ value }) => value === 'valid' || 'Invalid'],
         value: 'valid',
       });
 

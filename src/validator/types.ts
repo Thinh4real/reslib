@@ -2,148 +2,13 @@ import { I18n } from '@/i18n';
 import { InputFormatterResult } from '@/inputFormatter/types';
 import { ClassConstructor, Dictionary } from '@/types';
 
-/**
- * ## Validation Result Type
- *
- * The fundamental return type for all validation operations in the validator system.
- * This union type represents the possible outcomes of any validation rule execution,
- * supporting both synchronous and asynchronous validation patterns.
- *
- * ### Union Members
- *
- * #### Synchronous Results
- * - **`boolean`**: Direct success/failure indication
- *   - `true`: Validation passed
- *   - `false`: Validation failed
- *
- * - **`string`**: Validation failure with error message
- *   - Contains the error message explaining why validation failed
- *   - Used when validation fails and provides specific feedback
- *
- * #### Asynchronous Results
- * - **`Promise<ValidatorBaseResult>`**: Asynchronous validation result
- *   - Resolves to `true` for success
- *   - Resolves to `string` for failure with error message
- *   - Enables complex validations requiring I/O, network calls, or async operations
- *
- * ### Usage Patterns
- *
- * #### Synchronous Validation
- * ```typescript
- * function validateEmail(value: string): ValidatorResult {
- *   if (!value.includes("@")) {
- *     return "Invalid email format";  // string = failure
- *   }
- *   return true;  // boolean = success
- * }
- * ```
- *
- * #### Asynchronous Validation
- * ```typescript
- * async function validateUniqueUsername(username: string): Promise<ValidatorResult> {
- *   const exists = await checkUsernameInDatabase(username);
- *   if (exists) {
- *     return "Username already taken";  // Promise<string> = failure
- *   }
- *   return true;  // Promise<boolean> = success
- * }
- * ```
- *
- * #### In Validation Rules
- * ```typescript
- * const customRule: ValidatorRuleFunction = async ({ value }) => {
- *   // Synchronous check
- *   if (!value) return "Value is required";
- *
- *   // Asynchronous check
- *   const isValid = await externalValidationAPI(value);
- *   return isValid || "External validation failed";
- * };
- * ```
- *
- * ### Type Safety and Flexibility
- * This type provides maximum flexibility while maintaining type safety:
- * - **Synchronous rules** can return immediate results
- * - **Asynchronous rules** can perform complex operations
- * - **Error messages** provide detailed feedback
- * - **Boolean results** for simple pass/fail scenarios
- *
- * ### Integration with Validation System
- * All validation rule functions return this type, enabling:
- * - Consistent error handling across all rules
- * - Support for both sync and async validation logic
- * - Standardized result processing in the validator core
- * - Flexible error message generation and i18n support
- *
- * ### Best Practices
- *
- * #### Prefer Specific Error Messages
- * ```typescript
- * // ✅ Good: Specific error messages
- * return "Email must contain @ symbol";
- *
- * // ❌ Avoid: Generic failures
- * return false;
- * ```
- *
- * #### Handle Async Operations Properly
- * ```typescript
- * // ✅ Good: Proper async handling
- * const result = await externalCheck(value);
- * return result ? true : "Validation failed externally";
- *
- * // ❌ Avoid: Unhandled promises
- * return externalCheck(value);  // Returns Promise<Promise<...>>
- * ```
- *
- * #### Consistent Return Patterns
- * ```typescript
- * // ✅ Good: Consistent boolean/string returns
- * if (condition) return true;
- * return "Error message";
- *
- * // ❌ Avoid: Mixed return types without clear logic
- * if (success) return true;
- * if (warning) return "Warning message";
- * return false;  // Inconsistent with string returns above
- * ```
- *
- * @example
- * ```typescript
- * // Synchronous validation rule
- * function validateMinLength(value: string, minLength: number): ValidatorResult {
- *   if (value.length < minLength) {
- *     return `Must be at least ${minLength} characters long`;
- *   }
- *   return true;
- * }
- *
- * // Asynchronous validation rule
- * async function validateUniqueEmail(email: string): Promise<ValidatorResult> {
- *   try {
- *     const exists = await userRepository.exists({ email });
- *     return exists ? "Email already registered" : true;
- *   } catch (error) {
- *     return "Unable to verify email uniqueness";
- *   }
- * }
- * ```
- *
- * @public
- *
- * @see {@link ValidatorRuleFunction} - Functions that return this type
- * @see {@link ValidatorValidateResult} - Higher-level validation results
- * @see {@link ValidatorBaseResult} - Base synchronous validation results
- * @see {@link ValidatorAsyncResult} - Base asynchronous validation results
- * @see {@link Validator.validate} - Main validation method
- */
 export type ValidatorResult =
-  | ValidatorBaseResult
-  | Promise<ValidatorBaseResult>;
+  | ValidatorSyncResult
+  | Promise<ValidatorSyncResult>;
 
-export type ValidatorAsyncResult = Promise<ValidatorBaseResult>;
+export type ValidatorAsyncResult = Promise<ValidatorSyncResult>;
 
-export type ValidatorBaseResult = true | string;
+export type ValidatorSyncResult = true | string;
 
 /**
  * ## Validation Rule Type
@@ -833,7 +698,7 @@ export type ValidatorSanitizedRules<Context = unknown> = ValidatorSanitizedRule<
  *
  * ### Return Value:
  * - The function returns an `ValidatorResult`, which can be one of the following:
- *   - A `Promise<ValidatorBaseResult>`: Indicates asynchronous validation. If resolved to `true`, the validation has succeeded; if resolved to a `string`, it represents an error message indicating a validation failure.
+ *   - A `Promise<ValidatorSyncResult>`: Indicates asynchronous validation. If resolved to `true`, the validation has succeeded; if resolved to a `string`, it represents an error message indicating a validation failure.
  *   - A `string`: Represents an invalid validation result, where the string contains an error message.
  *   - A `boolean`: Indicates the success (`true`) or failure (`false`) of the validation.
  *

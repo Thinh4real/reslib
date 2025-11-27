@@ -9,7 +9,7 @@ import {
   MaxLength,
   MinLength,
 } from '../index';
-import { ValidatorRule } from '../types';
+import { ValidatorAsyncResult, ValidatorRule } from '../types';
 
 import { AllOf } from '../rules/multiRules';
 import { Validator } from '../validator';
@@ -184,17 +184,17 @@ describe('AllOf Validation Rules', () => {
       it('should execute all rules even when some fail', async () => {
         const executionOrder: string[] = [];
 
-        const rule1 = async ({ value }: any) => {
+        const rule1 = async ({ value }: any): ValidatorAsyncResult => {
           executionOrder.push('rule1');
           return value.length > 0 || 'Rule1 failed';
         };
 
-        const rule2 = async ({ value }: any) => {
+        const rule2 = async ({ value }: any): ValidatorAsyncResult => {
           executionOrder.push('rule2');
-          return false; // Always fails
+          return 'Always fails'; // Always fails
         };
 
-        const rule3 = async ({ value }: any) => {
+        const rule3 = async ({ value }: any): ValidatorAsyncResult => {
           executionOrder.push('rule3');
           return true;
         };
@@ -212,12 +212,12 @@ describe('AllOf Validation Rules', () => {
       it('should execute all rules when all pass', async () => {
         const executionOrder: string[] = [];
 
-        const rule1 = async ({ value }: any) => {
+        const rule1 = async ({ value }: any): ValidatorAsyncResult => {
           executionOrder.push('rule1');
           return true;
         };
 
-        const rule2 = async ({ value }: any) => {
+        const rule2 = async ({ value }: any): ValidatorAsyncResult => {
           executionOrder.push('rule2');
           return true;
         };
@@ -264,7 +264,10 @@ describe('AllOf Validation Rules', () => {
 
       it('should handle empty error messages gracefully', async () => {
         const result = await Validator.validateAllOfRule({
-          ruleParams: [({ value }: any) => false, ({ value }: any) => false],
+          ruleParams: [
+            ({ value }: any) => 'Always fails',
+            ({ value }: any) => 'Always fail',
+          ],
           value: 'test',
           i18n,
         });
@@ -358,8 +361,10 @@ describe('AllOf Validation Rules', () => {
       it('should handle empty string value', async () => {
         const result = await Validator.validateAllOfRule({
           ruleParams: [
-            ({ value }) => value === '',
-            ({ value }) => typeof value === 'string',
+            ({ value }) =>
+              value === '' ? true : 'Value must be an empty string',
+            ({ value }) =>
+              typeof value === 'string' ? true : 'Value must be a string',
           ],
           value: '',
           i18n,
@@ -370,7 +375,10 @@ describe('AllOf Validation Rules', () => {
 
       it('should handle numeric values', async () => {
         const result = await Validator.validateAllOfRule({
-          ruleParams: ['Number', ({ value }) => value > 0],
+          ruleParams: [
+            'Number',
+            ({ value }) => (value > 0 ? true : 'Value must be greater than 0'),
+          ],
           value: 42,
           i18n,
         });
@@ -381,8 +389,9 @@ describe('AllOf Validation Rules', () => {
       it('should handle boolean values', async () => {
         const result = await Validator.validateAllOfRule({
           ruleParams: [
-            ({ value }) => typeof value === 'boolean',
-            ({ value }) => value === true,
+            ({ value }) =>
+              typeof value === 'boolean' ? true : 'Value must be a boolean',
+            ({ value }) => (value === true ? true : 'Value must be true'),
           ],
           value: true,
           i18n,
@@ -394,8 +403,14 @@ describe('AllOf Validation Rules', () => {
       it('should handle object values', async () => {
         const result = await Validator.validateAllOfRule({
           ruleParams: [
-            ({ value }) => typeof value === 'object' && value !== null,
-            ({ value }) => Object.prototype.hasOwnProperty.call(value, 'key'),
+            ({ value }) =>
+              typeof value === 'object' && value !== null
+                ? true
+                : 'Value must be an object',
+            ({ value }) =>
+              Object.prototype.hasOwnProperty.call(value, 'key')
+                ? true
+                : 'Object must have key property',
           ],
           value: { key: 'value' },
           i18n,
@@ -406,7 +421,11 @@ describe('AllOf Validation Rules', () => {
 
       it('should handle array values', async () => {
         const result = await Validator.validateAllOfRule({
-          ruleParams: ['Array', ({ value }) => value.length > 0],
+          ruleParams: [
+            'Array',
+            ({ value }) =>
+              value.length > 0 ? true : 'Array must not be empty',
+          ],
           value: [1, 2, 3],
           i18n,
         });
@@ -715,7 +734,8 @@ describe('AllOf Validation Rules', () => {
           }
         );
 
-        const customRule = ({ value }: any) => value.length > 3;
+        const customRule = ({ value }: any) =>
+          value.length > 3 ? true : 'Too short';
 
         class TestEntity {
           @FunctionRuleDecorator([customRule, 'Required'])
@@ -1163,7 +1183,10 @@ describe('AllOf Validation Rules', () => {
     describe('AllOf with Different Data Types', () => {
       it('should validate numeric values', async () => {
         class NumericAllOf {
-          @AllOf(['Number', ({ value }) => value > 0])
+          @AllOf([
+            'Number',
+            ({ value }) => (value > 0 ? true : 'Value must be greater than 0'),
+          ])
           value: number = 0;
         }
 
@@ -1181,8 +1204,9 @@ describe('AllOf Validation Rules', () => {
       it('should validate boolean values', async () => {
         class BooleanAllOf {
           @AllOf([
-            ({ value }) => typeof value === 'boolean',
-            ({ value }) => value === true,
+            ({ value }) =>
+              typeof value === 'boolean' ? true : 'Value must be a boolean',
+            ({ value }) => (value === true ? true : 'Value must be true'),
           ])
           value: boolean = false;
         }
@@ -1199,7 +1223,10 @@ describe('AllOf Validation Rules', () => {
 
       it('should validate array values', async () => {
         class ArrayAllOf {
-          @AllOf(['Array', ({ value }) => value.length > 0])
+          @AllOf([
+            'Array',
+            ({ value }) => (value.length > 0 ? true : 'Array cannot be empty'),
+          ])
           value: any[] = [];
         }
 
@@ -1252,8 +1279,10 @@ describe('AllOf Validation Rules', () => {
       it('should handle empty string value', async () => {
         class EmptyStringTest {
           @AllOf([
-            ({ value }) => value === '',
-            ({ value }) => typeof value === 'string',
+            ({ value }) =>
+              value === '' ? true : 'Value must be an empty string',
+            ({ value }) =>
+              typeof value === 'string' ? true : 'Value must be a string',
           ])
           value: string = '';
         }

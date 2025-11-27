@@ -26,7 +26,7 @@ type t = ValidatorRuleParams;
  *   - `ruleParams`: An array where the first element specifies the minimum length required.
  *
  * ### Return Value:
- * - `ValidatorBaseResult`: Returns `true` if the value is empty or meets the minimum length requirement;
+ * - `ValidatorSyncResult`: Returns `true` if the value is empty or meets the minimum length requirement;
  *   otherwise, returns an error message indicating that the minimum length is not met.
  *
  * ### Example Usage:
@@ -71,7 +71,7 @@ export const MinLength = Validator.buildRuleDecorator<
  *   - `ruleParams`: An array where the first element specifies the maximum length allowed.
  * 
  * ### Return Value:
- * - `ValidatorBaseResult`: Returns `true` if the value is empty or meets the maximum length requirement; 
+ * - `ValidatorSyncResult`: Returns `true` if the value is empty or meets the maximum length requirement; 
  *   otherwise, returns an error message indicating that the maximum length is exceeded.
  * 
  * ### Example Usage:
@@ -166,7 +166,7 @@ export const IsNonNullString = Validator.buildRuleDecorator<
  *     - The second element specifies the maximum length (optional).
  *
  * ### Return Value:
- * - `ValidatorBaseResult`: Returns `true` if the string length is valid according to the specified rules;
+ * - `ValidatorSyncResult`: Returns `true` if the string length is valid according to the specified rules;
  *   otherwise, returns an error message indicating the validation failure.
  *
  * ### Example Usage:
