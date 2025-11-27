@@ -2296,7 +2296,7 @@ export class Validator {
     RulesFunctions extends
       ValidatorDefaultMultiRule<Context> = ValidatorDefaultMultiRule<Context>,
   >(
-    ...ruleParams: RulesFunctions
+    ruleParams: RulesFunctions
   ): ValidatorRuleFunction<RulesFunctions, Context> {
     return function OneOf(
       options: ValidatorValidateMultiRuleOptions<Context, RulesFunctions>
@@ -2334,7 +2334,7 @@ export class Validator {
     RulesFunctions extends
       ValidatorDefaultMultiRule<Context> = ValidatorDefaultMultiRule<Context>,
   >(
-    ...ruleParams: RulesFunctions
+    ruleParams: RulesFunctions
   ): ValidatorRuleFunction<RulesFunctions, Context> {
     return function AllOf(
       options: ValidatorValidateMultiRuleOptions<Context, RulesFunctions>
