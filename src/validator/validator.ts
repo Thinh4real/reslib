@@ -3939,24 +3939,22 @@ export class Validator {
 
     symbolMarker?: symbol
   ): (...ruleParameters: TRuleParams) => PropertyDecorator {
+    this._prepareRuleDecorator(ruleFunction, ruleName, symbolMarker);
     return (...ruleParameters: TRuleParams) => {
       return this._buildRuleDecorator<TRuleParams, Context>(
         ruleParameters,
-        ruleFunction,
-        ruleName,
-        symbolMarker
+        ruleFunction
       );
     };
   }
-  private static _buildRuleDecorator<
+  private static _prepareRuleDecorator<
     TRuleParams extends ValidatorRuleParams = ValidatorRuleParams,
     Context = unknown,
   >(
-    ruleParameters: TRuleParams,
     ruleFunction: ValidatorRuleFunction<TRuleParams, Context>,
     ruleName?: ValidatorRuleName,
     symbolMarker?: symbol
-  ): PropertyDecorator {
+  ) {
     if (isNonNullString(ruleName)) {
       Validator.registerRule(ruleName, ruleFunction);
     }
@@ -3965,6 +3963,15 @@ export class Validator {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ruleFunction as any)[symbolMarker] = true;
     }
+    return ruleFunction;
+  }
+  private static _buildRuleDecorator<
+    TRuleParams extends ValidatorRuleParams = ValidatorRuleParams,
+    Context = unknown,
+  >(
+    ruleParameters: TRuleParams,
+    ruleFunction: ValidatorRuleFunction<TRuleParams, Context>
+  ): PropertyDecorator {
     const finalRuleParameters = ruleParameters;
     const enhancedValidatorFunction: ValidatorRuleFunction<
       TRuleParams,
@@ -4456,11 +4463,10 @@ export class Validator {
     symbolMarker?: symbol
   ) {
     return (ruleParameters: RulesFunctions) => {
+      this._prepareRuleDecorator(ruleFunction, undefined, symbolMarker);
       return this._buildRuleDecorator<RulesFunctions, Context>(
         ruleParameters,
-        ruleFunction,
-        undefined,
-        symbolMarker
+        ruleFunction
       );
     };
   }
