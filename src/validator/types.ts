@@ -768,14 +768,13 @@ export type ValidatorSanitizedRules<Context = unknown> = ValidatorSanitizedRule<
  *   - `ruleParams`: Optional parameters that may be required for specific validation rules.
  *
  * ### Return Value:
- * - The function returns an `ValidatorResult`, which can be one of the following:
- *   - A `Promise<ValidatorSyncResult>`: Indicates asynchronous validation. If resolved to `true`, the validation has succeeded; if resolved to a `string`, it represents an error message indicating a validation failure.
- *   - A `string`: Represents an invalid validation result, where the string contains an error message.
- *   - A `boolean`: Indicates the success (`true`) or failure (`false`) of the validation.
+ * - The function returns a {@link ValidatorResult}, which is either:
+ *   - a `ValidatorSyncResult` (synchronous rule result) — `true` for success, or a `string` containing the error message on failure
+ *   - or a `Promise<ValidatorSyncResult>` (asynchronous rule result)
  *
  * ### Example Usage:
  * ```typescript
- * function validateEmail({ value }):ValidatorSyncResult {
+ * function validateEmail({ value }) {
  *     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  *     if (!emailPattern.test(value)) {
  *         return "Invalid email format."; // Invalid validation
