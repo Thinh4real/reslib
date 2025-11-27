@@ -816,7 +816,7 @@ describe('ValidateNested Validation - Comprehensive Test Suite', () => {
       }
 
       class User {
-        @ArrayOf(Validator.validateNested(Address))
+        @ArrayOf([Validator.validateNested(Address)])
         address: Address = new Address();
       }
 

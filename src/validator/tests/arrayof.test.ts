@@ -133,7 +133,7 @@ describe('ArrayOf Validation Rules', () => {
   describe('ArrayOf Decorator', () => {
     it('should apply ArrayOf decorator on class properties', async () => {
       class TestEntity {
-        @ArrayOf('Email') emails: string[] = [];
+        @ArrayOf(['Email']) emails: string[] = [];
       }
 
       const ok = await Validator.validateTarget(TestEntity, {
