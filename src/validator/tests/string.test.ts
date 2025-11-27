@@ -298,12 +298,12 @@ describe('String Validation Rules', () => {
         expect(result.success).toBe(false);
       });
 
-      it('should validate empty strings', async () => {
+      it('should validate empty strings min length', async () => {
         const result = await Validator.validate({
           value: '',
           rules: [{ MinLength: [3] }],
         });
-        expect(result.success).toBe(true);
+        expect(result.success).toBe(false);
       });
     });
 
@@ -366,7 +366,7 @@ describe('String Validation Rules', () => {
         expect(result.success).toBe(false);
       });
 
-      it('should validate empty strings', async () => {
+      it('should validate empty strings max length', async () => {
         const result = await Validator.validate({
           value: '',
           rules: [{ MaxLength: [5] }],
