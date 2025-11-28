@@ -6,7 +6,7 @@ module.exports = {
   roots: ['<rootDir>/dist'],
   // Tell Jest to process .js files
   testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(spec|test).js'],
-  //testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(format.)(spec|test).js'],
+  //testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(numeric.)(spec|test).js'],
   // Optional: if you need to map module paths
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/dist/$1'

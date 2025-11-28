@@ -4,7 +4,11 @@ import { ValidatorResult, ValidatorValidateOptions } from '../types';
 import { Validator } from '../validator';
 import { toNumber } from './utils';
 
-import type { ValidatorRuleParamTypes, ValidatorRuleParams } from '../types';
+import type {
+  ValidatorRuleName,
+  ValidatorRuleParamTypes,
+  ValidatorRuleParams,
+} from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type t = ValidatorRuleParams;
 
@@ -12,7 +16,8 @@ function compareNumer(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   compare: (value: any, toCompare: any) => boolean,
   translateKey: string,
-  { value, ruleParams, i18n, ...rest }: ValidatorValidateOptions
+  { value, ruleParams, i18n, ...rest }: ValidatorValidateOptions,
+  ruleName: ValidatorRuleName
 ): ValidatorResult {
   ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
   const rParams = ruleParams ? ruleParams : [];
@@ -20,13 +25,15 @@ function compareNumer(
   const message = i18n.t(translateKey, { ...rest, value, ruleParams });
   const nVal = toNumber(value);
   value = typeof value === 'number' ? value : !isNaN(nVal) ? nVal : NaN;
-  const toCompareN = toNumber(rParams[0]);
-  const toCompare =
-    typeof rParams[0] === 'number'
-      ? rParams[0]
-      : isNumber(toCompareN)
-        ? toCompareN
-        : NaN;
+  const toCompare = toNumber(rParams[0]);
+  if (!isNumber(toCompare)) {
+    return i18n.t('validator.invalidRuleParams', {
+      value,
+      ...rest,
+      rule: ruleName,
+      ruleParams,
+    });
+  }
   if (isNaN(value) || rParams[0] === undefined) {
     return message;
   }
@@ -114,7 +121,7 @@ function compareNumer(
  * ```
  *
  * ### Error Messages
- * Uses i18n translation key: `validator.numberLessThanOrEquals`
+ * Uses i18n translation key: `validator.numberLTE`
  * Default format: "The {field} must be less than or equal to {comparisonValue}"
  *
  * ### Type Safety
@@ -148,8 +155,9 @@ export const IsNumberLTE = Validator.buildRuleDecorator<
     (value, toCompare) => {
       return value <= toCompare;
     },
-    'validator.numberLessThanOrEquals',
-    options
+    'validator.numberLTE',
+    options,
+    'NumberLTE'
   );
 }, 'NumberLTE');
 
@@ -187,8 +195,9 @@ export const IsNumberLT = Validator.buildRuleDecorator<
     (value, toCompare) => {
       return value < toCompare;
     },
-    'validator.numberLessThan',
-    options
+    'validator.numberLT',
+    options,
+    'NumberLT'
   );
 }, 'NumberLT');
 
@@ -226,8 +235,9 @@ export const IsNumberGTE = Validator.buildRuleDecorator<
     (value, toCompare) => {
       return value >= toCompare;
     },
-    'validator.numberGreaterThanOrEquals',
-    options
+    'validator.numberGTE',
+    options,
+    'NumberGTE'
   );
 }, 'NumberGTE');
 
@@ -267,8 +277,9 @@ export const IsNumberGT = Validator.buildRuleDecorator<
     (value, toCompare) => {
       return value > toCompare;
     },
-    'validator.numberGreaterThan',
-    options
+    'validator.numberGT',
+    options,
+    'NumberGT'
   );
 }, 'NumberGT');
 
@@ -307,7 +318,8 @@ export const IsNumberEQ = Validator.buildRuleDecorator<
       return value === toCompare;
     },
     'validator.numberEquals',
-    options
+    options,
+    'NumberEQ'
   );
 }, 'NumberEQ');
 
@@ -333,7 +345,8 @@ export const IsNumberNE = Validator.buildRuleDecorator<
       return value !== toCompare;
     },
     'validator.numberIsDifferentFrom',
-    options
+    options,
+    'NumberNE'
   );
 }, 'NumberNE');
 
@@ -448,7 +461,7 @@ export const IsNumberBetween = Validator.buildRuleDecorator<
 
   const min = toNumber(ruleParams[0]);
   const max = toNumber(ruleParams[1]);
-  if (isNaN(min) || isNaN(max)) {
+  if (isNaN(min) || isNaN(max) || min > max) {
     const message = i18n.t('validator.invalidRuleParams', {
       rule: 'NumberBetween',
       field: translatedPropertyName || fieldName,
@@ -823,10 +836,7 @@ export const IsMultipleOf = Validator.buildRuleDecorator<
   }
 
   const multiple = toNumber(ruleParams[0]);
-  if (
-    isNaN(multiple) ||
-    (multiple === 0 && String(ruleParams[0]).trim() !== '0')
-  ) {
+  if (isNaN(multiple) || multiple === 0) {
     const message = i18n.t('validator.invalidRuleParams', {
       rule: 'MultipleOf',
       ruleParams,
@@ -845,7 +855,7 @@ export const IsMultipleOf = Validator.buildRuleDecorator<
     const message = i18n.t('validator.multipleOf', {
       field: translatedPropertyName || fieldName,
       value,
-      multiple,
+      multipleOf: multiple,
       ruleParams,
       ...rest,
     });

@@ -13,6 +13,7 @@ export const validator = {
     one: 'Validation failed for one item',
     other: 'Validation failed for %{count} items',
   },
+  multipleOf: 'This field must be a multiple of %{multipleOf}',
   invalidRule: 'Invalid validation rule: %{rule}',
   invalidRuleParams:
     'Invalid parameters for rule %{rule}; params: %{ruleParams[0]}, %{ruleParams[1]}, ...',
@@ -44,20 +45,17 @@ export const validator = {
   length: 'This field must be exactly %{length} characters long',
   lengthRange:
     'This field must be between %{minLength} and %{maxLength} characters long',
-  numberLessThanOrEquals:
-    'This field must be less than or equal to %{ruleParams[0]}',
-  numberLessThan: 'This field must be less than %{ruleParams[0]}',
-  numberGreaterThanOrEquals:
-    'This field must be greater than or equal to %{ruleParams[0]}',
-  numberGreaterThan: 'This field must be greater than %{ruleParams[0]}',
+  numberLTE: 'This field must be less than or equal to %{ruleParams[0]}',
+  numberLT: 'This field must be less than %{ruleParams[0]}',
+  numberGTE: 'This field must be greater than or equal to %{ruleParams[0]}',
+  numberGT: 'This field must be greater than %{ruleParams[0]}',
   noteEquals: 'This field must be different from %{ruleParams[0]}',
   numberIsDifferentFrom: 'This field must be different from %{ruleParams[0]}',
   numberEquals: 'This field must be equal to %{ruleParams[0]}',
   phoneNumber: 'This field must be a valid phone number',
   emailOrPhoneNumber: 'This field must be a valid email or phone number',
   boolean: 'This field must be a valid boolean value',
-  numberBetween:
-    'This field must be between %{ruleParams[0]} and %{ruleParams[1]}',
+  numberBetween: 'This field must be between %{min} and %{max}',
   decimalCount:
     'This field must have(at least) %{ruleParams[0]} decimal places or/and at most %{ruleParams[1]} decimal places',
   decimalPlaces: 'This field must have exactly %{places} decimal places',

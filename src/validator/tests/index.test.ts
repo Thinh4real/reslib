@@ -21,7 +21,7 @@ describe('Validator Rules', () => {
     await i18n.setLocale('en');
   });
 
-  describe('numberLessThanOrEquals 5, and 10', () => {
+  describe('numberLTE 5, and 10', () => {
     it('should validate if the number 5 is less than  or equal to the specified value 10', async () => {
       const result = await Validator.getRules().NumberLTE({
         value: 5,
@@ -32,7 +32,7 @@ describe('Validator Rules', () => {
     });
   });
 
-  describe('numberLessThan', () => {
+  describe('numberLT', () => {
     it('should validate if the number is less than the specified value', async () => {
       const result = await Validator.getRules().NumberLT({
         value: 5,

@@ -81,7 +81,7 @@ describe('Target Validation Rules', () => {
       expect((result as any).errors?.length).toBeGreaterThan(0);
       expect(
         (result as any).errors?.some((e: any) =>
-          e.message.includes('nonNullString')
+          e.message.includes('must be a non null string')
         )
       ).toBe(true);
     });
@@ -125,7 +125,6 @@ describe('Target Validation Rules', () => {
       // address is undefined
       const result = await Validator.validateTarget(Person, { data: instance });
 
-      console.log(result, ' is rrrrrrrrr');
       expect(result.success).toBe(false);
     });
 
@@ -208,8 +207,10 @@ describe('Target Validation Rules', () => {
       const result = await Validator.validateTarget(Person, { data: instance });
       expect(result.success).toBe(false);
       expect(
-        (result as any).errors?.some((e: any) =>
-          e.message.includes('nonNullString')
+        (result as any).errors?.some(
+          (e: any) =>
+            e.message.includes('This field must be a non null string') &
+            e.message.includes('[email]')
         )
       ).toBe(true);
     });
@@ -285,7 +286,7 @@ describe('Target Validation Rules', () => {
         @IsString()
         orderId: string = '';
 
-        @ValidateNested(Item)
+        @ArrayOf([Validator.validateNested(Item)])
         items!: Item[];
       }
 
@@ -294,7 +295,6 @@ describe('Target Validation Rules', () => {
       instance.items = [];
 
       const result = await Validator.validateTarget(Order, { data: instance });
-      console.log(result, ' is reeeeeeeeeeee');
       expect(result.success).toBe(true);
     });
 

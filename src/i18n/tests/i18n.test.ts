@@ -15,12 +15,12 @@ describe('I18n', () => {
           length: 'This field must be exactly %{length} characters long',
           lengthRange:
             'This field must be between %{minLength} and %{maxLength} characters long',
-          numberLessThanOrEquals:
+          numberLTE:
             'This field must be less than or equal to %{ruleParams[0]}',
-          numberLessThan: 'This field must be less than %{ruleParams[0]}',
-          numberGreaterThanOrEquals:
+          numberLT: 'This field must be less than %{ruleParams[0]}',
+          numberGTE:
             'This field must be greater than or equal to %{ruleParams[0]}',
-          numberGreaterThan: 'This field must be greater than %{ruleParams[0]}',
+          numberGT: 'This field must be greater than %{ruleParams[0]}',
           noteEquals: 'This field must be different from %{ruleParams[0]}',
           numberIsDifferentFrom:
             'This field must be different from %{ruleParams[0]}',
@@ -36,16 +36,16 @@ describe('I18n', () => {
     expect(
       i18n.t('validator.lengthRange', { minLength: 5, maxLength: 10 })
     ).toBe('This field must be between 5 and 10 characters long');
-    expect(
-      i18n.t('validator.numberLessThanOrEquals', { ruleParams: [10] })
-    ).toBe('This field must be less than or equal to 10');
-    expect(i18n.t('validator.numberLessThan', { ruleParams: [10] })).toBe(
+    expect(i18n.t('validator.numberLTE', { ruleParams: [10] })).toBe(
+      'This field must be less than or equal to 10'
+    );
+    expect(i18n.t('validator.numberLT', { ruleParams: [10] })).toBe(
       'This field must be less than 10'
     );
-    expect(
-      i18n.t('validator.numberGreaterThanOrEquals', { ruleParams: [10] })
-    ).toBe('This field must be greater than or equal to 10');
-    expect(i18n.t('validator.numberGreaterThan', { ruleParams: [10] })).toBe(
+    expect(i18n.t('validator.numberGTE', { ruleParams: [10] })).toBe(
+      'This field must be greater than or equal to 10'
+    );
+    expect(i18n.t('validator.numberGT', { ruleParams: [10] })).toBe(
       'This field must be greater than 10'
     );
     expect(i18n.t('validator.noteEquals', { ruleParams: ['test'] })).toBe(

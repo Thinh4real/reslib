@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { areEquals } from '@utils/areEquals';
 import type { ValidatorRuleParams } from '../types';
 import { ValidatorRuleParamTypes } from '../types';
 import { Validator } from '../validator';
@@ -359,12 +360,11 @@ export const ArrayContains = Validator.buildRuleDecorator<
     });
     return message;
   }
-
   const containsAll = ruleParams.every((requiredValue) =>
     value.some((item) => {
       // Deep equality check for objects/arrays, simple equality for primitives
       if (typeof requiredValue === 'object' && requiredValue !== null) {
-        return JSON.stringify(item) === JSON.stringify(requiredValue);
+        return areEquals(item, requiredValue);
       }
       return item === requiredValue;
     })

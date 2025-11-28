@@ -341,7 +341,7 @@ describe('Array Validation Rules', () => {
     it('should work with decorator', async () => {
       class TestClass {
         @IsArray()
-        @ArrayContains(['admin', 'user'])
+        @ArrayContains('admin', 'user')
         roles!: string[];
       }
 
@@ -357,7 +357,7 @@ describe('Array Validation Rules', () => {
     it('should fail with decorator when missing values', async () => {
       class TestClass {
         @IsArray()
-        @ArrayContains(['admin'])
+        @ArrayContains('admin')
         roles!: string[];
       }
 

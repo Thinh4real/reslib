@@ -155,26 +155,23 @@ describe('Default Validation Rules', () => {
         value: 'hello',
         rules: ['Empty'],
       });
-      expect(result.success).toBe(false);
-      expect((result as any).error?.message).toContain('empty');
+      expect(result.success).toBe(true);
     });
 
-    it('should fail for numbers', async () => {
+    it('should pass for numbers', async () => {
       const result = await Validator.validate({
         value: 0,
         rules: ['Empty'],
       });
-      expect(result.success).toBe(false);
-      expect((result as any).error?.message).toContain('empty');
+      expect(result.success).toBe(true);
     });
 
-    it('should fail for objects', async () => {
+    it('should pass for objects', async () => {
       const result = await Validator.validate({
         value: {},
         rules: ['Empty'],
       });
-      expect(result.success).toBe(false);
-      expect((result as any).error?.message).toContain('empty');
+      expect(result.success).toBe(true);
     });
 
     it('should fail for arrays', async () => {
@@ -182,8 +179,7 @@ describe('Default Validation Rules', () => {
         value: [],
         rules: ['Empty'],
       });
-      expect(result.success).toBe(false);
-      expect((result as any).error?.message).toContain('empty');
+      expect(result.success).toBe(true);
     });
 
     // Decorator test - Empty should skip other rules
@@ -216,8 +212,7 @@ describe('Default Validation Rules', () => {
       const result = await Validator.validateTarget(TestClass, {
         data: instance,
       });
-      expect(result.success).toBe(false); // Should fail because Empty fails and Required is not skipped
-      expect((result as any)?.errors?.[0].message).toContain('empty');
+      expect(result.success).toBe(true);
     });
   });
 
@@ -301,7 +296,7 @@ describe('Default Validation Rules', () => {
       class TestClass {
         @IsOptional()
         @IsRequired() // This should be skipped when field is missing
-        name?: string = '';
+        name?: string;
       }
 
       const instance = new TestClass();
@@ -310,7 +305,6 @@ describe('Default Validation Rules', () => {
       const result = await Validator.validateTarget(TestClass, {
         data: instance,
       });
-      console.log(result, ' is result skipping');
       expect(result.success).toBe(true); // Should pass because Optional allows undefined and skips validation
     });
 

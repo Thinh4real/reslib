@@ -1507,6 +1507,17 @@ export class Validator {
           i18n,
         };
         const handleResult = (result: unknown) => {
+          if (Validator.isFailure<Context>(result)) {
+            const opts = {
+              validatedValue: value,
+              validatedRuleName: ruleName,
+              validatedParams: ruleParams,
+            };
+            resolve({
+              ...result,
+              ...opts,
+            });
+          }
           result =
             typeof result === 'string'
               ? isNonNullString(result)
