@@ -103,9 +103,6 @@ export function debounce<T extends (...args: any[]) => any>(
     const args = lastArgs;
     const thisArg = lastThis;
 
-    // Reset last args to prepare for next call
-    lastArgs = undefined;
-    lastThis = undefined;
     lastInvokeTime = time;
     result = func.apply(thisArg, args as Parameters<T>);
     return result;
@@ -155,7 +152,11 @@ export function debounce<T extends (...args: any[]) => any>(
     lastInvokeTime = time;
 
     // Start timer for trailing edge
-    timerId = startTimer(timerExpired, wait);
+    const waitTime =
+      maxWait !== undefined
+        ? Math.min(wait, maxWait - (time - lastInvokeTime))
+        : wait;
+    timerId = startTimer(timerExpired, waitTime);
 
     // Invoke the function if leading is enabled
     return leading ? invokeFunc(time) : result;
@@ -168,7 +169,11 @@ export function debounce<T extends (...args: any[]) => any>(
     // Only invoke if we have lastArgs, which means func has been called at least once
     // and trailing option is enabled
     if (trailing && lastArgs) {
-      return invokeFunc(time);
+      const res = invokeFunc(time);
+      // Reset lastArgs and lastThis to avoid memory leaks
+      lastArgs = undefined;
+      lastThis = undefined;
+      return res;
     }
 
     // Reset lastArgs and lastThis to avoid memory leaks
@@ -185,6 +190,13 @@ export function debounce<T extends (...args: any[]) => any>(
     ...args: Parameters<T>
   ): ReturnType<T> | undefined {
     const time = getTime();
+
+    // Special case for wait = 0: invoke immediately
+    if (wait === 0) {
+      lastInvokeTime = time;
+      return func.apply(this, args);
+    }
+
     const isInvoking = shouldInvoke(time);
 
     // Store the args and this context for later use

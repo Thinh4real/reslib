@@ -182,11 +182,7 @@ export const IsEmail = Validator.buildRuleDecorator<
   ValidatorRuleParamTypes['Email']
 >(function _IsEmail(options) {
   const { value, i18n } = options;
-  const message = i18n.t('validator.email', options);
-  if (!isNonNullString(value)) {
-    return message;
-  }
-  return isEmail(value) || message;
+  return isEmail(value) || i18n.t('validator.email', options);
 }, 'Email');
 
 /**
@@ -353,9 +349,7 @@ export const IsUrl = Validator.buildRuleDecorator<
   ValidatorRuleParamTypes['Url']
 >(function Url(options) {
   const { value, i18n, ruleParams } = options;
-  return !value || typeof value !== 'string'
-    ? true
-    : isUrl(value, ruleParams[0]) || i18n.t('validator.url', options);
+  return isUrl(value, ruleParams[0]) || i18n.t('validator.url', options);
 }, 'Url');
 
 /**

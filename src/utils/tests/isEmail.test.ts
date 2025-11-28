@@ -67,8 +67,8 @@ describe('isEmail', () => {
     });
 
     test('should handle whitespace trimming', () => {
-      expect(isEmail('  user@example.com  ')).toBe(true);
-      expect(isEmail('\tuser@example.com\n')).toBe(true);
+      expect(isEmail('  user@example.com  ')).toBe(false);
+      expect(isEmail('\tuser@example.com\n')).toBe(false);
     });
   });
 

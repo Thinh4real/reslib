@@ -1,10 +1,10 @@
-import { defaultBool } from './defaultBool';
-import { isEmpty } from './isEmpty';
-import { isNonNullString } from './isNonNullString';
-import { isNumber } from './isNumber';
 /**
  * A highly optimized sorting function capable of efficiently handling billions of array elements
  * with support for complex objects and various data types.
+ *
+ * For very large arrays (millions of elements), this function automatically switches to
+ * a chunked sorting algorithm that reduces memory pressure and improves cache efficiency.
+ * You can control the chunk size with the `chunkSize` option.
  *
  * @template T - The type of array elements being sorted
  * @template V - The type of values being compared for sorting
@@ -48,6 +48,12 @@ import { isNumber } from './isNumber';
  * const sortedNumbers = sortBy(numbers, n => n, { inPlace: false });
  * // numbers is still [5, 2, 9, 1, 5, 6]
  * // sortedNumbers is [1, 2, 5, 5, 6, 9]
+ *
+ * @example
+ * // Handle very large datasets with custom chunk size for memory efficiency
+ * const largeDataset = Array.from({ length: 1000000 }, () => Math.random());
+ * const sortedLarge = sortBy(largeDataset, n => n, { chunkSize: 25000 });
+ * // Uses chunked sorting to reduce memory pressure on large arrays
  */
 
 export function sortBy<T, V = unknown>(
@@ -56,6 +62,8 @@ export function sortBy<T, V = unknown>(
   options: {
     direction?: SortOrder;
     inPlace?: boolean;
+    /** Controls chunk size for large array sorting. Arrays larger than chunkSize
+     * will be sorted using a memory-efficient chunked algorithm. Default: 50000 */
     chunkSize?: number;
     ignoreCase?: boolean;
   } = {}
@@ -64,58 +72,33 @@ export function sortBy<T, V = unknown>(
     return [];
   }
   // Handle empty or single-item arrays
-  if (data.length <= 1) return data;
+  if (data.length <= 1) return options.inPlace === false ? [...data] : data;
+
   // Default options
-  options = Object.assign({}, options);
-  options.direction =
-    isNonNullString(options.direction) &&
-    ['asc', 'desc'].includes(options.direction)
-      ? options.direction
-      : 'asc';
-  options.chunkSize =
-    isNumber(options.chunkSize) && options.chunkSize > 0
-      ? options.chunkSize
-      : 10000;
-  options.ignoreCase = defaultBool(options.ignoreCase, true);
-  const { direction, chunkSize, ignoreCase } = options;
-  // For very large arrays, use a chunked merge sort approach
-  if (data.length > chunkSize) {
-    return chunkingMergeSort(data, getItemValue, direction, ignoreCase);
+  const direction = options.direction === 'desc' ? 'desc' : 'asc';
+  const ignoreCase = options.ignoreCase !== false; // default true
+  const inPlace = options.inPlace !== false; // default true
+  const chunkSize =
+    options.chunkSize && options.chunkSize > 0 ? options.chunkSize : 50000; // Default chunk size for large arrays
+
+  // Work on a copy if not in-place
+  const arrayToSort = inPlace ? data : [...data];
+
+  // For very large arrays, use chunked sorting to reduce memory pressure
+  if (arrayToSort.length > chunkSize) {
+    return chunkedSort(
+      arrayToSort,
+      getItemValue,
+      direction,
+      ignoreCase,
+      chunkSize
+    );
   }
-  // For smaller arrays, use native sort with comparison function
-  return data.sort((a, b) => {
+
+  // For smaller arrays, use native sort
+  return arrayToSort.sort((a, b) => {
     return compare<V>(getItemValue(a), getItemValue(b), direction, ignoreCase);
   });
-}
-
-/**
- * Chunking merge sort implementation for very large arrays
- * Splits the work into manageable chunks to avoid call stack issues
- */
-function chunkingMergeSort<T, V>(
-  array: T[],
-  getItemValue: (item: T) => V,
-  direction: SortOrder,
-  ignoreCase: boolean
-): T[] {
-  // Base case
-  if (array.length <= 1) {
-    return array;
-  }
-
-  // Split array into two halves
-  const middle = Math.floor(array.length / 2);
-  const left = array.slice(0, middle);
-  const right = array.slice(middle);
-
-  // Recursively sort both halves
-  return merge(
-    chunkingMergeSort(left, getItemValue, direction, ignoreCase),
-    chunkingMergeSort(right, getItemValue, direction, ignoreCase),
-    getItemValue,
-    direction,
-    ignoreCase
-  );
 }
 
 function compare<V = unknown>(
@@ -124,101 +107,136 @@ function compare<V = unknown>(
   direction: SortOrder,
   ignoreCase?: boolean
 ): number {
-  // Inside our compare function:
-  // Special handling for null and undefined
-  if (isEmpty(valueA) && isEmpty(valueB)) return 0;
-  if (isEmpty(valueA) && !isEmpty(valueB)) return direction === 'asc' ? -1 : 1;
-  if (isEmpty(valueB) && !isEmpty(valueA)) return direction === 'asc' ? 1 : -1;
+  // Handle null/undefined
+  if (valueA == null && valueB == null) return 0;
+  if (valueA == null) return direction === 'asc' ? -1 : 1;
+  if (valueB == null) return direction === 'asc' ? 1 : -1;
+
+  // Fast path for numbers
   if (typeof valueA === 'number' && typeof valueB === 'number') {
-    return direction === 'asc' ? valueA - valueB : valueB - valueA;
+    const diff = valueA - valueB;
+    return direction === 'asc' ? diff : -diff;
   }
-  // Handle different types appropriately
+
+  // Fast path for strings
+  if (typeof valueA === 'string' && typeof valueB === 'string') {
+    let a = valueA;
+    let b = valueB;
+    if (ignoreCase) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      a = a.toLowerCase() as any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      b = b.toLowerCase() as any;
+    }
+    const cmp = a < b ? -1 : a > b ? 1 : 0;
+    return direction === 'asc' ? cmp : -cmp;
+  }
+
+  // Dates
   if (valueA instanceof Date && valueB instanceof Date) {
-    return direction === 'asc'
-      ? valueA.getTime() - valueB.getTime()
-      : valueB.getTime() - valueA.getTime();
+    const diff = valueA.getTime() - valueB.getTime();
+    return direction === 'asc' ? diff : -diff;
   }
-  if (valueA instanceof RegExp && valueB instanceof RegExp) {
-    valueA = valueA.toString() as V;
-    valueB = valueB.toString() as V;
-  }
-  if (['boolean', 'number', 'string'].includes(typeof valueA)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    valueA = String(valueA) as any;
-  }
-  if (['boolean', 'number', 'string'].includes(typeof valueB)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    valueB = String(valueB) as any;
-  }
-  // Convert to strings for general comparison
-  let stringA = valueA?.toString() ?? String(valueA);
-  let stringB = valueB?.toString() ?? String(valueB);
-  if (ignoreCase) {
-    stringA = stringA.toLowerCase();
-    stringB = stringB.toLowerCase();
-  }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return compareStrings(stringA, stringB, direction as any);
+
+  // Convert to strings for other types
+  const strA = String(valueA);
+  const strB = String(valueB);
+  const cmp = ignoreCase
+    ? strA.toLowerCase() < strB.toLowerCase()
+      ? -1
+      : strA.toLowerCase() > strB.toLowerCase()
+        ? 1
+        : 0
+    : strA < strB
+      ? -1
+      : strA > strB
+        ? 1
+        : 0;
+  return direction === 'asc' ? cmp : -cmp;
 }
 
 /**
- * Compares two strings and returns -1, 0, or 1 based on their relative order
- *
- * @param a - First string to compare
- * @param b - Second string to compare
- * @param dir - Direction of comparison ('asc' for ascending, 'desc' for descending)
- * @returns -1 if a comes before b, 0 if equal, 1 if a comes after b
+ * Chunked sorting for large arrays to reduce memory pressure and improve cache efficiency
  */
-function compareStrings(a: string, b: string, dir: SortOrder): -1 | 0 | 1 {
-  // For empty string checks
-  if (!a && b) return dir === 'asc' ? -1 : 1;
-  if (a && !b) return dir === 'asc' ? 1 : -1;
-  if (!a && !b) return 0;
+function chunkedSort<T, V>(
+  array: T[],
+  getItemValue: (item: T) => V,
+  direction: SortOrder,
+  ignoreCase: boolean,
+  chunkSize: number
+): T[] {
+  if (array.length <= chunkSize) {
+    // If array is smaller than chunk size, just sort directly
+    return array.sort((a, b) =>
+      compare<V>(getItemValue(a), getItemValue(b), direction, ignoreCase)
+    );
+  }
 
-  // For non-empty strings
-  const comparison = a.localeCompare(b);
+  // Split array into chunks
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
 
-  // Normalize to exactly -1, 0, or 1
-  const normalizedComparison = comparison < 0 ? -1 : comparison > 0 ? 1 : 0;
-  // Apply direction
-  return (dir === 'asc' ? normalizedComparison : -normalizedComparison) as
-    | -1
-    | 0
-    | 1;
+  // Sort each chunk individually
+  const sortedChunks = chunks.map((chunk) =>
+    chunk.sort((a, b) =>
+      compare<V>(getItemValue(a), getItemValue(b), direction, ignoreCase)
+    )
+  );
+
+  // Merge all sorted chunks
+  return mergeSortedChunks(sortedChunks, getItemValue, direction, ignoreCase);
 }
 
 /**
- * Merge two sorted arrays
+ * Merge multiple sorted chunks into a single sorted array
  */
-function merge<T, V>(
-  left: T[],
-  right: T[],
+function mergeSortedChunks<T, V>(
+  chunks: T[][],
   getItemValue: (item: T) => V,
   direction: SortOrder,
   ignoreCase: boolean
 ): T[] {
-  const result: T[] = [];
-  let leftIndex = 0;
-  let rightIndex = 0;
+  if (chunks.length === 0) return [];
+  if (chunks.length === 1) return chunks[0];
 
-  while (leftIndex < left.length && rightIndex < right.length) {
-    if (
-      compare<V>(
-        getItemValue(left[leftIndex]),
-        getItemValue(right[rightIndex]),
-        direction,
-        ignoreCase
-      ) <= 0
-    ) {
-      result.push(left[leftIndex]);
-      leftIndex++;
-    } else {
-      result.push(right[rightIndex]);
-      rightIndex++;
+  // Use a priority queue-like approach for k-way merge
+  const result: T[] = [];
+  const indices = new Array(chunks.length).fill(0);
+
+  while (true) {
+    let minIndex = -1;
+    let minValue: T | null = null;
+
+    // Find the smallest element among the current heads of all chunks
+    for (let i = 0; i < chunks.length; i++) {
+      if (indices[i] < chunks[i].length) {
+        const currentItem = chunks[i][indices[i]];
+        if (
+          minValue === null ||
+          compare<V>(
+            getItemValue(currentItem),
+            getItemValue(minValue),
+            direction,
+            ignoreCase
+          ) < 0
+        ) {
+          minValue = currentItem;
+          minIndex = i;
+        }
+      }
     }
+
+    // If no more elements, we're done
+    if (minIndex === -1) break;
+
+    // Add the smallest element to result and advance its chunk index
+    result.push(minValue!);
+    indices[minIndex]++;
   }
-  // Add remaining elements
-  return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
+
+  return result;
 }
 
 type SortOrder = 'asc' | 'desc';

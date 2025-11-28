@@ -372,12 +372,12 @@ export function isUrl(value: string, options: IsUrlOptions = {}): boolean {
   const { requireHost = true, allowedProtocols } = Object.assign({}, options);
 
   // Early return for non-string or empty values
-  if (typeof value !== 'string' || value.trim() === '') {
+  if (!isNonNullString(value) || !isNonNullString(value.trim())) {
     return false;
   }
 
   // Trim whitespace for consistent validation
-  const trimmedValue = value.trim();
+  const trimmedValue = value; //value.trim();
 
   // Strategy 1: Try using native URL constructor (preferred method)
   if (typeof URL !== 'undefined' && URL) {

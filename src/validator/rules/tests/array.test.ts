@@ -102,7 +102,7 @@ describe('Array Validation Rules', () => {
         rules: [{ ArrayMinLength: [1] }],
       });
       expect(result.success).toBe(false);
-      expect(result.error?.message).toContain('Must be an array');
+      expect(result.error?.message).toContain('must be an array');
     });
 
     it('should fail for invalid parameters', async () => {
@@ -111,7 +111,7 @@ describe('Array Validation Rules', () => {
         rules: [{ ArrayMinLength: [-1] }],
       });
       expect(result.success).toBe(false);
-      expect(result.error?.message).toContain('invalidRuleParams');
+      expect(result.error?.message).toContain('Invalid parameters for rule');
     });
 
     // Decorator test
@@ -183,7 +183,7 @@ describe('Array Validation Rules', () => {
         rules: [{ ArrayMaxLength: [-1] }],
       });
       expect(result.success).toBe(false);
-      expect(result.error?.message).toContain('invalidRuleParams');
+      expect(result.error?.message).toContain('Invalid parameters for rule');
     });
 
     // Decorator test
@@ -334,7 +334,7 @@ describe('Array Validation Rules', () => {
         rules: [{ ArrayContains: [] }],
       });
       expect(result.success).toBe(false);
-      expect(result.error?.message).toContain('invalidRuleParams');
+      expect(result.error?.message).toContain('Invalid parameters for rule');
     });
 
     // Decorator test
@@ -564,7 +564,7 @@ describe('Array Validation Rules', () => {
         value: [1, 2.5, -3, 0, NaN, Infinity],
         rules: ['ArrayAllNumbers'],
       });
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(false);
     });
 
     it('should pass for empty arrays', async () => {

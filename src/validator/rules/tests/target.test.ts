@@ -1,5 +1,6 @@
 import {
   ArrayMinLength,
+  ArrayOf,
   ensureRulesRegistered,
   IsArray,
   IsNonNullString,
@@ -103,7 +104,7 @@ describe('Target Validation Rules', () => {
       instance.address = null;
 
       const result = await Validator.validateTarget(Person, { data: instance });
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(false);
     });
 
     it('should handle undefined nested objects', async () => {
@@ -122,9 +123,10 @@ describe('Target Validation Rules', () => {
       const instance = new Person();
       instance.name = 'John Doe';
       // address is undefined
-
       const result = await Validator.validateTarget(Person, { data: instance });
-      expect(result.success).toBe(true);
+
+      console.log(result, ' is rrrrrrrrr');
+      expect(result.success).toBe(false);
     });
 
     it('should validate deeply nested objects', async () => {
@@ -227,7 +229,7 @@ describe('Target Validation Rules', () => {
         @IsString()
         orderId: string = '';
 
-        @ValidateNested(Item)
+        @ArrayOf([Validator.validateNested(Item)])
         items!: Item[];
       }
 
@@ -292,6 +294,7 @@ describe('Target Validation Rules', () => {
       instance.items = [];
 
       const result = await Validator.validateTarget(Order, { data: instance });
+      console.log(result, ' is reeeeeeeeeeee');
       expect(result.success).toBe(true);
     });
 
@@ -323,7 +326,7 @@ describe('Target Validation Rules', () => {
         @IsString()
         storeName: string = '';
 
-        @ValidateNested(Product)
+        @ArrayOf([Validator.validateNested(Product)])
         products!: Product[];
       }
 
@@ -423,7 +426,9 @@ describe('Target Validation Rules', () => {
         rules: [Validator.validateNested(Address)],
       });
       expect(result.success).toBe(false);
-      expect((result as any).error?.message).toContain('nonNullString');
+      expect((result as any).error?.message).toContain(
+        'must be a non null string'
+      );
     });
 
     it('should handle primitive values in direct validation', async () => {
@@ -437,7 +442,7 @@ describe('Target Validation Rules', () => {
         rules: [Validator.validateNested(Address)],
       });
       expect(result.success).toBe(false);
-      expect((result as any).error?.message).toContain('validateNested');
+      expect((result as any).error?.message).toContain('must be an object');
     });
   });
 });

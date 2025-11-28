@@ -60,6 +60,7 @@ export const validator = {
     'This field must be between %{ruleParams[0]} and %{ruleParams[1]}',
   decimalCount:
     'This field must have(at least) %{ruleParams[0]} decimal places or/and at most %{ruleParams[1]} decimal places',
+  decimalPlaces: 'This field must have exactly %{places} decimal places',
   string: 'This field must be a string',
   endsWithOneOf:
     'This field must end with one of the following values: %{endings}',

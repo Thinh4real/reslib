@@ -75,9 +75,6 @@ export function isEmail(email: string, options: IsEmailOptions = {}): boolean {
     return false;
   }
 
-  // Trim whitespace
-  email = email.trim();
-
   /**
    * Length constraints (RFC 5321)
    * https://www.rfc-editor.org/rfc/rfc3696

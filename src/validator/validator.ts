@@ -1997,7 +1997,13 @@ export class Validator {
 
     // Validate value is an object
     if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-      const receivedType = value === null ? 'null' : typeof value;
+      const receivedType = Array.isArray(value)
+        ? 'array'
+        : value === undefined
+          ? 'undefined'
+          : value === null
+            ? 'null'
+            : typeof value;
       return (
         i18n.t('validator.validateNestedInvalidType', {
           ...translateProperties,
