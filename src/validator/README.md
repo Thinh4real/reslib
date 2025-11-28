@@ -50,7 +50,7 @@ import { Validator } from 'reslib/validator';
 // Simple validation
 const result = await Validator.validate({
   value: 'user@example.com',
-  rules: ['Required', 'Email']
+  rules: ['Required', 'Email'],
 });
 
 if (result.success) {
@@ -102,7 +102,7 @@ import { Validator } from 'reslib/validator';
 const result = await Validator.validate({
   value: 'test@example.com',
   rules: ['Required', 'Email'],
-  context: { userId: 123 } // Optional context
+  context: { userId: 123 }, // Optional context
 });
 
 console.log(result.success); // true or false
@@ -118,8 +118,8 @@ const result = await Validator.validate({
     'Required',
     { MinLength: [8] },
     { MaxLength: [128] },
-    ({ value }) => /[A-Z]/.test(value) || 'Must contain uppercase letter'
-  ]
+    ({ value }) => /[A-Z]/.test(value) || 'Must contain uppercase letter',
+  ],
 });
 ```
 
@@ -129,20 +129,20 @@ The validator supports multiple rule specification formats:
 
 ```typescript
 // Named rules (strings)
-rules: ['Required', 'Email']
+rules: ['Required', 'Email'];
 
 // Parameterized rules (objects)
-rules: [{ MinLength: [5] }, { MaxLength: [100] }]
+rules: [{ MinLength: [5] }, { MaxLength: [100] }];
 
 // Function rules
-rules: [({ value }) => value.length > 3 || 'Too short']
+rules: [({ value }) => value.length > 3 || 'Too short'];
 
 // Mixed rules
 rules: [
-  'Required',           // Named
-  { MinLength: [3] },   // Parameterized
-  ({ value }) => true   // Function
-]
+  'Required', // Named
+  { MinLength: [3] }, // Parameterized
+  ({ value }) => true, // Function
+];
 ```
 
 ## Decorator-Based Validation
@@ -152,9 +152,14 @@ Decorators provide a clean, declarative way to define validation rules on class 
 ### Basic Decorators
 
 ```typescript
-import { 
-  IsRequired, IsEmail, IsNumber, IsString,
-  MinLength, MaxLength, IsOptional 
+import {
+  IsRequired,
+  IsEmail,
+  IsNumber,
+  IsString,
+  MinLength,
+  MaxLength,
+  IsOptional,
 } from 'reslib/validator';
 
 class User {
@@ -185,8 +190,8 @@ const result = await Validator.validateTarget(User, {
     name: 'John Doe',
     email: 'john@example.com',
     age: 30,
-    bio: 'Software developer'
-  }
+    bio: 'Software developer',
+  },
 });
 
 if (result.success) {
@@ -302,7 +307,7 @@ import { Validator } from 'reslib/validator';
 Validator.registerRule('MinWords', ({ value, ruleParams }) => {
   const [minWords] = ruleParams;
   if (typeof value !== 'string') return 'Must be a string';
-  
+
   const wordCount = value.trim().split(/\s+/).length;
   return wordCount >= minWords || `Must contain at least ${minWords} words`;
 });
@@ -310,7 +315,7 @@ Validator.registerRule('MinWords', ({ value, ruleParams }) => {
 // Use the custom rule
 const result = await Validator.validate({
   value: 'This is a test',
-  rules: [{ MinWords: [3] }]
+  rules: [{ MinWords: [3] }],
 });
 ```
 
@@ -332,7 +337,7 @@ const asyncRule = async ({ value, ruleParams, context }) => {
 // Use in validation
 const result = await Validator.validate({
   value: 'test',
-  rules: [customRule, asyncRule]
+  rules: [customRule, asyncRule],
 });
 ```
 
@@ -367,7 +372,7 @@ Validator.registerRule('AnotherRule', ({ value }) => {
 // Now you can use them with full type safety
 const result = await Validator.validate({
   value: 'test',
-  rules: [{ CustomRule: ['param'] }, 'AnotherRule']
+  rules: [{ CustomRule: ['param'] }, 'AnotherRule'],
 });
 ```
 
@@ -401,7 +406,7 @@ class SecurePassword {
     { MinLength: [8] },
     ({ value }) => /[A-Z]/.test(value) || 'Must contain uppercase',
     ({ value }) => /[a-z]/.test(value) || 'Must contain lowercase',
-    ({ value }) => /\d/.test(value) || 'Must contain number'
+    ({ value }) => /\d/.test(value) || 'Must contain number',
   ])
   password: string;
 }
@@ -452,8 +457,8 @@ const result = await Validator.validateTarget(Post, {
   data: postData,
   context: {
     currentUser: { id: 1, role: 'user' },
-    permissions: ['read', 'write']
-  }
+    permissions: ['read', 'write'],
+  },
 });
 ```
 
@@ -470,7 +475,7 @@ await i18n.setLocale('fr');
 // Error messages will now be in French
 const result = await Validator.validate({
   value: '',
-  rules: ['Required']
+  rules: ['Required'],
 });
 // result.error.message will be in French
 ```
@@ -481,9 +486,11 @@ const result = await Validator.validate({
 // Per-rule custom messages
 const result = await Validator.validate({
   value: 'short',
-  rules: [{
-    MinLength: [10, { message: 'custom.minLength' }]
-  }]
+  rules: [
+    {
+      MinLength: [10, { message: 'custom.minLength' }],
+    },
+  ],
 });
 
 // Or with decorators
@@ -530,9 +537,9 @@ interface ValidatorValidateTargetOptions {
 
 ```typescript
 type ValidatorRule =
-  | string                          // Named rule
-  | ValidatorRuleFunction          // Function rule
-  | ValidatorRuleObject;           // Object rule
+  | string // Named rule
+  | ValidatorRuleFunction // Function rule
+  | ValidatorRuleObject; // Object rule
 
 type ValidatorRules = ValidatorRule | ValidatorRule[];
 ```
@@ -551,9 +558,16 @@ property: Type;
 ### User Registration
 
 ```typescript
-import { 
-  IsRequired, IsEmail, IsString, MinLength, MaxLength,
-  IsNumber, IsOptional, OneOf, ValidateNested
+import {
+  IsRequired,
+  IsEmail,
+  IsString,
+  MinLength,
+  MaxLength,
+  IsNumber,
+  IsOptional,
+  OneOf,
+  ValidateNested,
 } from 'reslib/validator';
 
 class Address {
@@ -609,8 +623,8 @@ const userData = {
   address: {
     street: '123 Main St',
     city: 'Anytown',
-    zipCode: '12345'
-  }
+    zipCode: '12345',
+  },
 };
 
 const result = await Validator.validateTarget(User, { data: userData });
@@ -656,7 +670,7 @@ class CreateUserRequest {
     { MinLength: [8] },
     ({ value }) => /[A-Z]/.test(value) || 'Must contain uppercase',
     ({ value }) => /[a-z]/.test(value) || 'Must contain lowercase',
-    ({ value }) => /\d/.test(value) || 'Must contain number'
+    ({ value }) => /\d/.test(value) || 'Must contain number',
   ])
   password: string;
 }
@@ -664,7 +678,7 @@ class CreateUserRequest {
 // In your API handler
 app.post('/users', async (req, res) => {
   const result = await Validator.validateTarget(CreateUserRequest, {
-    data: req.body
+    data: req.body,
   });
 
   if (!result.success) {
@@ -687,7 +701,7 @@ app.post('/users', async (req, res) => {
 // Joi
 const schema = Joi.object({
   name: Joi.string().min(3).max(50).required(),
-  email: Joi.string().email().required()
+  email: Joi.string().email().required(),
 });
 
 // ResLib
@@ -709,7 +723,7 @@ class User {
 // Yup
 const schema = yup.object({
   name: yup.string().min(3).max(50).required(),
-  email: yup.string().email().required()
+  email: yup.string().email().required(),
 });
 
 // ResLib
