@@ -1576,13 +1576,16 @@ class Document {
   title: string;
 
   // Conditional validation based on context
-  @OneOf('IsString', ({ value, context }) => {
-    const ctx = context as ValidationContext;
-    if (ctx?.userRole === 'admin') {
-      return true; // Admins can set any value
-    }
-    return /^PUBLIC-/.test(value) || 'Must start with PUBLIC-';
-  })
+  @OneOf([
+    'IsString',
+    ({ value, context }) => {
+      const ctx = context as ValidationContext;
+      if (ctx?.userRole === 'admin') {
+        return true; // Admins can set any value
+      }
+      return /^PUBLIC-/.test(value) || 'Must start with PUBLIC-';
+    },
+  ])
   accessCode: string;
 }
 
