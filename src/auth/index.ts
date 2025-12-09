@@ -476,7 +476,7 @@ export class Auth {
    *
    * ### Security Architecture:
    * - **AES Encryption**: User data is encrypted before storage to protect sensitive information
-   * - **Session Timestamping**: Automatically adds `authSessionCreatedAt` timestamp for session tracking
+   * - **Session Timestamping**: Automatically adds `sessionCreatedAt` timestamp for session tracking
    * - **Error Isolation**: Encryption failures don't crash the application, user reference is safely cleared
    * - **Memory Management**: Updates local cache reference for immediate access
    *
@@ -489,7 +489,7 @@ export class Auth {
    * @param u - The user object to store in session, or `null` to clear the current session.
    *            When providing a user object, it should contain all necessary authentication
    *            information including permissions, roles, and tokens. The object will be
-   *            automatically timestamped with `authSessionCreatedAt`.
+   *            automatically timestamped with `sessionCreatedAt`.
    *
    * @param triggerEvent - Optional flag controlling whether to broadcast authentication events.
    *                       When `true` (default), triggers either 'SIGN_IN' or 'SIGN_OUT' events
@@ -618,7 +618,7 @@ export class Auth {
     let encrypted: any = null;
     try {
       if (isObj(uToSave)) {
-        uToSave.authSessionCreatedAt = new Date().getTime();
+        uToSave.sessionCreatedAt = new Date().getTime();
       }
       encrypted = uToSave
         ? encrypt(JSON.stringify(uToSave), SESSION_ENCRYPT_KEY).toString()

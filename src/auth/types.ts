@@ -18,7 +18,7 @@ import { Dictionary } from '../types/dictionary';
  * - `id` (string | number): A unique identifier for the user. This
  *   can be either a string or a number, depending on the implementation.
  *
- * - `authSessionCreatedAt` (number, optional): An optional property
+ * - `sessionCreatedAt` (number, optional): An optional property
  *   that stores the timestamp (in milliseconds) of when the
  *   authentication session was created. This can be useful for
  *   tracking session duration or expiration.
@@ -42,7 +42,7 @@ import { Dictionary } from '../types/dictionary';
  * ```typescript
  * const user: AuthUser = {
  *     id: "user123",
- *     authSessionCreatedAt: Date.now(),
+ *     sessionCreatedAt: Date.now(),
  *     token: "jwt-token-here",
  *     perms: {
  *         documents: ["read", "create", "update"],
@@ -75,8 +75,8 @@ import { Dictionary } from '../types/dictionary';
  */
 
 export interface AuthUser extends Dictionary {
-  id: string | number;
-  authSessionCreatedAt?: number;
+  //id: string | number | object;
+  sessionCreatedAt?: number;
   perms?: AuthPerms;
   /**
    * The authentication token associated with the user.
