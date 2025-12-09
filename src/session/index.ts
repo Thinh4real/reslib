@@ -240,7 +240,9 @@ class Manager {
         get: (key: string) => InMemoryStorage[key],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         set: (key: string, value: any) => (InMemoryStorage[key] = value),
-        remove: (key: string) => delete InMemoryStorage[key],
+        remove: (key: string) => {
+          delete InMemoryStorage[key];
+        },
         removeAll: () => (InMemoryStorage = {}),
       };
     }
@@ -1230,10 +1232,10 @@ export interface SessionStorage {
    * @param {string} key - The key to set the value for.
    * @param {any} value - The value to set.
    * @param {boolean} [decycle] - Optional parameter to decycle the value.
-   * @returns {any} The set value.
+   * @returns {void | Promise<void>} The set value.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  set: (key: string, value: any, decycle?: boolean) => any;
+  set: (key: string, value: any, decycle?: boolean) => void | Promise<void>;
 
   /**
    * Gets a value from the session storage object.
@@ -1248,10 +1250,10 @@ export interface SessionStorage {
    * Removes a value from the session storage object.
    *
    * @param {string} key - The key to remove the value for.
-   * @returns {any} The removed value.
+   * @returns {void | Promise<void>} The removed value.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  remove: (key: string) => any;
+
+  remove: (key: string) => void | Promise<void>;
 
   /**
    * Removes all values from the session storage object.

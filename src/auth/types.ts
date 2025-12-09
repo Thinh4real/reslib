@@ -10,7 +10,7 @@ import { Dictionary } from '../types/dictionary';
  *
  * The `AuthUser` interface defines the structure for an authenticated
  * user object, which includes core user identification, optional session
- * tracking, permissions mapping, authentication token, and role assignments.
+ * tracking, permissions mapping, and role assignments.
  * This interface extends `Dictionary` to allow for additional custom properties.
  *
  * ### Properties
@@ -28,10 +28,6 @@ import { Dictionary } from '../types/dictionary';
  *   to perform on those resources. This allows for fine-grained control
  *   over user permissions within the application.
  *
- * - `token` (string, optional): An optional authentication token
- *   associated with the user, typically used for API authentication
- *   or session management.
- *
  * - `roles` (AuthRole[], optional): An optional array of roles assigned
  *   to the user, defining their authorization level and capabilities.
  *
@@ -43,7 +39,6 @@ import { Dictionary } from '../types/dictionary';
  * const user: AuthUser = {
  *     id: "user123",
  *     sessionCreatedAt: Date.now(),
- *     token: "jwt-token-here",
  *     perms: {
  *         documents: ["read", "create", "update"],
  *         users: ["read", "delete"]
@@ -64,7 +59,7 @@ import { Dictionary } from '../types/dictionary';
  * ```
  *
  * In this example, the `AuthUser` interface is used to define a user
- * object with an ID, session creation timestamp, authentication token,
+ * object with an ID, session creation timestamp,
  * permissions map, and roles. The `hasPermission` function checks if
  * the user has the specified permission for a given resource.
  *
@@ -78,10 +73,6 @@ export interface AuthUser extends Dictionary {
   id: string | number | object;
   sessionCreatedAt?: number;
   perms?: AuthPerms;
-  /**
-   * The authentication token associated with the user.
-   */
-  token?: string;
 
   roles?: AuthRole[];
 }
@@ -488,3 +479,88 @@ export interface AuthEventMap {
  * }
  */
 export type AuthEvent = keyof AuthEventMap;
+
+/**
+ * @interface AuthStorage
+ * Interface for secure, cross-platform storage of authentication data.
+ *
+ * The `AuthStorage` interface abstracts storage operations to enable secure,
+ * platform-specific implementations for storing sensitive data like user sessions
+ * and tokens. This allows the library to work across web, React Native, Node.js,
+ * and other environments by injecting appropriate storage adapters.
+ *
+ * ### Security Features:
+ * - **Async Operations**: All methods are asynchronous to support secure storage APIs
+ * - **Encryption Ready**: Implementations should handle encryption internally
+ * - **Platform Agnostic**: No assumptions about underlying storage mechanism
+ * - **Error Handling**: Methods should handle storage failures gracefully
+ *
+ * ### Methods
+ *
+ * - `get(key: string): Promise<string | null>`: Retrieves the value associated with the key
+ * - `set(key: string, value: string): Promise<void>`: Stores a value under the specified key
+ * - `remove(key: string): Promise<void>`: Removes the value associated with the key
+ *
+ * ### Example Usage
+ *
+ * ```typescript
+ * // Web implementation using HttpOnly cookies
+ * class WebSecureStorage implements AuthStorage {
+ *   async get(key: string): Promise<string | null> {
+ *     return Cookies.get(key) || null;
+ *   }
+ *   async set(key: string, value: string): Promise<void> {
+ *     Cookies.set(key, value, { httpOnly: true, secure: true });
+ *   }
+ *   async remove(key: string): Promise<void> {
+ *     Cookies.remove(key);
+ *   }
+ * }
+ *
+ * // React Native implementation using expo-secure-store
+ * class ReactNativeSecureStorage implements AuthStorage {
+ *   async get(key: string): Promise<string | null> {
+ *     return await SecureStore.getItemAsync(key);
+ *   }
+ *   async set(key: string, value: string): Promise<void> {
+ *     await SecureStore.setItemAsync(key, value);
+ *   }
+ *   async remove(key: string): Promise<void> {
+ *     await SecureStore.deleteItemAsync(key);
+ *   }
+ * }
+ *
+ * // Configure Auth to use platform-specific storage
+ * Auth.configure({ storage: new ReactNativeSecureStorage() });
+ * ```
+ *
+ * @see {@link Auth.configure} - Method to inject storage implementation
+ * @see {@link Auth.getToken} - Uses this interface for token storage
+ * @see {@link Auth.setToken} - Uses this interface for token storage
+ */
+export interface AuthStorage {
+  /**
+   * Retrieves the value associated with the specified key.
+   *
+   * @param key - The unique key for the stored value
+   * @returns Promise resolving to the stored string value, or null if not found
+   */
+  get(key: string): Promise<string | null>;
+
+  /**
+   * Stores a value under the specified key.
+   *
+   * @param key - The unique key for storing the value
+   * @param value - The string value to store
+   * @returns Promise that resolves when storage is complete
+   */
+  set(key: string, value: string): Promise<void>;
+
+  /**
+   * Removes the value associated with the specified key.
+   *
+   * @param key - The unique key for the value to remove
+   * @returns Promise that resolves when removal is complete
+   */
+  remove(key: string): Promise<void>;
+}

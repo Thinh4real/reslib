@@ -1,4 +1,5 @@
 import { Observable, observable } from '@/observable';
+import { ClassConstructor } from '@/types';
 import {
   ResourceActionName,
   ResourceActionTupleArray,
@@ -18,6 +19,7 @@ import {
   AuthPerm,
   AuthPerms,
   AuthSessionStorage,
+  AuthStorage,
   AuthUser,
 } from './types';
 
@@ -30,6 +32,16 @@ const USER_SESSION_KEY = 'user-session';
 
 type ILocalUserRef = {
   current: AuthUser | null;
+};
+
+const DefaultAuthStorage: AuthStorage = {
+  get: async (key) => $session.get(key),
+  set: async (key, value) => {
+    await $session.set(key, value);
+  },
+  remove: async (key) => {
+    await $session.remove(key);
+  },
 };
 
 /***
@@ -144,48 +156,6 @@ class Session {
     const key = Session.getKey(sessionName);
     return Object.assign({}, $session.get(key));
   }
-
-  /**
-   * Retrieves the authentication token from the session storage.
-   *
-   * This function checks the currently signed-in user and returns their token.
-   * If the user is not signed in or if there is no token available, it will return
-   * `undefined` or `null`.
-   *
-   * @returns {string | undefined | null} The authentication token of the signed user,
-   * or `undefined` if the user is not signed in, or `null` if there is no token.
-   *
-   * @example
-   * const token = getToken();
-   * if (token) {
-   *     console.log("User  token:", token);
-   * } else {
-   *     console.log("No user is signed in or token is not available.");
-   * }
-   */
-  static getToken(): string | undefined | null {
-    return Auth.getSignedUser()?.token;
-  }
-  /**
-   * Sets the authentication token in the session storage for the currently signed-in user.
-   *
-   * This function updates the signed user's information by adding or updating the token
-   * in the session storage. If the token is `null`, it will remove the token from the user's
-   * session data.
-   *
-   * @param {string | null} token - The token to be set for the signed user.
-   * If `null`, the token will be removed from the user's session data.
-   *
-   * @returns {void} This function does not return a value.
-   *
-   * @example
-   * setToken("my-secret-token");
-   * // To remove the token
-   * setToken(null);
-   */
-  static setToken(token: string | null): void {
-    Auth.setSignedUser(Object.assign({}, Auth.getSignedUser(), { token }));
-  }
   /**
    * Retrieves a session storage object that provides methods for managing session data.
    *
@@ -208,15 +178,6 @@ class Session {
    * @example
    * // Create a session storage object with a specific session name
    * const session = getSessionStorage('userSession');
-   *
-   * // Set a value in the session storage
-   * session.set('token', 'abc123');
-   *
-   * // Retrieve the value from session storage
-   * const token = session.get('token'); // 'abc123'
-   *
-   * // Get all data stored in the session
-   * const allData = session.getData(); // { token: 'abc123' }
    *
    * // Get the session key
    * const sessionKey = session.getKey(); // 'userSession'
@@ -399,22 +360,6 @@ export class Auth {
    * ```
    *
    * @example
-   * ```typescript
-   * // API request with user token
-   * async function makeAuthenticatedRequest(url: string) {
-   *   const user = Auth.getSignedUser();
-   *   if (!user?.token) {
-   *     throw new Error("No valid authentication token");
-   *   }
-   *
-   *   return fetch(url, {
-   *     headers: {
-   *       'Authorization': `Bearer ${user.token}`,
-   *       'Content-Type': 'application/json'
-   *     }
-   *   });
-   * }
-   * ```
    *
    * @throws {CryptoError} May throw during decryption if session data is corrupted
    * @throws {SyntaxError} May throw during JSON parsing if decrypted data is malformed
@@ -423,7 +368,6 @@ export class Auth {
    * @see {@link setSignedUser} - Method to store user in session
    * @see {@link signIn} - High-level user authentication method
    * @see {@link signOut} - Method to clear user session
-   * @see {@link Session.getToken} - Utility to get user's authentication token
    * @see {@link checkUserPermission} - Check specific user permissions
    *
    *
@@ -507,7 +451,6 @@ export class Auth {
    *   id: "user123",
    *   username: "john_doe",
    *   email: "john@example.com",
-   *   token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
    *   perms: { documents: ["read", "write"] },
    *   roles: [{ name: "editor", perms: { images: ["upload"] } }]
    * };
@@ -660,7 +603,7 @@ export class Auth {
    *
    * @param user - The authenticated user object containing all necessary user information.
    *               Must be a valid object conforming to the `AuthUser` interface, including
-   *               properties like id, username, email, permissions, roles, and authentication token.
+   *               properties like id, username, email, permissions, roles.
    *               The object should come from a successful authentication process (login API, OAuth, etc.).
    *
    * @param triggerEvent - Optional flag controlling whether to broadcast authentication events.
@@ -710,7 +653,6 @@ export class Auth {
    *       id: userProfile.id,
    *       username: userProfile.login,
    *       email: userProfile.email,
-   *       token: tokenResponse.access_token,
    *       perms: await fetchUserPermissions(userProfile.id),
    *       roles: await fetchUserRoles(userProfile.id),
    *       provider: 'oauth'
@@ -808,7 +750,6 @@ export class Auth {
    * **Best Practices:**
    * - Always validate user data before calling this method
    * - Use try-catch blocks to handle authentication failures gracefully
-   * - Consider implementing token refresh logic for long-lived sessions
    * - Use event listeners to initialize user-specific application features
    *
    * **Error Handling:**
@@ -980,9 +921,6 @@ export class Auth {
    *         return true;
    *       }
    *
-   *       // Perform API sign-out call if needed
-   *       await this.notifyServerSignOut(currentUser.token);
-   *
    *       // Sign out locally
    *       await Auth.signOut();
    *
@@ -995,16 +933,6 @@ export class Auth {
    *       await Auth.signOut(false);
    *       return false;
    *     }
-   *   }
-   *
-   *   private async notifyServerSignOut(token: string): Promise<void> {
-   *     await fetch('/api/auth/logout', {
-   *       method: 'POST',
-   *       headers: {
-   *         'Authorization': `Bearer ${token}`,
-   *         'Content-Type': 'application/json'
-   *       }
-   *     });
    *   }
    * }
    * ```
@@ -2301,4 +2229,56 @@ export class Auth {
   static get Session() {
     return Session;
   }
+  private static _storage: AuthStorage = DefaultAuthStorage;
+  static get storage(): AuthStorage {
+    const storage = Reflect.getMetadata(Auth.authStorageMetaData, Auth);
+    if (isValidStorage(storage)) {
+      this._storage = storage;
+    }
+    if (this._storage) return this._storage;
+    return DefaultAuthStorage;
+  }
+  public static set storage(storage: AuthStorage) {
+    if (isValidStorage(storage)) {
+      Reflect.defineMetadata(Auth.authStorageMetaData, storage, Auth);
+    }
+  }
+  private static readonly authStorageMetaData = Symbol('auth:storage:meta');
 }
+
+export function AttachAuthStorage() {
+  return function (target: ClassConstructor<AuthStorage>) {
+    try {
+      const storage = new target();
+      if (!isValidStorage(storage)) {
+        return;
+      }
+      Auth.storage = storage;
+    } catch (error) {
+      console.error(error, ' registering session storage');
+    }
+  };
+}
+
+const isValidStorage = (storage?: AuthStorage): boolean => {
+  /**
+   * Check if the storage object is null or undefined.
+   * If so, return false immediately.
+   */
+  if (!storage) return false;
+
+  try {
+    /**
+     * Check if the storage object has the required methods.
+     * If any of these checks fail, the storage object is not valid.
+     */
+    return ['get', 'set', 'remove'].every(
+      (value) => typeof (storage as Dictionary)[value] === 'function'
+    );
+  } catch {
+    /**
+     * If an error occurs during the checks, return false.
+     */
+    return false;
+  }
+};

@@ -274,17 +274,15 @@ describe('Auth', () => {
       expect(signOutCallback).not.toHaveBeenCalled();
     });
 
-    it('should add authSessionCreatedAt timestamp to user', async () => {
+    it('should add sessionCreatedAt timestamp to user', async () => {
       const testUser: AuthUser = { id: 'test123' };
       const beforeTime = Date.now();
 
       await Auth.setSignedUser(testUser, false);
 
       const storedUser = Auth.getSignedUser();
-      expect(storedUser?.authSessionCreatedAt).toBeDefined();
-      expect(storedUser?.authSessionCreatedAt).toBeGreaterThanOrEqual(
-        beforeTime
-      );
+      expect(storedUser?.sessionCreatedAt).toBeDefined();
+      expect(storedUser?.sessionCreatedAt).toBeGreaterThanOrEqual(beforeTime);
     });
 
     it('should handle encryption errors gracefully', async () => {
@@ -298,7 +296,7 @@ describe('Auth', () => {
       const storedUser = Auth.getSignedUser();
       expect(storedUser).not.toBeNull();
       expect(storedUser?.id).toBe('test123');
-      expect(storedUser?.authSessionCreatedAt).toBeDefined();
+      expect(storedUser?.sessionCreatedAt).toBeDefined();
     });
 
     it('should update local cache immediately', async () => {
