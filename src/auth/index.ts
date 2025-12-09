@@ -2532,7 +2532,215 @@ export class Auth {
   private static readonly authStorageMetaData = Symbol('auth:storage:meta');
 }
 
-export function AttachAuthStorage() {
+/**
+ * Decorator factory for automatically attaching secure storage implementations to the Auth module.
+ *
+ * This decorator provides a declarative way to configure custom secure storage implementations
+ * for the authentication system. When applied to a class that implements `AuthSecureStorage`,
+ * it automatically instantiates the class, validates the implementation, and configures it
+ * as the active secure storage for all authentication operations.
+ *
+ * ### How It Works:
+ * 1. **Class Instantiation**: Creates a new instance of the decorated storage class
+ * 2. **Validation**: Verifies the instance implements all required `AuthSecureStorage` methods
+ * 3. **Configuration**: Sets the validated instance as the active secure storage via `Auth.secureStorage`
+ * 4. **Error Handling**: Gracefully handles instantiation or validation failures
+ *
+ * ### Use Cases:
+ * - **Dependency Injection**: Declarative configuration of storage implementations
+ * - **Module Registration**: Automatic registration during module initialization
+ * - **Platform Abstraction**: Easy switching between platform-specific storage implementations
+ * - **Testing**: Simplified setup of mock or test storage implementations
+ *
+ * ### Security Features:
+ * - **Runtime Validation**: Ensures storage implementations are valid before use
+ * - **Fail-Safe Operation**: Invalid implementations are rejected without breaking the system
+ * - **Error Isolation**: Storage configuration errors don't prevent application startup
+ * - **Type Safety**: TypeScript ensures decorated classes conform to the interface
+ *
+ * @returns A class decorator function that configures secure storage implementations.
+ *
+ * @example
+ * ```typescript
+ * // Basic usage with a custom storage implementation
+ * @AttachAuthSecureStorage()
+ * class CustomSecureStorage implements AuthSecureStorage {
+ *   async get(key: string): Promise<string | null> {
+ *     // Custom secure storage logic
+ *     return await this.customGet(key);
+ *   }
+ *
+ *   async set(key: string, value: string): Promise<void> {
+ *     // Custom secure storage logic
+ *     await this.customSet(key, value);
+ *   }
+ *
+ *   async remove(key: string): Promise<void> {
+ *     // Custom secure storage logic
+ *     await this.customRemove(key);
+ *   }
+ * }
+ *
+ * // The CustomSecureStorage is automatically configured when the module loads
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Platform-specific storage implementations
+ * @AttachAuthSecureStorage()
+ * class WebSecureStorage implements AuthSecureStorage {
+ *   async get(key: string): Promise<string | null> {
+ *     return Cookies.get(key) || null;
+ *   }
+ *
+ *   async set(key: string, value: string): Promise<void> {
+ *     Cookies.set(key, value, { httpOnly: true, secure: true });
+ *   }
+ *
+ *   async remove(key: string): Promise<void> {
+ *     Cookies.remove(key);
+ *   }
+ * }
+ *
+ * @AttachAuthSecureStorage()
+ * class ReactNativeSecureStorage implements AuthSecureStorage {
+ *   async get(key: string): Promise<string | null> {
+ *     return await SecureStore.getItemAsync(key);
+ *   }
+ *
+ *   async set(key: string, value: string): Promise<void> {
+ *     await SecureStore.setItemAsync(key, value);
+ *   }
+ *
+ *   async remove(key: string): Promise<void> {
+ *     await SecureStore.deleteItemAsync(key);
+ *   }
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Error handling for invalid implementations
+ * @AttachAuthSecureStorage()
+ * class InvalidStorage {
+ *   // Missing required methods - will be rejected during validation
+ *   async get(key: string): Promise<string | null> {
+ *     return null;
+ *   }
+ *   // Missing set() and remove() methods
+ * }
+ *
+ * // The decorator will log an error and skip configuration
+ * // Auth.secureStorage will retain its previous configuration
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Testing with mock storage
+ * @AttachAuthSecureStorage()
+ * class MockSecureStorage implements AuthSecureStorage {
+ *   private store = new Map<string, string>();
+ *
+ *   async get(key: string): Promise<string | null> {
+ *     return this.store.get(key) || null;
+ *   }
+ *
+ *   async set(key: string, value: string): Promise<void> {
+ *     this.store.set(key, value);
+ *   }
+ *
+ *   async remove(key: string): Promise<void> {
+ *     this.store.delete(key);
+ *   }
+ *
+ *   // Additional methods for testing
+ *   clearAll(): void {
+ *     this.store.clear();
+ *   }
+ *
+ *   getAllData(): Map<string, string> {
+ *     return new Map(this.store);
+ *   }
+ * }
+ *
+ * // In tests, you can access the configured storage
+ * const mockStorage = Auth.secureStorage as MockSecureStorage;
+ * mockStorage.clearAll(); // Clear all test data
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Advanced usage with dependency injection
+ * interface StorageDependencies {
+ *   encryptionKey: string;
+ *   storagePath: string;
+ * }
+ *
+ * @AttachAuthSecureStorage()
+ * class EncryptedFileStorage implements AuthSecureStorage {
+ *   constructor(private deps: StorageDependencies = {
+ *     encryptionKey: 'default-key',
+ *     storagePath: './secure'
+ *   }) {}
+ *
+ *   async get(key: string): Promise<string | null> {
+ *     // Implementation using this.deps.encryptionKey and this.deps.storagePath
+ *     return null;
+ *   }
+ *
+ *   async set(key: string, value: string): Promise<void> {
+ *     // Implementation using dependencies
+ *   }
+ *
+ *   async remove(key: string): Promise<void> {
+ *     // Implementation using dependencies
+ *   }
+ * }
+ * ```
+ *
+ * @see {@link AuthSecureStorage} - Interface that decorated classes must implement
+ * @see {@link Auth.secureStorage} - Property that gets configured by this decorator
+ * @see {@link isValidStorage} - Validation function used internally
+ * @see {@link Auth.getToken} - Uses the configured storage for token operations
+ * @see {@link Auth.setToken} - Uses the configured storage for token operations
+ *
+ * @public
+ *
+ * @remarks
+ * **Decorator Execution:**
+ * - Decorators are executed when the module is loaded, not when instances are created
+ * - Multiple decorated classes will overwrite each other (last one wins)
+ * - Failed validations are logged but don't throw exceptions
+ *
+ * **Best Practices:**
+ * - Use this decorator for singleton storage implementations
+ * - Ensure decorated classes have parameterless constructors
+ * - Implement proper error handling in storage methods
+ * - Test storage implementations thoroughly before decoration
+ *
+ * **Security Considerations:**
+ * - Decorated classes should implement proper encryption
+ * - Validate storage implementations in development environments
+ * - Monitor error logs for storage configuration failures
+ * - Consider the security implications of automatic configuration
+ *
+ * **Performance Notes:**
+ * - Storage instantiation happens once during module initialization
+ * - Validation overhead is minimal and occurs only at startup
+ * - Decorated storage implementations should be optimized for frequent access
+ *
+ * **Error Handling:**
+ * - Instantiation errors are caught and logged
+ * - Validation failures are logged but don't prevent module loading
+ * - Previous storage configuration is preserved on failure
+ * - Error messages include context for debugging
+ *
+ * **TypeScript Integration:**
+ * - Provides compile-time type checking for decorated classes
+ * - Ensures interface compliance through type constraints
+ * - Supports IntelliSense and refactoring tools
+ */
+export function AttachAuthSecureStorage() {
   return function (target: ClassConstructor<AuthSecureStorage>) {
     try {
       const storage = new target();
@@ -2541,30 +2749,18 @@ export function AttachAuthStorage() {
       }
       Auth.secureStorage = storage;
     } catch (error) {
-      console.error(error, ' registering session storage');
+      Logger.error(error, ' registering secure storage');
     }
   };
 }
 
 const isValidStorage = (storage?: AuthSecureStorage): boolean => {
-  /**
-   * Check if the storage object is null or undefined.
-   * If so, return false immediately.
-   */
   if (!storage) return false;
-
   try {
-    /**
-     * Check if the storage object has the required methods.
-     * If any of these checks fail, the storage object is not valid.
-     */
     return ['get', 'set', 'remove'].every(
       (value) => typeof (storage as Dictionary)[value] === 'function'
     );
   } catch {
-    /**
-     * If an error occurs during the checks, return false.
-     */
     return false;
   }
 };
