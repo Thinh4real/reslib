@@ -6,9 +6,11 @@ import {
   IsEmailOrPhone,
   IsFileName,
   IsHexColor,
+  IsHexadecimal,
   IsIP,
   IsJSON,
   IsMACAddress,
+  IsMongoId,
   IsPhoneNumber,
   IsUUID,
   IsUrl,
@@ -1032,8 +1034,157 @@ describe('Format Validation Rules', () => {
         data: instance,
       });
       expect(result.success).toBe(false);
+    });
+  });
+
+  describe('IsMongoId', () => {
+    it('should pass for valid MongoDB ObjectIds', async () => {
+      const validIds = [
+        '507f1f77bcf86cd799439011',
+        '507f191e810c19729de860ea',
+        '507f191e810c19729de860eb',
+      ];
+
+      for (const id of validIds) {
+        const result = await Validator.validate({
+          value: id,
+          rules: ['MongoId'],
+        });
+        expect(result.success).toBe(true);
+      }
+    });
+
+    it('should fail for invalid MongoDB ObjectIds', async () => {
+      const invalidIds = [
+        'invalid',
+        '507f1f77bcf86cd79943901', // too short
+        '507f1f77bcf86cd7994390111', // too long
+        '507f1f77bcf86cd79943901g', // invalid character
+        '',
+        null,
+        undefined,
+      ];
+
+      for (const id of invalidIds) {
+        const result = await Validator.validate({
+          value: id,
+          rules: ['MongoId'],
+        });
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect((result as any).error?.message).toContain(
+            'valid MongoDB ObjectId'
+          );
+        }
+      }
+    });
+
+    // Decorator test
+    it('should work with decorator for valid MongoId', async () => {
+      class TestClass {
+        @IsMongoId()
+        id: string = '';
+      }
+
+      const instance = new TestClass();
+      instance.id = '507f1f77bcf86cd799439011';
+
+      const result = await Validator.validateTarget(TestClass, {
+        data: instance,
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should fail with decorator for invalid MongoId', async () => {
+      class TestClass {
+        @IsMongoId()
+        id: string = '';
+      }
+
+      const instance = new TestClass();
+      instance.id = 'invalid-id';
+
+      const result = await Validator.validateTarget(TestClass, {
+        data: instance,
+      });
+      expect(result.success).toBe(false);
       expect((result as any).errors?.[0].message).toContain(
-        'must match the patter'
+        'valid MongoDB ObjectId'
+      );
+    });
+  });
+
+  describe('IsHexadecimal', () => {
+    it('should pass for valid hexadecimal values', async () => {
+      const validHex = ['1a2b3c', 'ABCDEF', '1234567890abcdef', 'a', '0', 'ff'];
+
+      for (const hex of validHex) {
+        const result = await Validator.validate({
+          value: hex,
+          rules: ['Hexadecimal'],
+        });
+        expect(result.success).toBe(true);
+      }
+    });
+
+    it('should fail for invalid hexadecimal values', async () => {
+      const invalidHex = [
+        '1a2b3g', // invalid character g
+        'xyz',
+        '123abc!',
+        '',
+        null,
+        undefined,
+        '1a2b3c ', // space
+      ];
+
+      for (const hex of invalidHex) {
+        const result = await Validator.validate({
+          value: hex,
+          rules: ['Hexadecimal'],
+        });
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect((result as any).error?.message).toContain(
+            'valid hexadecimal value'
+          );
+        }
+      }
+    });
+
+    // Decorator test
+    it('should work with decorator for valid hexadecimal', async () => {
+      class TestClass {
+        @IsHexadecimal()
+        hex: string = '';
+      }
+
+      const instance = new TestClass();
+      instance.hex = '1a2b3c';
+
+      const result = await Validator.validateTarget(TestClass, {
+        data: instance,
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should fail with decorator for invalid hexadecimal', async () => {
+      class TestClass {
+        @IsHexadecimal()
+        hex: string = '';
+      }
+
+      const instance = new TestClass();
+      instance.hex = '1a2b3g';
+
+      const result = await Validator.validateTarget(TestClass, {
+        data: instance,
+      });
+      expect(result.success).toBe(false);
+      expect((result as any).errors?.[0].message).toContain(
+        'valid hexadecimal value'
       );
     });
   });

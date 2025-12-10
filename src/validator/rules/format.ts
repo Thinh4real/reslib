@@ -2,6 +2,8 @@ import { InputFormatter } from '@/inputFormatter';
 import { CountryCode } from '@countries/types';
 import { defaultStr } from '@utils/defaultStr';
 import { isEmail, IsEmailOptions } from '@utils/isEmail';
+import { isHexadecimal } from '@utils/isHexadecimal';
+import { isMongoId } from '@utils/isMongoId';
 import { isNonNullString } from '@utils/isNonNullString';
 import { isRegExp } from '@utils/isRegex';
 import { isUrl, IsUrlOptions } from '@utils/uri';
@@ -184,6 +186,108 @@ export const IsEmail = Validator.buildRuleDecorator<
   const { value, i18n } = options;
   return isEmail(value) || i18n.t('validator.email', options);
 }, 'Email');
+
+/**
+ * ## IsMongoId Decorator
+ *
+ * Property decorator that validates a property value is a valid MongoDB ObjectId.
+ * MongoDB ObjectIds are 12-byte values typically represented as 24-character hexadecimal strings.
+ *
+ * ### Usage
+ * ```typescript
+ * class Document {
+ *   @IsMongoId()
+ *   _id: string;
+ * }
+ * ```
+ *
+ * ### Validation Behavior
+ * - **Passes**: When value is a valid 24-character hexadecimal string
+ * - **Fails**: When value is not a string, wrong length, or contains non-hex characters
+ *
+ * ### Error Messages
+ * - Default: "This field must be a valid MongoDB ObjectId"
+ * - I18n key: "validator.mongoId"
+ *
+ * ### Related Decorators
+ * - Often used for database document IDs and references
+ *
+ * @returns A property decorator function
+ * @public
+ */
+export const IsMongoId = Validator.buildRuleDecorator<
+  ValidatorRuleParamTypes['MongoId']
+>(function IsMongoId({
+  value,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}) {
+  if (isMongoId(value)) {
+    return true;
+  } else {
+    const message = i18n.t('validator.mongoId', {
+      field: translatedPropertyName || fieldName,
+      fieldName,
+      translatedPropertyName,
+      value,
+      ...rest,
+    });
+    return message;
+  }
+}, 'MongoId');
+
+/**
+ * ## IsHexadecimal Decorator
+ *
+ * Property decorator that validates a property value is a valid hexadecimal string.
+ * Accepts hexadecimal strings with or without "0x" or "0X" prefix.
+ *
+ * ### Usage
+ * ```typescript
+ * class Color {
+ *   @IsHexadecimal()
+ *   hexValue: string;
+ * }
+ * ```
+ *
+ * ### Validation Behavior
+ * - **Passes**: When value is a valid hexadecimal string (e.g., "1a2b3c", "0xFFFF")
+ * - **Fails**: When value contains non-hex characters or is not a string
+ *
+ * ### Error Messages
+ * - Default: "This field must be a valid hexadecimal value"
+ * - I18n key: "validator.hexadecimal"
+ *
+ * ### Related Decorators
+ * - Often used for color codes, hash values, and binary data representations
+ *
+ * @returns A property decorator function
+ * @public
+ */
+export const IsHexadecimal = Validator.buildRuleDecorator<
+  ValidatorRuleParamTypes['Hexadecimal']
+>(function IsHexadecimal({
+  value,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}) {
+  if (isHexadecimal(value)) {
+    return true;
+  } else {
+    const message = i18n.t('validator.hexadecimal', {
+      field: translatedPropertyName || fieldName,
+      fieldName,
+      translatedPropertyName,
+      value,
+      ...rest,
+    });
+    return message;
+  }
+}, 'Hexadecimal');
 
 /**
  * @summary IsUrl Decorator
@@ -3218,5 +3322,118 @@ declare module '../types' {
         },
       ]
     >;
+
+    /**
+     * @summary MongoId Rule
+     *
+     * @description Validates that the field under validation is a valid MongoDB ObjectId.
+     * MongoDB ObjectIds are 12-byte values represented as 24-character hexadecimal strings.
+     *
+     * #### Validation Logic
+     * - Must be exactly 24 characters long
+     * - Must contain only hexadecimal characters (0-9, a-f, A-F)
+     * - Does not accept "0x" prefix (unlike general hex validation)
+     *
+     * @example
+     * ```typescript
+     * // Valid MongoDB ObjectIds
+     * await Validator.validate({
+     *   value: '507f1f77bcf86cd799439011',
+     *   rules: ['MongoId']
+     * }); // ✓ Valid
+     *
+     * // Invalid examples
+     * await Validator.validate({
+     *   value: '507f1f77bcf86cd79943901', // Too short
+     *   rules: ['MongoId']
+     * }); // ✗ Invalid
+     *
+     * await Validator.validate({
+     *   value: '507f1f77bcf86cd799439011a', // Too long
+     *   rules: ['MongoId']
+     * }); // ✗ Invalid
+     *
+     * await Validator.validate({
+     *   value: 'gggggggggggggggggggggggg', // Non-hex characters
+     *   rules: ['MongoId']
+     * }); // ✗ Invalid
+     *
+     * // Class validation
+     * class Document {
+     *   @IsMongoId()
+     *   _id: string;
+     *
+     *   @IsMongoId()
+     *   userId: string;
+     * }
+     * ```
+     *
+     * @returns true if valid MongoDB ObjectId, rejecting with error message if invalid
+     *
+     * @public
+     */
+    MongoId: ValidatorRuleParams<[]>;
+
+    /**
+     * @summary Hexadecimal Rule
+     *
+     * @description Validates that the field under validation is a valid hexadecimal string.
+     * Accepts hexadecimal strings with or without "0x" or "0X" prefix.
+     *
+     * #### Validation Logic
+     * - Contains only characters 0-9, a-f, or A-F
+     * - Can optionally start with "0x" or "0X" prefix
+     * - Must have at least one hex digit after any prefix
+     * - Can be of any length (after prefix)
+     *
+     * @example
+     * ```typescript
+     * // Valid hexadecimal strings
+     * await Validator.validate({
+     *   value: '1a2b3c',
+     *   rules: ['Hexadecimal']
+     * }); // ✓ Valid
+     *
+     * await Validator.validate({
+     *   value: '0xFFFF',
+     *   rules: ['Hexadecimal']
+     * }); // ✓ Valid
+     *
+     * await Validator.validate({
+     *   value: '0X123ABC',
+     *   rules: ['Hexadecimal']
+     * }); // ✓ Valid
+     *
+     * // Invalid examples
+     * await Validator.validate({
+     *   value: 'GHI', // Non-hex characters
+     *   rules: ['Hexadecimal']
+     * }); // ✗ Invalid
+     *
+     * await Validator.validate({
+     *   value: '0x', // No hex digits after prefix
+     *   rules: ['Hexadecimal']
+     * }); // ✗ Invalid
+     *
+     * await Validator.validate({
+     *   value: '', // Empty string
+     *   rules: ['Hexadecimal']
+     * }); // ✗ Invalid
+     *
+     * // Class validation
+     * class Color {
+     *   @IsHexadecimal()
+     *   hexValue: string;
+     *
+     *   @IsHexadecimal()
+     *   rgbValue?: string;
+     * }
+     * ```
+     *
+     * @returns true if valid hexadecimal string, rejecting with error message if invalid
+     *
+     * @public
+     */
+    Hexadecimal: ValidatorRuleParams<[]>;
   }
 }

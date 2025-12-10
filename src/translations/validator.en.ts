@@ -104,6 +104,8 @@ export const validator = {
   ip: 'This field must be a valid IP address (version %{version})',
   macAddress: 'This field must be a valid MAC address',
   matches: 'This field must match the pattern %{pattern}',
+  mongoId: 'This field must be a valid MongoDB ObjectId',
+  hexadecimal: 'This field must be a valid hexadecimal value',
   object: 'This field must be an object',
   isObject: 'This field must be an object',
   tests: {
