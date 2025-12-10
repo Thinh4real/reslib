@@ -327,6 +327,35 @@ This project supports two release workflows: **Changesets** (recommended) and **
 - **Minor** (`0.1.0`): New features (backward compatible)
 - **Major** (`1.0.0`): Breaking changes
 
+### Troubleshooting Publishing Issues
+
+If `npm run changeset:publish` fails with a **403 Forbidden** error, it's due to npm authentication requirements:
+
+**Error Message:** "Two-factor authentication or granular access token with bypass 2fa enabled is required to publish packages."
+
+**Solutions:**
+
+1. **Enable 2FA on npm** (if not already enabled):
+   - Log in to [npmjs.com](https://www.npmjs.com).
+   - Go to Account Settings > Two-Factor Authentication.
+   - Enable 2FA and save recovery codes.
+
+2. **Use a Granular Access Token**:
+   - Log in to [npmjs.com](https://www.npmjs.com).
+   - Navigate to Account Settings > Access Tokens (or visit `https://www.npmjs.com/settings/tokens` after logging in).
+   - Create a new token with **Automation** or **Publish** permissions (enable bypass 2FA if available).
+   - Run `npm login` and enter the token when prompted.
+   - **Note**: If the tokens page returns 404, ensure you're logged in, clear browser cache, or use `npm token create` via CLI.
+
+3. **Verify Authentication**:
+   - Check login status: `npm whoami`.
+   - Ensure you're logged in with the correct account.
+
+4. **Retry Publishing**:
+   - After fixing auth, run `npm run changeset:publish` again.
+
+If issues persist, check your npm account's publishing permissions or contact npm support.
+
 #### Traditional Releases (Legacy)
 
 **When to use Traditional Releases:**
