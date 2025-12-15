@@ -1,6 +1,6 @@
 {
   "name": "reslib",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A lightweight, production-ready TypeScript library for decorator-based resource management and application utilities. ResLib provides a modular framework for building scalable applications with features like authentication, internationalization, validation, session management, and observable patterns. Designed for flexibility, it works seamlessly across web, Node.js, React Native (including Expo), and server-side frameworks like NestJS, offering type safety, extensibility, and performance optimizations without platform-specific dependencies.",
   "exports": {
     "./auth": {

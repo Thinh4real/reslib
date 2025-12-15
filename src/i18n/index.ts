@@ -12,6 +12,7 @@ import { Logger } from '@logger';
 import { Session as session } from '@session/index';
 import { defaultStr } from '@utils/defaultStr';
 import { interpolate } from '@utils/interpolate';
+import { isEmpty } from '@utils/isEmpty';
 import { isNonNullString } from '@utils/isNonNullString';
 import { isNullable } from '@utils/isNullable';
 import { isPrimitive } from '@utils/isPrimitive';
@@ -435,6 +436,18 @@ export class I18n extends I18nJs implements Observable<I18nEvent> {
     if (!isObj(r) || !r) return false;
     return isNonNullString(r?.one) && isNonNullString(r?.other); //&& isNonNullString(r?.zero);
   }
+
+  /**
+   * Checks if the provided translation key exists for the given locale.
+   * @since 1.1.1
+   * @param scope The translation scope to check.
+   * @param locale The locale to use for the check. If not provided, the current locale is used.
+   * @returns `true` if the translation key exists, `false` otherwise.
+   */
+  has(scope: Scope, locale?: string): boolean {
+    const resolvedTranslation = this.getNestedTranslation(scope, locale);
+    return !isEmpty(resolvedTranslation);
+  }
   /**
    * Resolves translation for nested keys.
    * @param scope {Scope} The translation scope.
@@ -465,10 +478,10 @@ export class I18n extends I18nJs implements Observable<I18nEvent> {
    * // Resolve translation for the "farewell" key.
    * i18n.getNestedTranslation("en", "farewell");
    */
-  getNestedTranslation(
+  getNestedTranslation<T = string | Dictionary>(
     scope: Scope,
     locale?: string
-  ): string | Dictionary | undefined {
+  ): T | undefined {
     locale = defaultStr(locale, this.getLocale());
     const scopeArray = (
       isNonNullString(scope)
@@ -478,7 +491,7 @@ export class I18n extends I18nJs implements Observable<I18nEvent> {
           : []
     ).filter(isNonNullString);
     if (!scopeArray.length) return undefined;
-    let result = this.getTranslations(locale);
+    let result: unknown = this.getTranslations(locale);
     for (const k of scopeArray) {
       if (isObj(result)) {
         result = result[k];
@@ -486,7 +499,7 @@ export class I18n extends I18nJs implements Observable<I18nEvent> {
         return undefined;
       }
     }
-    return result;
+    return result as T;
   }
   /**
    * Checks if the provided `TranslateOptions` object has a `count` property of type `number`.

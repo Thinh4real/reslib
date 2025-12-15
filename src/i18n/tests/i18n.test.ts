@@ -475,3 +475,91 @@ describe('i18n translateObject', () => {
     expect(result).toEqual({});
   });
 });
+
+describe('I18n has method', () => {
+  let i18n: I18n;
+
+  beforeEach(() => {
+    i18n = I18n.getInstance();
+    i18n.registerTranslations({
+      en: {
+        simple: 'Simple Value',
+        nested: {
+          key: 'Nested Value',
+          deep: {
+            value: 'Deep Value',
+          },
+        },
+        empty: '',
+        zero: 0,
+        nullValue: null,
+      },
+      fr: {
+        simple: 'Valeur Simple',
+      },
+    });
+    i18n.setLocale('en');
+  });
+
+  test('should return true for existing simple key', () => {
+    expect(i18n.has('simple')).toBe(true);
+  });
+
+  test('should return true for existing nested key', () => {
+    expect(i18n.has('nested.key')).toBe(true);
+    expect(i18n.has('nested.deep.value')).toBe(true);
+  });
+
+  test('should return true for intermediate nested objects', () => {
+    // "nested" is an object, so it technically "exists" in the translation tree
+    expect(i18n.has('nested')).toBe(true);
+    expect(i18n.has('nested.deep')).toBe(true);
+  });
+
+  test('should return false for non-existent simple key', () => {
+    expect(i18n.has('nonexistent')).toBe(false);
+  });
+
+  test('should return false for non-existent nested key', () => {
+    expect(i18n.has('nested.nonexistent')).toBe(false);
+    expect(i18n.has('nonexistent.key')).toBe(false);
+  });
+
+  test('should handle different locales', async () => {
+    await i18n.setLocale('fr');
+    expect(i18n.has('simple')).toBe(true);
+    expect(i18n.has('nested.key')).toBe(false); // Only in EN
+
+    await i18n.setLocale('en'); // Reset
+  });
+
+  test('should allow specifying locale explicitly', () => {
+    expect(i18n.has('simple', 'fr')).toBe(true);
+    expect(i18n.has('nested.key', 'fr')).toBe(false);
+  });
+
+  test('should return true for keys with falsy values (empty string, 0)', () => {
+    // empty string is a valid translation
+    expect(i18n.has('empty')).toBe(true);
+    // 0 is a valid translation
+    expect(i18n.has('zero')).toBe(true);
+  });
+
+  // Note: Depending on implementation, null might be considered "existing" or "missing"
+  // In the current getNestedTranslation implementation:
+  // if (isObj(result)) result = result[k] else return undefined
+  // if result becomes null, isObj(null) depends on implementation.
+  // Standard typeof null is 'object'. But usually util isObj checks for non-null.
+  // Assuming isObj(null) is false, then getting deeper prop on null fails safety check and returns undefined.
+  // But strictly getting 'nullValue' itself:
+  // loop finishes, returns result (which is null).
+  // has() checks !== undefined. null !== undefined is true.
+  test('should return true for explicit null value', () => {
+    expect(i18n.has('nullValue')).toBe(true);
+  });
+
+  test('should return false for undefined (missing) value', () => {
+    // Assuming 'missing' is not in the object, it returns undefined
+    expect(i18n.has('missing')).toBe(false);
+  });
+});

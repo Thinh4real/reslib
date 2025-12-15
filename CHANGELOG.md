@@ -1,5 +1,11 @@
 ## 1.0.3 (2025-12-09)
 
+## 1.1.1
+
+### Patch Changes
+
+- feat: add i18n module with enhanced I18n class, @Translate decorator, and related tests
+
 ## 1.1.0
 
 ### Minor Changes
