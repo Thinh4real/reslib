@@ -54,14 +54,12 @@ export const loginFields = {
   email: {
     type: 'email',
     required: true,
-    validationRules: [{ rule: 'Email', message: 'Please enter a valid email' }],
+    validationRules: ['Email'],
   },
   password: {
     type: 'password',
     required: true,
-    validationRules: [
-      { rule: 'MinLength', params: [8], message: 'Min 8 characters' },
-    ],
+    validationRules: [{ MinLength: [8] }],
   },
 } satisfies FormFields;
 ```
@@ -176,7 +174,7 @@ export async function POST(req: Request) {
 
   const result = await Validator.validate({
     value: body,
-    rules: [{ rule: 'IsObject' }, { rule: 'Required', field: 'eventId' }],
+    rules: ['IsObject', { Required: [], field: 'eventId' }],
   });
 
   if (!result.isValid) {
