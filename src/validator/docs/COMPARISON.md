@@ -30,7 +30,7 @@ reslib/validator is the **only validation library** that offers:
 | **Functional/Schema API** | ✅ Yes (array rules + functional)                      | ✅ Yes                        | ⚠️ Limited                                                      | ✅ Yes                                | ✅ Yes                   |
 | **Built-in Rules**        | ⭐⭐⭐ 67 comprehensive rules                          | ⭐⭐ ~40 methods              | ⭐⭐ ~80 decorators                                             | ⭐⭐ ~30 methods                      | ⭐⭐⭐ ~100 methods      |
 | **NestJS Integration**    | ⭐⭐⭐ Excellent (production-ready pipe)               | ⚠️ Custom pipe needed         | ⭐⭐⭐ Excellent (default)                                      | ⚠️ Custom implementation              | ⚠️ Custom implementation |
-| **Next.js Integration**   | ⭐⭐ Good (planned improvements)                       | ⭐⭐⭐ Excellent (tRPC)       | ⚠️ Limited                                                      | ⚠️ Limited                            | ❌ Server-only           |
+| **Next.js Integration**   | ⭐⭐⭐ Excellent (Server Actions)                      | ⭐⭐⭐ Excellent (tRPC)       | ⚠️ Limited                                                      | ⚠️ Limited                            | ❌ Server-only           |
 | **Async Validation**      | ✅ Built-in                                            | ✅ Built-in                   | ✅ Built-in                                                     | ✅ Built-in                           | ✅ Built-in              |
 | **Custom Rules**          | ✅ Easy (`registerRule`)                               | ✅ Easy (`refine`)            | ✅ Custom decorators                                            | ✅ Custom methods                     | ✅ Extensions            |
 | **Context Support**       | ⭐⭐⭐ Built-in first-class                            | ⚠️ Via refinements            | ⚠️ Via custom                                                   | ✅ Yes                                | ✅ Yes                   |
@@ -327,51 +327,41 @@ async login(@ValidatedParam('body') credentials: any) {}
 
 ---
 
-### Next.js Integration (In Progress)
+### Next.js Integration (Production-Ready)
 
-Next.js integration is being developed for the Digitorn Accounts project:
+**reslib/validator** offers a first-class integration for Next.js 15 Server Actions and React 19:
 
 ```typescript
-// Server Actions (planned)
-'use server'
+// 1. Define fields & rules (Generic Pattern)
+const loginFields = {
+  email: {
+    type: 'email',
+    validationRules: [{ rule: 'Email' }],
+  },
+};
 
-export async function createUser(formData: FormData) {
-  const result = await Validator.validate({
-    value: Object.fromEntries(formData),
-    rules: [{ ... }]
-  });
+// 2. Create type-safe Server Action using your factory
+('use server');
+// formActionFactory is a helper you create in your app
+export const loginAction = formActionFactory(async ({ values }) => {
+  // values is fully typed and validated
+  // Automatic error handling with AppException
+  await auth.login(values.email);
+}, loginFields);
 
-  if (!result.isValid) {
-    return { error: result.message };
-  }
-
-  // Process validated data
-}
-
-// API Routes (current)
-import { Validator } from 'reslib/validator';
-
-export async function POST(request: Request) {
-  const body = await request.json();
-
-  const result = await Validator.validate({
-    value: body,
-    rules: ['Required', 'Email']
-  });
-
-  if (!result.isValid) {
-    return Response.json({ error: result.message }, { status: 400 });
-  }
-
-  // ...
-}
+// 3. Consume in React 19 Client Component
+// Automatic form state & validation error mapping
+const [state, action] = useActionState(loginAction, initial);
 ```
 
-**Coming soon:**
+**Why it beats the competition:**
 
-- Server Component validation helpers
-- Form validation utilities
-- tRPC-style integration
+- ✅ **Optimized for React 19** `useActionState`
+- ✅ **Type-safe factory pattern** reduces boilerplate
+- ✅ **Shared validation logic** between backend (NestJS) and frontend (Next.js)
+- ✅ **Zero-client JS** validation (Server Actions driven)
+
+📖 **[See Complete Next.js Guide](./NEXTJS_INTEGRATION.md)**
 
 ---
 

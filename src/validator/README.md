@@ -54,6 +54,7 @@ class UserRegistration {
 ### **Complete documentation is in the [`docs/`](./docs) folder:**
 
 - **[📖 User Guide](./docs/GUIDE.md)** - Complete walkthrough with examples
+- **[⚡ Next.js Integration](./docs/NEXTJS_INTEGRATION.md)** - Modern Server Actions guide
 - **[📋 Rules Reference](./docs/RULES.md)** - All 67 validation rules
 - **[🔧 API Reference](./docs/API_REFERENCE.md)** - Detailed API documentation
 - **[🗺️ Documentation Index](./docs/INDEX.md)** - Navigation guide
