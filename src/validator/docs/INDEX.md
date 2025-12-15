@@ -59,6 +59,7 @@ This directory contains comprehensive documentation for `reslib/validator`.
 ---
 
 ### **[API_REFERENCE.md](./API_REFERENCE.md)** - API Documentation
+| **[COMPARISON.md](./COMPARISON.md)** - Library comparison | Comparing with other validators |
 
 **Complete API reference for Validator class** (~500 lines)
 
